@@ -1,0 +1,12 @@
+{
+    "dbConfig":{
+        "host":"localhost",
+        "user":"root",
+        "password":"password",
+        "database":"angagu",
+        "timezone": "Asia/Seoul",
+        "waitForConnections":true,
+        "connectionLimit":10
+    },
+    "jwtSecret": "insert jwt secret key"
+}
