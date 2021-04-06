@@ -14,5 +14,8 @@ describe('customer test', () => {
   it('login test', async () => {
     const res = await chai.request(server).post('/customer/login').send({ email: 'abcd', password: 'abcd' });
     expect(res.status).to.equal(202);
+
+    const res2 = await chai.request(server).post('/customer/login').send({ email: 'abcd@acd.com', password: 'abcdadf' });
+    expect(res2.status).to.equal(202);
   });
 });
