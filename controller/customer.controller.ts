@@ -4,15 +4,17 @@ import { jwtSignUser, User, isEmail } from './utils';
 
 const login = async (req:Request, res:Response):Promise<void> => {
   try {
-    console.log(isEmail(req.body.email));
     if (!isEmail(req.body.email)) {
-      res.json({
-        status: 'fail',
-        data: null,
+      res.status(202).json({
+        status: 'error',
+        data: {
+          errCode: 101,
+        },
         message: 'wrong email format',
       });
       return;
     }
+
     const result = await getCustomerByEmailPassword(req.body.email, req.body.password);
     if (result.status === 'success') {
       const user:User = result.data[0];
@@ -26,14 +28,23 @@ const login = async (req:Request, res:Response):Promise<void> => {
         },
       });
     } else {
-      res.json({
-        status: 'fail',
-        data: null,
+      res.status(202).json({
+        status: 'error',
+        data: {
+          errCode: 102,
+        },
         message: 'can not find user',
       });
     }
   } catch (err) {
-    console.log(err);
+    res.status(500).json({
+      status: 'error',
+      data: {
+        errCode: 0,
+        data: err,
+      },
+      message: 'unknown error',
+    });
   }
 };
 

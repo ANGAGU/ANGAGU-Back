@@ -8,7 +8,6 @@ const getCustomerByEmailPassword = async (email:string, password:string):Promise
     result.data = JSON.parse(JSON.stringify(rows));
     return result;
   } catch (err) {
-    console.log(err);
     result.status = 'error';
     result.data = err;
     result.message = 'customer select error';
