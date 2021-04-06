@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express, { Request, Response } from 'express';
 import path from 'path';
 import createError from 'http-errors';
 import indexRouter from './routes/index';
@@ -23,7 +23,7 @@ export default class App {
     });
 
     // error handler
-    this.app.use((err:any, req:Request, res:Response, next:NextFunction) => {
+    this.app.use((err:any, req:Request, res:Response) => {
       // set locals, only providing error in development
       res.locals.message = err.message;
       res.locals.error = req.app.get('env') === 'development' ? err : {};
