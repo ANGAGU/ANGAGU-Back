@@ -1,6 +1,4 @@
 import { Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
-import config from '../config.json';
 import { getCustomerByEmailPassword } from '../database/customer-service';
 import errorCode from './errorCode';
 import { jwtSignUser, User, isEmail } from './utils';
