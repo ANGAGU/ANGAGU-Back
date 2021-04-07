@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import config from '../config.json';
 import { getCustomerByEmailPassword } from '../database/customer-service';
+import errorCode from './errorCode';
 import { jwtSignUser, User, isEmail } from './utils';
 
 const login = async (req:Request, res:Response):Promise<void> => {
@@ -12,7 +13,7 @@ const login = async (req:Request, res:Response):Promise<void> => {
         data: {
           errCode: 101,
         },
-        message: 'wrong email format',
+        message: errorCode[101],
       });
       return;
     }
@@ -35,7 +36,7 @@ const login = async (req:Request, res:Response):Promise<void> => {
           data: {
             errCode: 102,
           },
-          message: 'can not find user',
+          message: errorCode[102],
         });
       }
     } else {
@@ -45,7 +46,7 @@ const login = async (req:Request, res:Response):Promise<void> => {
           errCode: 100,
           data: result.data,
         },
-        message: 'db select error',
+        message: errorCode[100],
       });
     }
   } catch (err) {
@@ -55,7 +56,7 @@ const login = async (req:Request, res:Response):Promise<void> => {
         errCode: 0,
         data: err,
       },
-      message: 'unknown error',
+      message: errorCode[0],
     });
   }
 };

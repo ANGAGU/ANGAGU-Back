@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { getCompanyByEmailPassword } from '../database/company-service';
 import { jwtSignUser, User, isEmail } from './utils';
+import errorCode from './errorCode';
 
 const login = async (req:Request, res:Response):Promise<void> => {
   try {
@@ -10,12 +11,11 @@ const login = async (req:Request, res:Response):Promise<void> => {
         data: {
           errCode: 101,
         },
-        message: 'wrong email format',
+        message: errorCode[101],
       });
       return;
     }
 
-    console.log('hi ');
     const result = await getCompanyByEmailPassword(req.body.email, req.body.password);
     if (result.status === 'success') {
       if (result.data.length === 1) {
@@ -35,7 +35,7 @@ const login = async (req:Request, res:Response):Promise<void> => {
           data: {
             errCode: 102,
           },
-          message: 'can not find user',
+          message: errorCode[102],
         });
       }
     } else {
@@ -45,7 +45,7 @@ const login = async (req:Request, res:Response):Promise<void> => {
           errCode: 100,
           data: result.data,
         },
-        message: 'db select error',
+        message: errorCode[100],
       });
     }
   } catch (err) {
@@ -55,7 +55,7 @@ const login = async (req:Request, res:Response):Promise<void> => {
         errCode: 0,
         data: err,
       },
-      message: 'unknown error',
+      message: errorCode[0],
     });
   }
 };
