@@ -11,11 +11,21 @@ describe('customer test', () => {
     expect(result.status).to.equal('success');
   });
 
-  it('login test', async () => {
+  it('login api test', async () => {
     const res = await chai.request(server).post('/customer/login').send({ email: 'abcd', password: 'abcd' });
     expect(res.status).to.equal(202);
 
     const res2 = await chai.request(server).post('/customer/login').send({ email: 'abcd@acd.com', password: 'abcdadf' });
     expect(res2.status).to.equal(202);
+  });
+
+  it('get product db test', async () => {
+    const result = await service.getProduct('', '');
+    expect(result.status).to.equal('success');
+  });
+
+  it('get product api test', async () => {
+    const res = await chai.request(server).get('/customer/product').send();
+    expect(res.body.status).to.equal('success');
   });
 });

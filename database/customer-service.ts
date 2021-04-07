@@ -17,6 +17,15 @@ const getCustomerByEmailPassword = async (email:string, password:string):Promise
   }
 };
 
+const getProduct = async (search:string, sort:string) => {
+  const result:DBresult = {
+    status: 'error',
+    data: [],
+  };
+  return result;
+};
+
 export {
   getCustomerByEmailPassword,
+  getProduct,
 };
