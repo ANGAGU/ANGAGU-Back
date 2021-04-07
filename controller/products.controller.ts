@@ -1,15 +1,16 @@
 import { Request, Response } from 'express';
 import { ok } from 'node:assert';
-import { getProductDetailById } from '../database/product-service';
+import { getProductDetailById } from '../database/products-service';
+import { Product } from './utils';
 
 const productDetail = async(req: Request, res: Response):Promise<void> => {
-  const productId = Number(req.params.id);
-  const result:any = {};
+  const productId = Number(req.params.productId);
   try{
-    const rows = await getProductDetailById(productId);
+    const result = await getProductDetailById(productId);
+    const product:Product = result;
     const resPayload = {
       status: 'success',
-      data: rows[0],
+      data: product,
     };
     res
       .status(200)
@@ -19,7 +20,7 @@ const productDetail = async(req: Request, res: Response):Promise<void> => {
     console.log(err);
     const resPayload = {
       status: 'error',
-      data: 'db select err',
+      message: 'db select err',
     };
   res
     .status(500)

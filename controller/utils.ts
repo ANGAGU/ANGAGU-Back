@@ -9,6 +9,22 @@ export interface User {
   phoneNumber:string;
 }
 
+export interface Product {
+  productId: number,
+  companyId: number,
+  descriptionUrl: string,
+  name: string,
+  price: string,
+  stock: number,
+  sellCount: number,
+  viewCount: number,
+  deliveryCharge: number,
+  category?: string,
+  freeDeliveryCondition?: string,
+  createTime: Date,
+  updateTime: Date,
+}
+
 function jwtSignUser(user:User):string {
   const ONE_WEEK = 60 * 60 * 24 * 7;
   return jwt.sign({ data: user }, jwtSecret, {
