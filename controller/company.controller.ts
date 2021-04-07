@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { getCompanyByEmailPassword } from '../database/company-service';
-import { jwtSignUser, User, isEmail } from './utils';
+import { jwtSignUser, isEmail } from './utils';
 import errorCode from './errorCode';
 
 const login = async (req:Request, res:Response):Promise<void> => {
@@ -15,11 +15,10 @@ const login = async (req:Request, res:Response):Promise<void> => {
       });
       return;
     }
-
     const result = await getCompanyByEmailPassword(req.body.email, req.body.password);
     if (result.status === 'success') {
       if (result.data.length === 1) {
-        const user:User = result.data[0];
+        const user:any = result.data[0];
         user.type = 'company';
         const token = jwtSignUser(user);
         res.json({

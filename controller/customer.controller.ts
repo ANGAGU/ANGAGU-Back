@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { getCustomerByEmailPassword } from '../database/customer-service';
 import errorCode from './errorCode';
-import { jwtSignUser, User, isEmail } from './utils';
+import { jwtSignUser, isEmail } from './utils';
 
 const login = async (req:Request, res:Response):Promise<void> => {
   try {
@@ -18,7 +18,7 @@ const login = async (req:Request, res:Response):Promise<void> => {
     const result = await getCustomerByEmailPassword(req.body.email, req.body.password);
     if (result.status === 'success') {
       if (result.data.length === 1) {
-        const user:User = result.data[0];
+        const user:any = result.data[0];
         user.type = 'customer';
         const token = jwtSignUser(user);
         res.json({

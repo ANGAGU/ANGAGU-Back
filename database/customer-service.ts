@@ -1,7 +1,10 @@
-import pool from './pool';
+import { pool, DBresult } from './pool';
 
-const getCustomerByEmailPassword = async (email:string, password:string):Promise<any> => {
-  const result:any = {};
+const getCustomerByEmailPassword = async (email:string, password:string):Promise<DBresult> => {
+  const result:DBresult = {
+    status: 'error',
+    data: [],
+  };
   try {
     const [rows] = await pool.query('SELECT id,email,birth,phone_number FROM CUSTOMER WHERE email = ? AND password = ?', [email, password]);
     result.status = 'success';
@@ -10,7 +13,6 @@ const getCustomerByEmailPassword = async (email:string, password:string):Promise
   } catch (err) {
     result.status = 'error';
     result.data = err;
-    result.message = 'customer select error';
     return result;
   }
 };
