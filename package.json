@@ -5,7 +5,7 @@
   "scripts": {
     "start": "ts-node ./bin/www",
     "dev": "npx nodemon --ext 'ts,json,js' --exec 'ts-node' ./bin/www",
-    "test": "mocha -r ts-node/register test/**/*.ts"
+    "test": "mocha -r ts-node/register --exit test/**/*.ts"
   },
   "dependencies": {
     "chai": "^4.3.4",
