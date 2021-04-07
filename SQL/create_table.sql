@@ -43,7 +43,7 @@ CREATE TABLE `product` (
   `company_id` int NOT NULL,
   `description_url` varchar(45) NOT NULL,
   `name` varchar(45) NOT NULL,
-  `price` varchar(45) NOT NULL,
+  `price` int NOT NULL,
   `stock` int NOT NULL DEFAULT '-1',
   `sell_count` int NOT NULL DEFAULT '0',
   `view_count` int NOT NULL DEFAULT '0',

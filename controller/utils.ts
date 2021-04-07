@@ -23,6 +23,7 @@ export interface Product {
   freeDeliveryCondition?: string,
   createTime: Date,
   updateTime: Date,
+  images: Array<object>
 }
 
 function jwtSignUser(user:User):string {
