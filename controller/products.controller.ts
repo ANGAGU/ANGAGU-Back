@@ -3,6 +3,7 @@ import { ok } from 'node:assert';
 import { idText } from 'typescript';
 import { getProductDetailById } from '../database/products-service';
 import { Product } from './utils';
+import errorCode from './errorCode';
 
 const productDetail = async(req: Request, res: Response):Promise<void> => {
   const productId = Number(req.params.productId);
@@ -14,7 +15,10 @@ const productDetail = async(req: Request, res: Response):Promise<void> => {
     if(!product){
       const resPayload = {
         status: 'error',
-        message: 'cannot find that product.'
+        data: {
+          errCode: 103,
+        },
+        message: errorCode[103],
       }
       res
         .status(404)
@@ -22,7 +26,9 @@ const productDetail = async(req: Request, res: Response):Promise<void> => {
         .end();
       return;
     }
+
     product.images = productImages;
+
     const resPayload = {
       status: 'success',
       data: product,
@@ -32,10 +38,12 @@ const productDetail = async(req: Request, res: Response):Promise<void> => {
       .json(resPayload)
       .end();
   } catch(err) {
-    console.log(err);
     const resPayload = {
       status: 'error',
-      message: 'db select err',
+      data: {
+        errCode: 100,
+      },
+      message: errorCode[100],
     };
   res
     .status(500)
