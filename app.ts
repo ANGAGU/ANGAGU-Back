@@ -4,6 +4,7 @@ import createError from 'http-errors';
 import indexRouter from './routes/index';
 import usersRouter from './routes/users';
 import customerRouter from './routes/customer';
+import companyRouter from './routes/company';
 import productsRouter from './routes/products';
 
 export default class App {
@@ -39,6 +40,7 @@ export default class App {
     this.app.use('/', indexRouter);
     this.app.use('/users', usersRouter);
     this.app.use('/customer', customerRouter);
+    this.app.use('/company', companyRouter);
     this.app.use('/products', productsRouter);
   }
 }
