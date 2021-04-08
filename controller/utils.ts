@@ -21,6 +21,7 @@ export interface Product {
   deliveryCharge: number,
   category?: string,
   freeDeliveryCondition?: string,
+  isApprove: number,
   createTime: Date,
   updateTime: Date,
   images: Array<object>

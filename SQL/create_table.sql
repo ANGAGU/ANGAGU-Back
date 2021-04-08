@@ -50,6 +50,7 @@ CREATE TABLE `product` (
   `delivery_charge` int NOT NULL,
   `category` varchar(45) DEFAULT NULL,
   `free_delivery_condition` varchar(45) DEFAULT NULL,
+  `is_approve` tinyint NOT NULL DEFAULT '0',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
