@@ -17,12 +17,21 @@ const getCompanyByEmailPassword = async (email:string, password:string):Promise<
   }
 };
 
-const getProduct = async (search:string, sort:string) => {
+const getProduct = async (id :number):Promise<DBresult> => {
   const result:DBresult = {
     status: 'error',
     data: [],
   };
-  return result;
+  try {
+    const [rows] = await pool.query('SELECT * FROM product WHERE company_id = ?', id);
+    result.status = 'success';
+    result.data = JSON.parse(JSON.stringify(rows));
+    return result;
+  } catch (err) {
+    result.status = 'error';
+    result.data = err;
+    return result;
+  }
 };
 
 export {

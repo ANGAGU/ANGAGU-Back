@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { getCompanyByEmailPassword } from '../database/company-service';
+import { getCompanyByEmailPassword, getProduct } from '../database/company-service';
 import { jwtSignUser, isEmail } from './utils';
 import errorCode from './errorCode';
 
@@ -59,6 +59,46 @@ const login = async (req:Request, res:Response):Promise<void> => {
   }
 };
 
+const product = async (req:Request, res:Response) => {
+  try {
+    const { id, type } = res.locals;
+    if (type !== 'company') {
+      res.status(403).json({
+        status: 'error',
+        data: {
+          errCode: 200,
+        },
+        message: errorCode[200],
+      });
+    }
+    const result = await getProduct(id);
+    if (result.status === 'success') {
+      res.json({
+        status: 'success',
+        data: result.data,
+      });
+    } else {
+      res.status(202).json({
+        status: 'error',
+        data: {
+          errCode: 100,
+        },
+        message: errorCode[100],
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      status: 'error',
+      data: {
+        errCode: 0,
+        data: err,
+      },
+      message: errorCode[0],
+    });
+  }
+};
+
 export {
   login,
+  product,
 };
