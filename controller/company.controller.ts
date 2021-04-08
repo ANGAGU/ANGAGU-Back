@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { getCompanyByEmailPassword, getProduct } from '../database/company-service';
+import { getCompanyByEmailPassword, getProducts } from '../database/company-service';
 import { jwtSignUser, isEmail } from './utils';
 import errorCode from './errorCode';
 
@@ -71,7 +71,7 @@ const product = async (req:Request, res:Response) => {
         message: errorCode[200],
       });
     }
-    const result = await getProduct(id);
+    const result = await getProducts(id);
     if (result.status === 'success') {
       res.json({
         status: 'success',

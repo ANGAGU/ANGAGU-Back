@@ -17,7 +17,7 @@ const getCustomerByEmailPassword = async (email:string, password:string):Promise
   }
 };
 
-const getProduct = async ():Promise<DBresult> => {
+const getProducts = async ():Promise<DBresult> => {
   const result:DBresult = {
     status: 'error',
     data: [],
@@ -36,5 +36,5 @@ const getProduct = async ():Promise<DBresult> => {
 
 export {
   getCustomerByEmailPassword,
-  getProduct,
+  getProducts,
 };

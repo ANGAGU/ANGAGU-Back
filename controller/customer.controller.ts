@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { getCustomerByEmailPassword, getProduct } from '../database/customer-service';
+import { getCustomerByEmailPassword, getProducts } from '../database/customer-service';
 import errorCode from './errorCode';
 import { jwtSignUser, isEmail } from './utils';
 
@@ -61,7 +61,7 @@ const login = async (req:Request, res:Response):Promise<void> => {
 
 const product = async (req:Request, res:Response):Promise<void> => {
   try {
-    const result = await getProduct();
+    const result = await getProducts();
     if (result.status === 'success') {
       res.json({
         status: 'success',

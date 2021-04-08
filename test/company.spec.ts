@@ -20,12 +20,12 @@ describe('company test', () => {
   });
 
   it('get product db test', async () => {
-    const result = await service.getProduct(0);
+    const result = await service.getProducts(0);
     expect(result.status).to.equal('success');
   });
 
   it('get product api test', async () => {
-    const res = await chai.request(server).get('/company/product').send();
+    const res = await chai.request(server).get('/company/products').send();
     expect(res.status).to.equal(403);
   });
 });
