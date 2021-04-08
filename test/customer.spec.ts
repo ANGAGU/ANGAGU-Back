@@ -20,7 +20,7 @@ describe('customer test', () => {
   });
 
   it('get product db test', async () => {
-    const result = await service.getProduct('', '');
+    const result = await service.getProduct();
     expect(result.status).to.equal('success');
   });
 

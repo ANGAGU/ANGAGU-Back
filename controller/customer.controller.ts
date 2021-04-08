@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { getCustomerByEmailPassword } from '../database/customer-service';
+import { getCustomerByEmailPassword, getProduct } from '../database/customer-service';
 import errorCode from './errorCode';
 import { jwtSignUser, isEmail } from './utils';
 
@@ -59,6 +59,36 @@ const login = async (req:Request, res:Response):Promise<void> => {
   }
 };
 
+const product = async (req:Request, res:Response):Promise<void> => {
+  try {
+    const result = await getProduct();
+    if (result.status === 'success') {
+      res.json({
+        status: 'success',
+        data: result.data,
+      });
+    } else {
+      res.status(202).json({
+        status: 'error',
+        data: {
+          errCode: 100,
+        },
+        message: errorCode[100],
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      status: 'error',
+      data: {
+        errCode: 0,
+        data: err,
+      },
+      message: errorCode[0],
+    });
+  }
+};
+
 export {
   login,
+  product,
 };

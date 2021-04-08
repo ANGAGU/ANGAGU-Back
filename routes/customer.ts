@@ -4,5 +4,6 @@ import * as controller from '../controller/customer.controller';
 const router = express.Router();
 
 router.post('/login', controller.login);
+router.get('/product', controller.product);
 
 export default router;
