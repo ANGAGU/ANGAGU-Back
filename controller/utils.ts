@@ -17,8 +17,12 @@ function jwtSignUser(user:User):string {
 }
 
 function jwtVerify(token:string):any {
-  const decode = jwt.verify(token, jwtSecret);
-  return decode;
+  try {
+    const decode = jwt.verify(token, jwtSecret);
+    return decode;
+  } catch {
+    return {};
+  }
 }
 
 function isEmail(asValue: string):boolean {
