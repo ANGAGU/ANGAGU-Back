@@ -96,43 +96,39 @@ const productDetail = async (req: Request, res: Response):Promise<void> => {
     const result = await getProductDetailById(productId);
     const product:Product = result[0];
     const productImages:Array<ProductImage> = result[1];
-
     if (!product) {
-      const resPayload = {
-        status: 'error',
-        data: {
-          errCode: 300,
-        },
-        message: errorCode[300],
-      };
       res
         .status(404)
-        .json(resPayload)
+        .json({
+          status: 'error',
+          data: {
+            errorCode: 300,
+          },
+          message: errorCode[300],
+        })
         .end();
       return;
     }
 
     product.images = productImages;
 
-    const resPayload = {
-      status: 'success',
-      data: product,
-    };
     res
       .status(200)
-      .json(resPayload)
+      .json({
+        status: 'success',
+        data: product,
+      })
       .end();
   } catch (err) {
-    const resPayload = {
-      status: 'error',
-      data: {
-        errCode: 100,
-      },
-      message: errorCode[100],
-    };
     res
       .status(500)
-      .json(resPayload)
+      .json({
+        status: 'error',
+        data: {
+          errorCode: 100,
+        },
+        message: errorCode[100],
+      })
       .end();
   }
 };
