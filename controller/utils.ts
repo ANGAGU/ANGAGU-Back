@@ -9,8 +9,15 @@ export interface User {
   phoneNumber:string;
 }
 
-export interface Product {
+export interface ProductImage {
+  id: number,
   productId: number,
+  imageUrl: string,
+  imageOrder: number,
+}
+
+export interface Product {
+  id: number,
   companyId: number,
   descriptionUrl: string,
   name: string,
@@ -24,7 +31,7 @@ export interface Product {
   isApprove: number,
   createTime: Date,
   updateTime: Date,
-  images: Array<object>
+  images: Array<ProductImage>,
 }
 
 function jwtSignUser(user:User):string {
@@ -35,8 +42,12 @@ function jwtSignUser(user:User):string {
 }
 
 function jwtVerify(token:string):any {
-  const decode = jwt.verify(token, jwtSecret);
-  return decode;
+  try {
+    const decode = jwt.verify(token, jwtSecret);
+    return decode;
+  } catch {
+    return {};
+  }
 }
 
 function isEmail(asValue: string):boolean {

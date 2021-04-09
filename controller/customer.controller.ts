@@ -1,7 +1,9 @@
 import { Request, Response } from 'express';
-import { getCustomerByEmailPassword } from '../database/customer-service';
+import { getCustomerByEmailPassword, getProducts, getProductDetailById } from '../database/customer-service';
 import errorCode from './errorCode';
-import { jwtSignUser, User, isEmail } from './utils';
+import {
+  jwtSignUser, isEmail, Product, ProductImage,
+} from './utils';
 
 const login = async (req:Request, res:Response):Promise<void> => {
   try {
@@ -18,7 +20,7 @@ const login = async (req:Request, res:Response):Promise<void> => {
     const result = await getCustomerByEmailPassword(req.body.email, req.body.password);
     if (result.status === 'success') {
       if (result.data.length === 1) {
-        const user:User = result.data[0];
+        const user:any = result.data[0];
         user.type = 'customer';
         const token = jwtSignUser(user);
         res.json({
@@ -59,6 +61,84 @@ const login = async (req:Request, res:Response):Promise<void> => {
   }
 };
 
+const products = async (req:Request, res:Response):Promise<void> => {
+  try {
+    const result = await getProducts();
+    if (result.status === 'success') {
+      res.json({
+        status: 'success',
+        data: result.data,
+      });
+    } else {
+      res.status(202).json({
+        status: 'error',
+        data: {
+          errCode: 100,
+        },
+        message: errorCode[100],
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      status: 'error',
+      data: {
+        errCode: 0,
+        data: err,
+      },
+      message: errorCode[0],
+    });
+  }
+};
+
+const productDetail = async (req: Request, res: Response):Promise<void> => {
+  const productId = Number(req.params.productId);
+  try {
+    const result = await getProductDetailById(productId);
+    const product:Product = result[0];
+    const productImages:Array<ProductImage> = result[1];
+
+    if (!product) {
+      const resPayload = {
+        status: 'error',
+        data: {
+          errCode: 300,
+        },
+        message: errorCode[300],
+      };
+      res
+        .status(404)
+        .json(resPayload)
+        .end();
+      return;
+    }
+
+    product.images = productImages;
+
+    const resPayload = {
+      status: 'success',
+      data: product,
+    };
+    res
+      .status(200)
+      .json(resPayload)
+      .end();
+  } catch (err) {
+    const resPayload = {
+      status: 'error',
+      data: {
+        errCode: 100,
+      },
+      message: errorCode[100],
+    };
+    res
+      .status(500)
+      .json(resPayload)
+      .end();
+  }
+};
+
 export {
   login,
+  products,
+  productDetail,
 };

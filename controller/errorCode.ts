@@ -3,5 +3,7 @@ export default {
   100: 'db select error',
   101: 'wrong email format',
   102: 'cannot find user',
-  103: 'cannot find product',
-}
+  200: 'wrong user type',
+  201: 'no auth token',
+  300: 'cannot find product',
+};
