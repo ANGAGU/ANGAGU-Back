@@ -1,7 +1,9 @@
 import { Request, Response } from 'express';
-import { getCustomerByEmailPassword, getProducts } from '../database/customer-service';
+import { getCustomerByEmailPassword, getProducts, getProductDetailById } from '../database/customer-service';
 import errorCode from './errorCode';
-import { jwtSignUser, isEmail } from './utils';
+import {
+  jwtSignUser, isEmail, Product, ProductImage,
+} from './utils';
 
 const login = async (req:Request, res:Response):Promise<void> => {
   try {
@@ -59,7 +61,7 @@ const login = async (req:Request, res:Response):Promise<void> => {
   }
 };
 
-const product = async (req:Request, res:Response):Promise<void> => {
+const products = async (req:Request, res:Response):Promise<void> => {
   try {
     const result = await getProducts();
     if (result.status === 'success') {
@@ -88,7 +90,51 @@ const product = async (req:Request, res:Response):Promise<void> => {
   }
 };
 
+const productDetail = async (req: Request, res: Response):Promise<void> => {
+  const productId = Number(req.params.productId);
+  try {
+    const result = await getProductDetailById(productId);
+    const product:Product = result[0];
+    const productImages:Array<ProductImage> = result[1];
+    if (!product) {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errorCode: 300,
+          },
+          message: errorCode[300],
+        })
+        .end();
+      return;
+    }
+
+    product.images = productImages;
+
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: product,
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errorCode: 100,
+        },
+        message: errorCode[100],
+      })
+      .end();
+  }
+};
+
 export {
   login,
-  product,
+  products,
+  productDetail,
 };

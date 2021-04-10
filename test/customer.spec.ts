@@ -29,3 +29,14 @@ describe('customer test', () => {
     expect(res.body.status).to.equal('success');
   });
 });
+
+describe('product information test', () => {
+  it('it should get a product', async () => {
+    const getProductResult = await chai.request(server).get('/customer/products/1');
+    expect(getProductResult.status).to.equal(200);
+  });
+  it('it should not get a product', async () => {
+    const notGetProductResult = await chai.request(server).get('/customer/products/512315');
+    expect(notGetProductResult).to.have.status(404);
+  });
+});

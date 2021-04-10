@@ -5,4 +5,5 @@ export default {
   102: 'cannot find user',
   200: 'wrong user type',
   201: 'no auth token',
+  300: 'cannot find product',
 };

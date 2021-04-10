@@ -59,7 +59,7 @@ const login = async (req:Request, res:Response):Promise<void> => {
   }
 };
 
-const product = async (req:Request, res:Response) => {
+const products = async (req:Request, res:Response): Promise<void> => {
   try {
     const { id, type } = res.locals;
     if (type !== 'company') {
@@ -100,5 +100,5 @@ const product = async (req:Request, res:Response) => {
 
 export {
   login,
-  product,
+  products,
 };
