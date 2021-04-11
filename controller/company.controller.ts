@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { getCompanyByEmailPassword, getProducts } from '../database/company-service';
+import * as service from '../database/company-service';
 import { jwtSignUser, isEmail } from './utils';
 import errorCode from './errorCode';
 
@@ -98,7 +99,25 @@ const products = async (req:Request, res:Response): Promise<void> => {
   }
 };
 
+const addProduct = async (req:Request, res:Response): Promise<void> => {
+  const result = await service.addProduct(1, 'descriptionUrl', 'thumbUrl', 'desk', 50000, 10, 3000);
+  res.status(200).end();
+};
+
+const deleteProduct = async (req:Request, res:Response): Promise<void> => {
+  const result = await service.deleteProduct(100);
+  res.status(200).end();
+};
+
+const updateProduct = async (req:Request, res:Response): Promise<void> => {
+  const result = await service.updateProduct(100, 'descriptionUrl', 'thumbUrl', 'desk', 50000, 10, 3000);
+  res.status(200).end();
+};
+
 export {
   login,
   products,
+  addProduct,
+  deleteProduct,
+  updateProduct,
 };

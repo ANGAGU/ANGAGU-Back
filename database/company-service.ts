@@ -34,7 +34,41 @@ const getProducts = async (id :number):Promise<DBresult> => {
   }
 };
 
+const addProduct = async (
+  companyId: number,
+  descriptionUrl: string,
+  thumbUrl: string,
+  name: string,
+  price: number,
+  stock: number,
+  deliveryCharge: number,
+): Promise<any> => {
+  const result = 0;
+  return result;
+};
+
+const deleteProduct = async (id: number): Promise<any> => {
+  const result = 0;
+  return result;
+};
+
+const updateProduct = async (
+  companyId: number,
+  descriptionUrl: string,
+  thumbUrl: string,
+  name: string,
+  price: number,
+  stock: number,
+  deliveryCharge: number,
+): Promise<any> => {
+  const result = 0;
+  return result;
+};
+
 export {
   getCompanyByEmailPassword,
   getProducts,
+  addProduct,
+  deleteProduct,
+  updateProduct,
 };

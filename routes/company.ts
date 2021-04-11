@@ -6,5 +6,8 @@ const router = express.Router();
 
 router.post('/login', controller.login);
 router.get('/products', auth.authorization, controller.products);
+router.post('/products', auth.authorization, controller.products);
+router.put('/products/:productId', auth.authorization, controller.products);
+router.delete('/products/:productId', auth.authorization, controller.products);
 
 export default router;
