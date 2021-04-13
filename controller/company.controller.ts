@@ -1,4 +1,6 @@
 import { Request, Response } from 'express';
+import multer from 'multer';
+import { FileWatcherEventKind } from 'typescript';
 import { getCompanyByEmailPassword, getProducts } from '../database/company-service';
 import * as service from '../database/company-service';
 import { jwtSignUser, isEmail } from './utils';
@@ -100,8 +102,82 @@ const products = async (req:Request, res:Response): Promise<void> => {
 };
 
 const addProduct = async (req:Request, res:Response): Promise<void> => {
-  const result = await service.addProduct(1, 'descriptionUrl', 'thumbUrl', 'desk', 50000, 10, 3000);
-  res.status(200).end();
+  try {
+    const { id, type } = res.locals;
+    const { files } = req;
+    const inform = req.body;
+    console.log(inform);
+    if (type !== 'company') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errorCode[200],
+        })
+        .end();
+    }
+
+    if (!files) {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 302,
+          },
+          message: errorCode[302],
+        })
+        .end();
+    }
+    const productId = await service.addProduct(
+      id,
+      inform.group_id,
+      inform.description_url,
+      inform.thumb_url,
+      inform.name,
+      inform.price,
+      inform.stock,
+      inform.delivery_charge,
+      inform.category,
+    );
+    const fileList: any = files;
+    const dataList: Array<any> = fileList.map((x: any) => JSON.stringify({
+      product_id: productId.data,
+      image_url: x.path,
+      image_order: inform[x.filename],
+    }));
+    const addProductResult = await service.addProducctImage(dataList);
+    if (addProductResult.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errorCode: 301,
+          },
+          message: errorCode[301],
+        })
+        .end();
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: {},
+      })
+      .end();
+  } catch (err) {
+    res.status(500).json({
+      status: 'error',
+      data: {
+        errCode: 0,
+      },
+      message: errorCode[0],
+    });
+  }
 };
 
 const deleteProduct = async (req:Request, res:Response): Promise<void> => {

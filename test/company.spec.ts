@@ -32,8 +32,8 @@ describe('company test', () => {
 
 describe('company products test', () => {
   it('add product test', async () => {
-    const addResult = await service.addProduct(1, 'descriptionUrl', 'thumbUrl', 'desk', 50000, 10, 3000);
-    // expect(addResult.status).to.equal(200);
+    const addResult = await service.addProduct(1, 1, 'descriptionUrl', 'thumbUrl', 'desk', 50000, 10, 3000, '주방가구');
+    expect(addResult.status).to.equal('success');
   });
   it('delete product test', async () => {
     const delResult = await service.deleteProduct(100);
