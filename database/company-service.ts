@@ -38,20 +38,19 @@ const getProducts = async (id :number):Promise<DBresult> => {
 
 const addProduct = async (
   companyId: number,
-  groupId: number,
   descriptionUrl: string,
   thumbUrl: string,
+  description: string,
   name: string,
   price: number,
   stock: number,
   deliveryCharge: number,
-  category: string,
 ): Promise<any> => {
   try {
-    const productInsertQeury = 'INSERT INTO product(company_id, group_id, description_url, thumb_url, name, price, stock, delivery_charge, category) VALUES(?,?,?,?,?,?,?,?,?)';
+    const productInsertQeury = 'INSERT INTO product(company_id, description_url, thumb_url, description, name, price, stock, delivery_charge) VALUES(?,?,?,?,?,?,?,?)';
     const [result] = await pool.query(
       productInsertQeury,
-      [companyId, groupId, descriptionUrl, thumbUrl, name, price, stock, deliveryCharge, category],
+      [companyId, descriptionUrl, thumbUrl, description, name, price, stock, deliveryCharge],
     );
     const data:any = result;
     return { status: 'success', data: data.insertId };
@@ -63,7 +62,7 @@ const addProduct = async (
 const addProducctImage = async (dataList: Array<string>): Promise<any> => {
   try {
     const addImageQuery = 'INSERT INTO product_image(product_id, image_url, image_order) VALUES(?,?,?)';
-    dataList.forEach(async (data: any) => {
+    dataList.forEach(async (data: string) => {
       const dataTrans = JSON.parse(data);
       const id = dataTrans.product_id;
       const url = dataTrans.image_url;

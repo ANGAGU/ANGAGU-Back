@@ -1,6 +1,4 @@
 import { Request, Response } from 'express';
-import multer from 'multer';
-import { FileWatcherEventKind } from 'typescript';
 import { getCompanyByEmailPassword, getProducts } from '../database/company-service';
 import * as service from '../database/company-service';
 import { jwtSignUser, isEmail } from './utils';
@@ -106,7 +104,7 @@ const addProduct = async (req:Request, res:Response): Promise<void> => {
     const { id, type } = res.locals;
     const { files } = req;
     const inform = req.body;
-    console.log(inform);
+    const fileList: any = files;
     if (type !== 'company') {
       res
         .status(403)
@@ -134,17 +132,16 @@ const addProduct = async (req:Request, res:Response): Promise<void> => {
     }
     const productId = await service.addProduct(
       id,
-      inform.group_id,
-      inform.description_url,
-      inform.thumb_url,
+      fileList.description_image[0].path,
+      fileList.thumb_image[0].path,
+      inform.description,
       inform.name,
       inform.price,
       inform.stock,
       inform.delivery_charge,
-      inform.category,
     );
-    const fileList: any = files;
-    const dataList: Array<any> = fileList.map((x: any) => JSON.stringify({
+
+    const dataList: Array<string> = fileList.images.map((x: any) => JSON.stringify({
       product_id: productId.data,
       image_url: x.path,
       image_order: inform[x.filename],
