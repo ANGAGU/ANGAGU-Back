@@ -8,4 +8,5 @@ export default {
   300: 'cannot find product',
   301: 'db insert error',
   302: 'no file',
+  303: 'db delete error',
 };

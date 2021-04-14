@@ -12,7 +12,6 @@ export interface User {
 }
 
 export interface ProductImage {
-  id: number,
   productId: number,
   imageUrl: string,
   imageOrder: number,
@@ -22,13 +21,15 @@ export interface Product {
   id: number,
   companyId: number,
   descriptionUrl: string,
+  thumbUrl: string,
+  objectUrl: string,
+  description: string,
   name: string,
   price: string,
   stock: number,
   sellCount: number,
   viewCount: number,
   deliveryCharge: number,
-  category?: string,
   freeDeliveryCondition?: string,
   isApprove: number,
   createTime: Date,

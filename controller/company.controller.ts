@@ -178,8 +178,54 @@ const addProduct = async (req:Request, res:Response): Promise<void> => {
 };
 
 const deleteProduct = async (req:Request, res:Response): Promise<void> => {
-  const result = await service.deleteProduct(100);
-  res.status(200).end();
+  try {
+    const { id, type } = res.locals;
+    const productId = Number(req.params.productId);
+
+    if (type !== 'company') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errorCode[200],
+        })
+        .end();
+    }
+    const deleteResult = await service.deleteProduct(productId);
+    const deleteImageResult = await service.deleteProductImage(productId);
+    if (deleteResult.status !== 'success' || deleteImageResult.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errorCode: 303,
+          },
+          message: errorCode[303],
+        })
+        .end();
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: {},
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errorCode: 0,
+        },
+        message: errorCode[0],
+      });
+  }
 };
 
 const updateProduct = async (req:Request, res:Response): Promise<void> => {
