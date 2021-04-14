@@ -77,17 +77,12 @@ const addProducctImage = async (dataList: Array<string>): Promise<any> => {
 
 const deleteProduct = async (productId: number): Promise<any> => {
   try {
-    const result = pool.query('DELETE FROM product WHERE id = (?)', productId);
-    return { data: result, status: 'success' };
-  } catch (err) {
-    throw Error(err);
-  }
-};
-
-const deleteProductImage = async (productId: number): Promise<any> => {
-  try {
-    const result = await pool.query('DELETE FROM product_image WHERE product_id = (?)', productId);
-    return { data: result, status: 'success' };
+    const deleteDetail = await pool.query('DELETE FROM product WHERE id = (?)', productId);
+    const deleteImage = await pool.query('DELETE FROM product_image WHERE product_id = (?)', productId);
+    return {
+      data: [deleteDetail, deleteImage],
+      status: 'success',
+    };
   } catch (err) {
     throw Error(err);
   }
@@ -112,6 +107,5 @@ export {
   addProduct,
   addProducctImage,
   deleteProduct,
-  deleteProductImage,
   updateProduct,
 };

@@ -195,8 +195,7 @@ const deleteProduct = async (req:Request, res:Response): Promise<void> => {
         .end();
     }
     const deleteResult = await service.deleteProduct(productId);
-    const deleteImageResult = await service.deleteProductImage(productId);
-    if (deleteResult.status !== 'success' || deleteImageResult.status !== 'success') {
+    if (deleteResult.status !== 'success') {
       res
         .status(400)
         .json({
