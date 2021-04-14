@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
+import { servicesVersion } from 'typescript';
 import { getCustomerByEmailPassword, getProducts, getProductDetailById } from '../database/customer-service';
+import * as service from '../database/customer-service';
 import errorCode from './errorCode';
 import {
   jwtSignUser, isEmail, Product, ProductImage,
@@ -102,7 +104,7 @@ const productDetail = async (req: Request, res: Response):Promise<void> => {
         .json({
           status: 'error',
           data: {
-            errorCode: 300,
+            errCode: 300,
           },
           message: errorCode[300],
         })
@@ -125,7 +127,7 @@ const productDetail = async (req: Request, res: Response):Promise<void> => {
       .json({
         status: 'error',
         data: {
-          errorCode: 100,
+          errCode: 100,
         },
         message: errorCode[100],
       })
@@ -134,7 +136,55 @@ const productDetail = async (req: Request, res: Response):Promise<void> => {
 };
 
 const orderList = async (req: Request, res: Response): Promise<void> => {
-  res.status(200).end();
+  try {
+    const { id, type } = res.locals;
+
+    if (type !== 'customer') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errorCode[200],
+        })
+        .end();
+    }
+
+    const result = await service.getOrderList(id);
+
+    if (result.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errorCode[100],
+        })
+        .end();
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: result.data,
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 100,
+        },
+        message: errorCode[100],
+      })
+      .end();
+  }
 };
 
 const orderDetail = async (req: Request, res: Response): Promise<void> => {

@@ -43,8 +43,8 @@ describe('product information test', () => {
 
 describe('customer order test', () => {
   it('it should get a order list', async () => {
-    const getOrderListDetail = await chai.request(server).get('/customer/order');
-    // expect(getOrderListDetail.status).to.equal(200);
+    const getOrderListDetail = await service.getOrderList(1);
+    expect(getOrderListDetail.status).to.equal('success');
   });
   it('it should get a order detail', async () => {
     const getOrderListDetail = await chai.request(server).get('/customer/order/1');
