@@ -37,7 +37,7 @@ const getProducts = async ():Promise<DBresult> => {
 const getProductDetailById = async (productId: number): Promise<any> => {
   try {
     const [result] = await pool.query('SELECT * FROM PRODUCT WHERE id = ?', productId);
-    const [images] = await pool.query('SELECT id, image_url, image_order FROM PRODUCT_IMAGE WHERE product_id = ?', productId);
+    const [images] = await pool.query('SELECT image_url, image_order FROM PRODUCT_IMAGE WHERE product_id = ?', productId);
     const data:any = result;
     return [data[0], images];
   } catch (err) {
@@ -45,8 +45,20 @@ const getProductDetailById = async (productId: number): Promise<any> => {
   }
 };
 
+const getOrderList = async (customerId: number): Promise<any> => {
+  const result = 0;
+  return result;
+};
+
+const getOrderDetail = async (customerId: number): Promise<any> => {
+  const result = 0;
+  return result;
+};
+
 export {
   getCustomerByEmailPassword,
   getProducts,
   getProductDetailById,
+  getOrderList,
+  getOrderDetail,
 };

@@ -40,3 +40,14 @@ describe('product information test', () => {
     expect(notGetProductResult).to.have.status(404);
   });
 });
+
+describe('customer order test', () => {
+  it('it should get a order list', async () => {
+    const getOrderListDetail = await chai.request(server).get('/customer/order');
+    // expect(getOrderListDetail.status).to.equal(200);
+  });
+  it('it should get a order detail', async () => {
+    const getOrderListDetail = await chai.request(server).get('/customer/order/1');
+    // expect(getOrderListDetail.status).to.equal(200);
+  });
+});

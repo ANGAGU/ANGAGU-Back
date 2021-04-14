@@ -133,8 +133,18 @@ const productDetail = async (req: Request, res: Response):Promise<void> => {
   }
 };
 
+const orderList = async (req: Request, res: Response): Promise<void> => {
+  res.status(200).end();
+};
+
+const orderDetail = async (req: Request, res: Response): Promise<void> => {
+  res.status(200).end();
+};
+
 export {
   login,
   products,
   productDetail,
+  orderList,
+  orderDetail,
 };
