@@ -17,6 +17,6 @@ router.post('/products', auth.authorization, upload.fields([{
   name: 'thumb_image', maxCount: 1,
 }]), controller.addProduct);
 router.delete('/products/:productId', auth.authorization, controller.deleteProduct);
-router.put('/products/:productId', auth.authorization, controller.products);
+router.put('/products/:productId', auth.authorization, controller.updateProduct);
 
 export default router;

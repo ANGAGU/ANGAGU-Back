@@ -39,12 +39,9 @@ describe('company products test', () => {
     const delResult = await service.deleteProduct(10000);
     expect(delResult.status).to.equal('success');
   });
-  it('delete product image test', async () => {
-    const delResult = await service.deleteProduct(100);
-    // expect(delResult.status).to.equal(200);
-  });
+
   it('update product test', async () => {
-    const upResult = await service.updateProduct(100, 'descriptionUrl', 'thumbUrl', 'desk', 50000, 10, 3000);
-    // expect(upResult.status).to.equal(200);
+    const upResult = await service.updateProduct(1, 'new_description', 'new_name', 111111, 1234, 111);
+    expect(upResult.status).to.equal('success');
   });
 });

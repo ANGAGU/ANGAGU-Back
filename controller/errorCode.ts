@@ -9,4 +9,5 @@ export default {
   301: 'db insert error',
   302: 'no file',
   303: 'db delete error',
+  304: 'db update error',
 };

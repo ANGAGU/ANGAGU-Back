@@ -228,8 +228,61 @@ const deleteProduct = async (req:Request, res:Response): Promise<void> => {
 };
 
 const updateProduct = async (req:Request, res:Response): Promise<void> => {
-  const result = await service.updateProduct(100, 'descriptionUrl', 'thumbUrl', 'desk', 50000, 10, 3000);
-  res.status(200).end();
+  try {
+    const { id, type } = res.locals;
+    const productId = Number(req.params.productId);
+    const detail = req.body;
+
+    if (type !== 'company') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errorCode[200],
+        })
+        .end();
+    }
+    const result = await service.updateProduct(
+      productId,
+      detail.description,
+      detail.name,
+      detail.price,
+      detail.stock,
+      detail.delivery_charge,
+    );
+    if (result.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errorCode: 304,
+          },
+          message: errorCode[304],
+        })
+        .end();
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: {},
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errorCode: 0,
+        },
+        message: errorCode[0],
+      });
+  }
 };
 
 export {

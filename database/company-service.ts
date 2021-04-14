@@ -89,6 +89,25 @@ const deleteProduct = async (productId: number): Promise<any> => {
 };
 
 const updateProduct = async (
+  productId: number,
+  description: string,
+  name: string,
+  price: number,
+  stock: number,
+  deliveryCharge: number,
+): Promise<any> => {
+  try {
+    const updateResult = await pool.query('UPDATE PRODUCT SET description = (?), name = (?), price = (?), stock = (?), delivery_charge = (?) WHERE id = (?)', [description, name, price, stock, deliveryCharge, productId]);
+    return {
+      data: updateResult,
+      status: 'success',
+    };
+  } catch (err) {
+    throw Error(err);
+  }
+};
+
+const updateProductImage = async (
   companyId: number,
   descriptionUrl: string,
   thumbUrl: string,
