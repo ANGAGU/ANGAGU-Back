@@ -47,7 +47,7 @@ describe('customer order test', () => {
     expect(getOrderListDetail.status).to.equal('success');
   });
   it('it should get a order detail', async () => {
-    const getOrderListDetail = await chai.request(server).get('/customer/order/1');
-    // expect(getOrderListDetail.status).to.equal(200);
+    const getOrderListDetail = await service.getOrderDetail(1);
+    expect(getOrderListDetail.status).to.equal('success');
   });
 });

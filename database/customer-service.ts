@@ -47,7 +47,7 @@ const getProductDetailById = async (productId: number): Promise<any> => {
 
 const getOrderList = async (customerId: number): Promise<any> => {
   try {
-    const [result] = await pool.query('SELECT * FROM order_list WHERE customer_id = ?', customerId);
+    const [result] = await pool.query('SELECT * FROM order_list WHERE customer_id = (?)', customerId);
     const data:any = result;
     return {
       data,
@@ -58,9 +58,17 @@ const getOrderList = async (customerId: number): Promise<any> => {
   }
 };
 
-const getOrderDetail = async (customerId: number): Promise<any> => {
-  const result = 0;
-  return result;
+const getOrderDetail = async (orderId: number): Promise<any> => {
+  try {
+    const [result] = await pool.query('SELECT * FROM `order` WHERE order_list_id = (?)', orderId);
+    const data:any = result;
+    return {
+      data,
+      status: 'success',
+    };
+  } catch (err) {
+    throw Error(err);
+  }
 };
 
 export {
