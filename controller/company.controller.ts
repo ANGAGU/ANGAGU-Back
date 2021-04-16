@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { getCompanyByEmailPassword, getProducts } from '../database/company-service';
 import * as service from '../database/company-service';
 import { jwtSignUser, isEmail } from './utils';
+import * as upload from './s3';
 import errorCode from './errorCode';
 
 const login = async (req:Request, res:Response):Promise<void> => {
@@ -116,6 +117,7 @@ const addProduct = async (req:Request, res:Response): Promise<void> => {
           message: errorCode[200],
         })
         .end();
+      return;
     }
 
     if (!files) {
@@ -130,10 +132,11 @@ const addProduct = async (req:Request, res:Response): Promise<void> => {
         })
         .end();
     }
+
     const productId = await service.addProduct(
       id,
-      fileList.description_image[0].path,
-      fileList.thumb_image[0].path,
+      fileList.desc_image[0].location,
+      fileList.thumb_image[0].location,
       inform.description,
       inform.name,
       inform.price,
@@ -141,11 +144,12 @@ const addProduct = async (req:Request, res:Response): Promise<void> => {
       inform.delivery_charge,
     );
 
-    const dataList: Array<string> = fileList.images.map((x: any) => JSON.stringify({
+    const dataList: Array<string> = fileList.product_image.map((x: any) => JSON.stringify({
       product_id: productId.data,
-      image_url: x.path,
-      image_order: inform[x.filename],
+      image_url: x.location,
+      image_order: inform[x.originalname],
     }));
+
     const addProductResult = await service.addProducctImage(dataList);
     if (addProductResult.status !== 'success') {
       res
@@ -159,6 +163,7 @@ const addProduct = async (req:Request, res:Response): Promise<void> => {
         })
         .end();
     }
+
     res
       .status(200)
       .json({
@@ -223,13 +228,15 @@ const deleteProduct = async (req:Request, res:Response): Promise<void> => {
           errorCode: 0,
         },
         message: errorCode[0],
-      });
+      })
+      .end();
   }
 };
 
 const updateProduct = async (req:Request, res:Response): Promise<void> => {
   try {
     const { id, type } = res.locals;
+    // console.log(req);
     const productId = Number(req.params.productId);
     const detail = req.body;
 
@@ -281,7 +288,8 @@ const updateProduct = async (req:Request, res:Response): Promise<void> => {
           errorCode: 0,
         },
         message: errorCode[0],
-      });
+      })
+      .end();
   }
 };
 

@@ -1,5 +1,3 @@
-import { ResultSetHeader, RowDataPacket } from 'mysql2';
-import { ProductImage } from '../controller/utils';
 import { pool, DBresult } from './pool';
 
 const getCompanyByEmailPassword = async (email:string, password:string):Promise<DBresult> => {

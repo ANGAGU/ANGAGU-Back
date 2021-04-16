@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
-import multer from 'multer';
 import path from 'path';
+
 import { jwtSecret } from '../config.json';
 
 export interface User {
@@ -58,18 +58,8 @@ function isEmail(asValue: string):boolean {
   return regExp.test(asValue);
 }
 
-const storage = multer.diskStorage({
-  destination(req, file, cb) {
-    cb(null, 'public/uploads/');
-  },
-  filename(req, file, cb) {
-    cb(null, file.originalname);
-  },
-});
-
 export {
   jwtSignUser,
   jwtVerify,
   isEmail,
-  storage,
 };
