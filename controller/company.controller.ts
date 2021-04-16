@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { getCompanyByEmailPassword, getProducts } from '../database/company-service';
 import * as service from '../database/company-service';
 import { jwtSignUser, isEmail } from './utils';
-import * as upload from './s3';
+import * as S3 from './s3';
 import errorCode from './errorCode';
 
 const login = async (req:Request, res:Response):Promise<void> => {
@@ -135,8 +135,8 @@ const addProduct = async (req:Request, res:Response): Promise<void> => {
 
     const productId = await service.addProduct(
       id,
-      fileList.desc_image[0].location,
-      fileList.thumb_image[0].location,
+      fileList.desc_image[0].key,
+      fileList.thumb_image[0].key,
       inform.description,
       inform.name,
       inform.price,
@@ -146,7 +146,7 @@ const addProduct = async (req:Request, res:Response): Promise<void> => {
 
     const dataList: Array<string> = fileList.product_image.map((x: any) => JSON.stringify({
       product_id: productId.data,
-      image_url: x.location,
+      image_url: x.key,
       image_order: inform[x.originalname],
     }));
 
@@ -184,7 +184,7 @@ const addProduct = async (req:Request, res:Response): Promise<void> => {
 
 const deleteProduct = async (req:Request, res:Response): Promise<void> => {
   try {
-    const { id, type } = res.locals;
+    const { type } = res.locals;
     const productId = Number(req.params.productId);
 
     if (type !== 'company') {
@@ -199,6 +199,30 @@ const deleteProduct = async (req:Request, res:Response): Promise<void> => {
         })
         .end();
     }
+    const keyResult = await service.getFileKeys(productId);
+    if (keyResult.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errorCode: 303,
+          },
+          message: errorCode[303],
+        })
+        .end();
+    }
+
+    const keys = keyResult.data.map((key: string) => {
+      const obj:S3.s3Object = {
+        Key: '',
+      };
+      obj.Key = key;
+      return obj;
+    });
+
+    await S3.deleteFile(keys);
+
     const deleteResult = await service.deleteProduct(productId);
     if (deleteResult.status !== 'success') {
       res

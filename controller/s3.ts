@@ -33,3 +33,22 @@ export const fileUpload = imageUpload.fields([
     name: 'thumb_image', maxCount: 1,
   },
 ]);
+
+export interface s3Object {
+  Key: string,
+}
+
+export const deleteFile = (objects:Array<s3Object>):any => {
+  const params = {
+    Bucket: 'angagu',
+    Delete: {
+      Objects: objects,
+    },
+  };
+  s3.deleteObjects(params, (err, data) => {
+    if (err) {
+      console.log(err);
+    }
+    return data;
+  });
+};

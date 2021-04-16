@@ -1,3 +1,4 @@
+import { s3Object } from '../controller/s3';
 import { pool, DBresult } from './pool';
 
 const getCompanyByEmailPassword = async (email:string, password:string):Promise<DBresult> => {
@@ -75,10 +76,27 @@ const addProducctImage = async (dataList: Array<string>): Promise<any> => {
 
 const deleteProduct = async (productId: number): Promise<any> => {
   try {
-    const deleteDetail = await pool.query('DELETE FROM product WHERE id = (?)', productId);
-    const deleteImage = await pool.query('DELETE FROM product_image WHERE product_id = (?)', productId);
+    await pool.query('DELETE FROM product WHERE id = (?)', productId);
+    await pool.query('DELETE FROM product_image WHERE product_id = (?)', productId);
     return {
-      data: [deleteDetail, deleteImage],
+      status: 'success',
+    };
+  } catch (err) {
+    throw Error(err);
+  }
+};
+
+const getFileKeys = async (productId: number): Promise<any> => {
+  try {
+    const data:Array<string> = [];
+    const [productImageKeys] = await pool.query('SELECT image_url FROM product_image WHERE product_id = (?)', productId);
+    const [otherImageKeys] = await pool.query('SELECT description_url, thumb_url  FROM product WHERE id = (?)', productId);
+    const data1:any = JSON.parse(JSON.stringify(productImageKeys));
+    const data2:any = JSON.parse(JSON.stringify(otherImageKeys));
+    data1.map((key:any) => data.push(key.image_url));
+    data.push(data2[0].description_url, data2[0].thumb_url);
+    return {
+      data,
       status: 'success',
     };
   } catch (err) {
@@ -125,4 +143,5 @@ export {
   addProducctImage,
   deleteProduct,
   updateProduct,
+  getFileKeys,
 };
