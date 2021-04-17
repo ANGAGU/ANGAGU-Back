@@ -1,4 +1,3 @@
-import { s3Object } from '../controller/s3';
 import { pool, DBresult } from './pool';
 
 const getCompanyByEmailPassword = async (email:string, password:string):Promise<DBresult> => {
@@ -35,6 +34,7 @@ const getProducts = async (id :number):Promise<DBresult> => {
   }
 };
 
+// 상품 등록
 const addProduct = async (
   companyId: number,
   descriptionUrl: string,
@@ -58,6 +58,7 @@ const addProduct = async (
   }
 };
 
+// 상품 이미지 등록
 const addProductImage = async (dataList: Array<string>): Promise<any> => {
   try {
     const addImageQuery = 'INSERT INTO product_image(product_id, image_url, image_order) VALUES(?,?,?)';
@@ -74,6 +75,7 @@ const addProductImage = async (dataList: Array<string>): Promise<any> => {
   }
 };
 
+// 상품 상세정보 삭제
 const deleteProductDetail = async (productId: number): Promise<any> => {
   try {
     await pool.query('DELETE FROM product WHERE id = (?)', productId);
@@ -86,6 +88,7 @@ const deleteProductDetail = async (productId: number): Promise<any> => {
   }
 };
 
+// 상품 상세이미지 삭제
 const deleteProductImage = async (productId: number): Promise<any> => {
   try {
     await pool.query('DELETE FROM product_image WHERE product_id = (?)', productId);
@@ -98,6 +101,7 @@ const deleteProductImage = async (productId: number): Promise<any> => {
   }
 };
 
+// 상품 상세이미지 경로 조회
 const getProductImageKeys = async (productId: number): Promise<any> => {
   try {
     const data:Array<string> = [];
@@ -113,6 +117,7 @@ const getProductImageKeys = async (productId: number): Promise<any> => {
   }
 };
 
+// 상품 설명이미지, 썸네일 경로 조회
 const getOtherImageKeys = async (productId: number): Promise<any> => {
   try {
     const data:Array<string> = [];
@@ -128,6 +133,7 @@ const getOtherImageKeys = async (productId: number): Promise<any> => {
   }
 };
 
+// 상품 상세정보 업데이트
 const updateProductDetail = async (
   productId: number,
   descriptionUrl: string,

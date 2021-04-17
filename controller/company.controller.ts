@@ -100,6 +100,7 @@ const products = async (req:Request, res:Response): Promise<void> => {
   }
 };
 
+// 상품 등록하기
 const addProduct = async (req:Request, res:Response): Promise<void> => {
   try {
     const { id, type } = res.locals;
@@ -120,7 +121,8 @@ const addProduct = async (req:Request, res:Response): Promise<void> => {
       return;
     }
 
-    if (!files) {
+    // 이미지 파일이 한 종류라도 없으면 에러
+    if (!fileList.product_image || !fileList.desc_image || !fileList.thumb_image) {
       res
         .status(400)
         .json({
@@ -131,8 +133,10 @@ const addProduct = async (req:Request, res:Response): Promise<void> => {
           message: errorCode[302],
         })
         .end();
+      return;
     }
 
+    // 상품 DB 등록
     const productId = await service.addProduct(
       id,
       fileList.desc_image[0].key,
@@ -150,6 +154,7 @@ const addProduct = async (req:Request, res:Response): Promise<void> => {
       image_order: inform[x.originalname],
     }));
 
+    // 상품 상세이미지 DB 등록
     const addProductResult = await service.addProductImage(dataList);
     if (addProductResult.status !== 'success') {
       res
@@ -162,6 +167,7 @@ const addProduct = async (req:Request, res:Response): Promise<void> => {
           message: errorCode[301],
         })
         .end();
+      return;
     }
 
     res
@@ -182,6 +188,7 @@ const addProduct = async (req:Request, res:Response): Promise<void> => {
   }
 };
 
+// 상품 삭제하기
 const deleteProduct = async (req:Request, res:Response): Promise<void> => {
   try {
     const { type } = res.locals;
@@ -198,7 +205,10 @@ const deleteProduct = async (req:Request, res:Response): Promise<void> => {
           message: errorCode[200],
         })
         .end();
+      return;
     }
+
+    // 상품 상세이미지들이 있는 경로 구하기
     const productImageKeys = await service.getProductImageKeys(productId);
     if (productImageKeys.status !== 'success') {
       res
@@ -206,12 +216,15 @@ const deleteProduct = async (req:Request, res:Response): Promise<void> => {
         .json({
           status: 'error',
           data: {
-            errorCode: 303,
+            errorCode: 100,
           },
-          message: errorCode[303],
+          message: errorCode[100],
         })
         .end();
+      return;
     }
+
+    // 상품 설명 이미지, 썸네일이 있는 경로 구하기
     const otherImageKeys = await service.getOtherImageKeys(productId);
     if (otherImageKeys.status !== 'success') {
       res
@@ -219,12 +232,15 @@ const deleteProduct = async (req:Request, res:Response): Promise<void> => {
         .json({
           status: 'error',
           data: {
-            errorCode: 303,
+            errorCode: 100,
           },
-          message: errorCode[303],
+          message: errorCode[100],
         })
         .end();
+      return;
     }
+
+    // 상품 상세이미지와 설명 이미지, 썸네일을 S3에서 삭제
     const keyResult = [
       ...productImageKeys.data,
       ...otherImageKeys.data,
@@ -239,6 +255,7 @@ const deleteProduct = async (req:Request, res:Response): Promise<void> => {
 
     await S3.deleteFile(keys);
 
+    // 상품 상세이미지 DB에서 해당 상품 상세이미지의 정보를 삭제
     const deleteImage = await service.deleteProductImage(productId);
     if (deleteImage.status !== 'success') {
       res
@@ -251,8 +268,10 @@ const deleteProduct = async (req:Request, res:Response): Promise<void> => {
           message: errorCode[303],
         })
         .end();
+      return;
     }
 
+    // 상품 DB에서 해당 상품의 정보를 삭제
     const deleteDetail = await service.deleteProductDetail(productId);
     if (deleteDetail.status !== 'success') {
       res
@@ -265,6 +284,7 @@ const deleteProduct = async (req:Request, res:Response): Promise<void> => {
           message: errorCode[303],
         })
         .end();
+      return;
     }
 
     res
@@ -288,6 +308,7 @@ const deleteProduct = async (req:Request, res:Response): Promise<void> => {
   }
 };
 
+// 상품 상세정보(설명 이미지, 썸네일 포함)를 업데이트
 const updateProductDetail = async (req:Request, res:Response): Promise<void> => {
   try {
     const { type } = res.locals;
@@ -308,8 +329,10 @@ const updateProductDetail = async (req:Request, res:Response): Promise<void> => 
           message: errorCode[200],
         })
         .end();
+      return;
     }
 
+    // 해당 상품의 설명 이미지, 썸네일의 경로를 가져와 S3에서 파일 삭제
     const deleteList = await service.getOtherImageKeys(productId);
     const keys = deleteList.data.map((key: string) => {
       const obj:S3.s3Object = {
@@ -320,6 +343,7 @@ const updateProductDetail = async (req:Request, res:Response): Promise<void> => 
     });
     await S3.deleteFile(keys);
 
+    // 상품 상세 정보 DB를 업데이트
     const result = await service.updateProductDetail(
       productId,
       descImage.key,
@@ -341,6 +365,7 @@ const updateProductDetail = async (req:Request, res:Response): Promise<void> => 
           message: errorCode[304],
         })
         .end();
+      return;
     }
     res
       .status(200)
@@ -363,6 +388,7 @@ const updateProductDetail = async (req:Request, res:Response): Promise<void> => 
   }
 };
 
+// 상품 상세이미지 등록
 const addProductImage = async (req:Request, res:Response): Promise<void> => {
   try {
     const { type } = res.locals;
@@ -381,13 +407,16 @@ const addProductImage = async (req:Request, res:Response): Promise<void> => {
           message: errorCode[200],
         })
         .end();
+      return;
     }
+
     const dataList: Array<string> = fileList.product_image.map((x: any) => JSON.stringify({
       product_id: productId,
       image_url: x.key,
       image_order: order[x.originalname],
     }));
 
+    // 상품 상세이미지에 대한 정보를 상세이미지 테이블에 등록
     const addProductResult = await service.addProductImage(dataList);
     if (addProductResult.status !== 'success') {
       res
@@ -400,6 +429,7 @@ const addProductImage = async (req:Request, res:Response): Promise<void> => {
           message: errorCode[301],
         })
         .end();
+      return;
     }
     res
       .status(200)
@@ -421,6 +451,8 @@ const addProductImage = async (req:Request, res:Response): Promise<void> => {
       .end();
   }
 };
+
+// 상품 상세이미지 삭제
 const deleteProductImage = async (req:Request, res:Response): Promise<void> => {
   try {
     const { type } = res.locals;
@@ -437,7 +469,10 @@ const deleteProductImage = async (req:Request, res:Response): Promise<void> => {
           message: errorCode[200],
         })
         .end();
+      return;
     }
+
+    // 해당 상품의 상세이미지 경로를 가져오기
     const productImageKeys = await service.getProductImageKeys(productId);
     if (productImageKeys.status !== 'success') {
       res
@@ -450,7 +485,10 @@ const deleteProductImage = async (req:Request, res:Response): Promise<void> => {
           message: errorCode[303],
         })
         .end();
+      return;
     }
+
+    // 해당 상품의 상세이미지를 S3에서 삭제
     const keys = productImageKeys.data.map((key: string) => {
       const obj:S3.s3Object = {
         Key: '',
@@ -461,6 +499,7 @@ const deleteProductImage = async (req:Request, res:Response): Promise<void> => {
 
     await S3.deleteFile(keys);
 
+    // 해당 상품의 상세이미지 정보를 상세이미지 DB에서 삭제
     const deleteImage = await service.deleteProductImage(productId);
     if (deleteImage.status !== 'success') {
       res
@@ -473,6 +512,7 @@ const deleteProductImage = async (req:Request, res:Response): Promise<void> => {
           message: errorCode[303],
         })
         .end();
+      return;
     }
     res
       .status(200)
