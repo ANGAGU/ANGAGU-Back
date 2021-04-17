@@ -9,6 +9,6 @@ router.post('/login', controller.login);
 router.get('/products', auth.authorization, controller.products);
 router.post('/products', auth.authorization, upload.fileUpload, controller.addProduct);
 router.delete('/products/:productId', auth.authorization, controller.deleteProduct);
-router.put('/products/:productId', auth.authorization, controller.updateProduct);
+router.put('/products/:productId', auth.authorization, upload.fileUpload, controller.updateProductDetail);
 
 export default router;

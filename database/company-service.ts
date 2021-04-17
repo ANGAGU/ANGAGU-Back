@@ -86,15 +86,12 @@ const deleteProduct = async (productId: number): Promise<any> => {
   }
 };
 
-const getFileKeys = async (productId: number): Promise<any> => {
+const getProductImageKeys = async (productId: number): Promise<any> => {
   try {
     const data:Array<string> = [];
     const [productImageKeys] = await pool.query('SELECT image_url FROM product_image WHERE product_id = (?)', productId);
-    const [otherImageKeys] = await pool.query('SELECT description_url, thumb_url  FROM product WHERE id = (?)', productId);
-    const data1:any = JSON.parse(JSON.stringify(productImageKeys));
-    const data2:any = JSON.parse(JSON.stringify(otherImageKeys));
-    data1.map((key:any) => data.push(key.image_url));
-    data.push(data2[0].description_url, data2[0].thumb_url);
+    const result:any = JSON.parse(JSON.stringify(productImageKeys));
+    result.map((key:any) => data.push(key.image_url));
     return {
       data,
       status: 'success',
@@ -104,8 +101,25 @@ const getFileKeys = async (productId: number): Promise<any> => {
   }
 };
 
-const updateProduct = async (
+const getOtherImageKeys = async (productId: number): Promise<any> => {
+  try {
+    const data:Array<string> = [];
+    const [otherImageKeys] = await pool.query('SELECT description_url, thumb_url  FROM product WHERE id = (?)', productId);
+    const result:any = JSON.parse(JSON.stringify(otherImageKeys));
+    data.push(result[0].description_url, result[0].thumb_url);
+    return {
+      data,
+      status: 'success',
+    };
+  } catch (err) {
+    throw Error(err);
+  }
+};
+
+const updateProductDetail = async (
   productId: number,
+  descriptionUrl: string,
+  thumbUrl: string,
   description: string,
   name: string,
   price: number,
@@ -113,7 +127,7 @@ const updateProduct = async (
   deliveryCharge: number,
 ): Promise<any> => {
   try {
-    const updateResult = await pool.query('UPDATE PRODUCT SET description = (?), name = (?), price = (?), stock = (?), delivery_charge = (?) WHERE id = (?)', [description, name, price, stock, deliveryCharge, productId]);
+    const updateResult = await pool.query('UPDATE PRODUCT SET description_url = (?), thumb_url = (?), description = (?), name = (?), price = (?), stock = (?), delivery_charge = (?) WHERE id = (?)', [descriptionUrl, thumbUrl, description, name, price, stock, deliveryCharge, productId]);
     return {
       data: updateResult,
       status: 'success',
@@ -123,25 +137,13 @@ const updateProduct = async (
   }
 };
 
-const updateProductImage = async (
-  companyId: number,
-  descriptionUrl: string,
-  thumbUrl: string,
-  name: string,
-  price: number,
-  stock: number,
-  deliveryCharge: number,
-): Promise<any> => {
-  const result = 0;
-  return result;
-};
-
 export {
   getCompanyByEmailPassword,
   getProducts,
   addProduct,
   addProducctImage,
   deleteProduct,
-  updateProduct,
-  getFileKeys,
+  updateProductDetail,
+  getProductImageKeys,
+  getOtherImageKeys,
 };

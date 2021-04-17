@@ -199,8 +199,8 @@ const deleteProduct = async (req:Request, res:Response): Promise<void> => {
         })
         .end();
     }
-    const keyResult = await service.getFileKeys(productId);
-    if (keyResult.status !== 'success') {
+    const productImageKeys = await service.getProductImageKeys(productId);
+    if (productImageKeys.status !== 'success') {
       res
         .status(400)
         .json({
@@ -212,8 +212,24 @@ const deleteProduct = async (req:Request, res:Response): Promise<void> => {
         })
         .end();
     }
-
-    const keys = keyResult.data.map((key: string) => {
+    const otherImageKeys = await service.getOtherImageKeys(productId);
+    if (otherImageKeys.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errorCode: 303,
+          },
+          message: errorCode[303],
+        })
+        .end();
+    }
+    const keyResult = [
+      ...productImageKeys.data,
+      ...otherImageKeys.data,
+    ];
+    const keys = keyResult.map((key: string) => {
       const obj:S3.s3Object = {
         Key: '',
       };
@@ -257,12 +273,14 @@ const deleteProduct = async (req:Request, res:Response): Promise<void> => {
   }
 };
 
-const updateProduct = async (req:Request, res:Response): Promise<void> => {
+const updateProductDetail = async (req:Request, res:Response): Promise<void> => {
   try {
-    const { id, type } = res.locals;
-    // console.log(req);
-    const productId = Number(req.params.productId);
+    const { type } = res.locals;
     const detail = req.body;
+    const productId = Number(req.params.productId);
+    const fileList:any = req.files;
+    const descImage = fileList.desc_image[0];
+    const thumbImage = fileList.thumb_image[0];
 
     if (type !== 'company') {
       res
@@ -276,8 +294,21 @@ const updateProduct = async (req:Request, res:Response): Promise<void> => {
         })
         .end();
     }
-    const result = await service.updateProduct(
+
+    const deleteList = await service.getOtherImageKeys(productId);
+    const keys = deleteList.data.map((key: string) => {
+      const obj:S3.s3Object = {
+        Key: '',
+      };
+      obj.Key = key;
+      return obj;
+    });
+    await S3.deleteFile(keys);
+
+    const result = await service.updateProductDetail(
       productId,
+      descImage.key,
+      thumbImage.key,
       detail.description,
       detail.name,
       detail.price,
@@ -322,5 +353,5 @@ export {
   products,
   addProduct,
   deleteProduct,
-  updateProduct,
+  updateProductDetail,
 };
