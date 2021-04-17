@@ -10,5 +10,6 @@ router.get('/products', auth.authorization, controller.products);
 router.post('/products', auth.authorization, upload.fileUpload, controller.addProduct);
 router.delete('/products/:productId', auth.authorization, controller.deleteProduct);
 router.put('/products/:productId', auth.authorization, upload.fileUpload, controller.updateProductDetail);
-
+router.post('/products/:productId/image', auth.authorization, upload.fileUpload, controller.addProductImage);
+router.delete('/products/:productId/image', auth.authorization, controller.deleteProductImage);
 export default router;

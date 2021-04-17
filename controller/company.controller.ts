@@ -150,7 +150,7 @@ const addProduct = async (req:Request, res:Response): Promise<void> => {
       image_order: inform[x.originalname],
     }));
 
-    const addProductResult = await service.addProducctImage(dataList);
+    const addProductResult = await service.addProductImage(dataList);
     if (addProductResult.status !== 'success') {
       res
         .status(400)
@@ -239,8 +239,8 @@ const deleteProduct = async (req:Request, res:Response): Promise<void> => {
 
     await S3.deleteFile(keys);
 
-    const deleteResult = await service.deleteProduct(productId);
-    if (deleteResult.status !== 'success') {
+    const deleteImage = await service.deleteProductImage(productId);
+    if (deleteImage.status !== 'success') {
       res
         .status(400)
         .json({
@@ -252,6 +252,21 @@ const deleteProduct = async (req:Request, res:Response): Promise<void> => {
         })
         .end();
     }
+
+    const deleteDetail = await service.deleteProductDetail(productId);
+    if (deleteDetail.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errorCode: 303,
+          },
+          message: errorCode[303],
+        })
+        .end();
+    }
+
     res
       .status(200)
       .json({
@@ -348,10 +363,144 @@ const updateProductDetail = async (req:Request, res:Response): Promise<void> => 
   }
 };
 
+const addProductImage = async (req:Request, res:Response): Promise<void> => {
+  try {
+    const { type } = res.locals;
+    const productId = Number(req.params.productId);
+    const order = JSON.parse(req.body.order);
+    const fileList:any = req.files;
+
+    if (type !== 'company') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errorCode[200],
+        })
+        .end();
+    }
+    const dataList: Array<string> = fileList.product_image.map((x: any) => JSON.stringify({
+      product_id: productId,
+      image_url: x.key,
+      image_order: order[x.originalname],
+    }));
+
+    const addProductResult = await service.addProductImage(dataList);
+    if (addProductResult.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errorCode: 301,
+          },
+          message: errorCode[301],
+        })
+        .end();
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: {},
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errorCode: 0,
+        },
+        message: errorCode[0],
+      })
+      .end();
+  }
+};
+const deleteProductImage = async (req:Request, res:Response): Promise<void> => {
+  try {
+    const { type } = res.locals;
+    const productId = Number(req.params.productId);
+
+    if (type !== 'company') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errorCode[200],
+        })
+        .end();
+    }
+    const productImageKeys = await service.getProductImageKeys(productId);
+    if (productImageKeys.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errorCode: 303,
+          },
+          message: errorCode[303],
+        })
+        .end();
+    }
+    const keys = productImageKeys.data.map((key: string) => {
+      const obj:S3.s3Object = {
+        Key: '',
+      };
+      obj.Key = key;
+      return obj;
+    });
+
+    await S3.deleteFile(keys);
+
+    const deleteImage = await service.deleteProductImage(productId);
+    if (deleteImage.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errorCode: 303,
+          },
+          message: errorCode[303],
+        })
+        .end();
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: {},
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errorCode: 0,
+        },
+        message: errorCode[0],
+      })
+      .end();
+  }
+};
+
 export {
   login,
   products,
   addProduct,
   deleteProduct,
   updateProductDetail,
+  addProductImage,
+  deleteProductImage,
 };

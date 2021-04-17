@@ -58,7 +58,7 @@ const addProduct = async (
   }
 };
 
-const addProducctImage = async (dataList: Array<string>): Promise<any> => {
+const addProductImage = async (dataList: Array<string>): Promise<any> => {
   try {
     const addImageQuery = 'INSERT INTO product_image(product_id, image_url, image_order) VALUES(?,?,?)';
     dataList.forEach(async (data: string) => {
@@ -74,11 +74,23 @@ const addProducctImage = async (dataList: Array<string>): Promise<any> => {
   }
 };
 
-const deleteProduct = async (productId: number): Promise<any> => {
+const deleteProductDetail = async (productId: number): Promise<any> => {
   try {
     await pool.query('DELETE FROM product WHERE id = (?)', productId);
+    return {
+      data: [],
+      status: 'success',
+    };
+  } catch (err) {
+    throw Error(err);
+  }
+};
+
+const deleteProductImage = async (productId: number): Promise<any> => {
+  try {
     await pool.query('DELETE FROM product_image WHERE product_id = (?)', productId);
     return {
+      data: [],
       status: 'success',
     };
   } catch (err) {
@@ -141,9 +153,10 @@ export {
   getCompanyByEmailPassword,
   getProducts,
   addProduct,
-  addProducctImage,
-  deleteProduct,
+  deleteProductDetail,
+  deleteProductImage,
   updateProductDetail,
   getProductImageKeys,
   getOtherImageKeys,
+  addProductImage,
 };
