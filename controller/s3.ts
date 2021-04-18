@@ -1,4 +1,5 @@
 import AWS from 'aws-sdk';
+import shortId from 'shortid';
 import multerS3 = require('multer-s3');
 import multer = require('multer');
 
@@ -8,12 +9,13 @@ export const imageStorage = multerS3({
   s3,
   bucket: 'angagu',
   key: (req, file, cb) => {
+    const name = shortId.generate();
     if (file.fieldname === 'product_image') {
-      cb(null, `productImages/${Date.now().toString()}`);
+      cb(null, `product/productImages/${name.toString()}`);
     } else if (file.fieldname === 'desc_image') {
-      cb(null, `descriptionImages/${Date.now().toString()}`);
+      cb(null, `product/desc/${name.toString()}`);
     } else {
-      cb(null, `thumbImages/${Date.now().toString()}`);
+      cb(null, `product/thumb/${name.toString()}`);
     }
   },
 });
