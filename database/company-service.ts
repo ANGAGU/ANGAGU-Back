@@ -52,9 +52,14 @@ const addProduct = async (
       [companyId, descriptionUrl, thumbUrl, description, name, price, stock, deliveryCharge],
     );
     const data:any = result;
-    return { status: 'success', data: data.insertId };
+    return {
+      status: 'success',
+      data: data.insertId,
+    };
   } catch (err) {
-    throw Error(err);
+    return {
+      status: 'error',
+    };
   }
 };
 
@@ -71,7 +76,9 @@ const addProductImage = async (dataList: Array<string>): Promise<any> => {
     });
     return { status: 'success' };
   } catch (err) {
-    throw Error(err);
+    return {
+      status: 'error',
+    };
   }
 };
 
@@ -84,7 +91,9 @@ const deleteProductDetail = async (productId: number): Promise<any> => {
       status: 'success',
     };
   } catch (err) {
-    throw Error(err);
+    return {
+      status: 'error',
+    };
   }
 };
 
@@ -97,7 +106,9 @@ const deleteProductImage = async (productId: number): Promise<any> => {
       status: 'success',
     };
   } catch (err) {
-    throw Error(err);
+    return {
+      status: 'error',
+    };
   }
 };
 
@@ -113,7 +124,9 @@ const getProductImageKeys = async (productId: number): Promise<any> => {
       status: 'success',
     };
   } catch (err) {
-    throw Error(err);
+    return {
+      status: 'error',
+    };
   }
 };
 
@@ -129,7 +142,9 @@ const getOtherImageKeys = async (productId: number): Promise<any> => {
       status: 'success',
     };
   } catch (err) {
-    throw Error(err);
+    return {
+      status: 'error',
+    };
   }
 };
 
@@ -151,7 +166,9 @@ const updateProductDetail = async (
       status: 'success',
     };
   } catch (err) {
-    throw Error(err);
+    return {
+      status: 'error',
+    };
   }
 };
 

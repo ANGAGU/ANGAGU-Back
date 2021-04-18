@@ -44,7 +44,9 @@ const getProductDetailById = async (productId: number): Promise<any> => {
       status: 'success',
     };
   } catch (err) {
-    throw Error(err);
+    return {
+      status: 'error',
+    };
   }
 };
 
