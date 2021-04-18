@@ -36,6 +36,8 @@ const getProducts = async (id :number):Promise<DBresult> => {
 
 // 상품 등록
 const addProduct = async (
+  productImages: Array<any>,
+  orders: any,
   companyId: number,
   descriptionUrl: string,
   thumbUrl: string,
@@ -45,35 +47,58 @@ const addProduct = async (
   stock: number,
   deliveryCharge: number,
 ): Promise<any> => {
+  const conn = await pool.getConnection();
   try {
+    await conn.beginTransaction();
+
     const productInsertQeury = 'INSERT INTO product(company_id, description_url, thumb_url, description, name, price, stock, delivery_charge) VALUES(?,?,?,?,?,?,?,?)';
-    const [result] = await pool.query(
+    const [result] = await conn.query(
       productInsertQeury,
       [companyId, descriptionUrl, thumbUrl, description, name, price, stock, deliveryCharge],
     );
     const data:any = result;
+
+    const dataList: any = productImages.map((x: any) => [
+      data.insertId,
+      x.key,
+      orders[x.originalname],
+    ]);
+
+    const addImageQuery = 'INSERT INTO product_image(product_id, image_url, image_order) VALUES ?';
+
+    await conn.query(addImageQuery, [dataList]);
+
+    await conn.commit();
+
     return {
       status: 'success',
-      data: data.insertId,
+      data: {},
     };
   } catch (err) {
+    await conn.rollback();
     return {
       status: 'error',
     };
+  } finally {
+    conn.release();
   }
 };
 
 // 상품 이미지 등록
-const addProductImage = async (dataList: Array<string>): Promise<any> => {
+const addProductImage = async (
+  productId: number,
+  orders: any,
+  productImages:Array<any>,
+): Promise<any> => {
   try {
-    const addImageQuery = 'INSERT INTO product_image(product_id, image_url, image_order) VALUES(?,?,?)';
-    dataList.forEach(async (data: string) => {
-      const dataTrans = JSON.parse(data);
-      const id = dataTrans.product_id;
-      const url = dataTrans.image_url;
-      const order = Number(dataTrans.image_order);
-      await pool.query(addImageQuery, [id, url, order]);
-    });
+    const addImageQuery = 'INSERT INTO product_image(product_id, image_url, image_order) VALUES ?';
+
+    const dataList: any = productImages.map((x: any) => [
+      productId,
+      x.key,
+      orders[x.originalname],
+    ]);
+    await pool.query(addImageQuery, [dataList]);
     return { status: 'success' };
   } catch (err) {
     return {
@@ -82,18 +107,26 @@ const addProductImage = async (dataList: Array<string>): Promise<any> => {
   }
 };
 
-// 상품 상세정보 삭제
-const deleteProductDetail = async (productId: number): Promise<any> => {
+// 상품 삭제
+const deleteProduct = async (productId: number): Promise<any> => {
+  const conn = await pool.getConnection();
   try {
-    await pool.query('DELETE FROM product WHERE id = (?)', productId);
+    await conn.beginTransaction();
+    await conn.query('DELETE FROM product WHERE id = (?)', productId);
+    await conn.query('DELETE FROM product_image WHERE product_id = (?)', productId);
+
+    await conn.commit();
     return {
       data: [],
       status: 'success',
     };
   } catch (err) {
+    await conn.rollback;
     return {
       status: 'error',
     };
+  } finally {
+    conn.release();
   }
 };
 
@@ -176,7 +209,7 @@ export {
   getCompanyByEmailPassword,
   getProducts,
   addProduct,
-  deleteProductDetail,
+  deleteProduct,
   deleteProductImage,
   updateProductDetail,
   getProductImageKeys,

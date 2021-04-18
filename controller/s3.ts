@@ -49,8 +49,14 @@ export const deleteFile = (objects:Array<s3Object>):any => {
   };
   s3.deleteObjects(params, (err, data) => {
     if (err) {
-      console.log(err);
+      return {
+        status: 'error',
+        data: err,
+      };
     }
-    return data;
+    return {
+      status: 'success',
+      data,
+    };
   });
 };

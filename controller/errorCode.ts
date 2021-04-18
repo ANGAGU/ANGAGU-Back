@@ -10,4 +10,5 @@ export default {
   302: 'no file',
   303: 'db delete error',
   304: 'db update error',
+  305: 's3 delete error',
 };

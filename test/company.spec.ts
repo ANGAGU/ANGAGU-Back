@@ -31,12 +31,8 @@ describe('company test', () => {
 });
 
 describe('company products test', () => {
-  it('add product test', async () => {
-    const addResult = await service.addProduct(1, 'descriptionUrl', 'thumbUrl', 'description', 'desk', 50000, 10, 3000);
-    expect(addResult.status).to.equal('success');
-  });
   it('delete product detail test', async () => {
-    const delDetailResult = await service.deleteProductDetail(100);
+    const delDetailResult = await service.deleteProduct(100);
     expect(delDetailResult.status).to.equal('success');
   });
   it('delete product image test', async () => {
