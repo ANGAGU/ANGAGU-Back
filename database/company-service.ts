@@ -121,7 +121,7 @@ const deleteProduct = async (productId: number): Promise<any> => {
       status: 'success',
     };
   } catch (err) {
-    await conn.rollback;
+    await conn.rollback();
     return {
       status: 'error',
     };
