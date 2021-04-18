@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import { servicesVersion } from 'typescript';
 import { getCustomerByEmailPassword, getProducts, getProductDetailById } from '../database/customer-service';
 import * as service from '../database/customer-service';
 import errorCode from './errorCode';
@@ -150,6 +149,7 @@ const orderList = async (req: Request, res: Response): Promise<void> => {
           message: errorCode[200],
         })
         .end();
+      return;
     }
 
     const result = await service.getOrderList(id);
@@ -165,6 +165,7 @@ const orderList = async (req: Request, res: Response): Promise<void> => {
           message: errorCode[100],
         })
         .end();
+      return;
     }
     res
       .status(200)
@@ -203,6 +204,7 @@ const orderDetail = async (req: Request, res: Response): Promise<void> => {
           message: errorCode[200],
         })
         .end();
+      return;
     }
 
     const orderDetailResult = await service.getOrderDetail(orderId);
@@ -218,6 +220,7 @@ const orderDetail = async (req: Request, res: Response): Promise<void> => {
           message: errorCode[100],
         })
         .end();
+      return;
     }
     res
       .status(200)
