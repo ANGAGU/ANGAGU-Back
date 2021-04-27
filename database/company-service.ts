@@ -184,16 +184,18 @@ const getOtherImageKeys = async (productId: number): Promise<any> => {
 // 상품 상세정보 업데이트
 const updateProductDetail = async (
   productId: number,
-  descriptionUrl: string,
-  thumbUrl: string,
-  description: string,
-  name: string,
-  price: number,
-  stock: number,
-  deliveryCharge: number,
+  detail: any,
 ): Promise<any> => {
+  const conn = await pool.getConnection();
   try {
-    const updateResult = await pool.query('UPDATE PRODUCT SET description_url = (?), thumb_url = (?), description = (?), name = (?), price = (?), stock = (?), delivery_charge = (?) WHERE id = (?)', [descriptionUrl, thumbUrl, description, name, price, stock, deliveryCharge, productId]);
+    await conn.beginTransaction();
+    const sql1 = 'UPDATE PRODUCT SET ';
+    const sql2 = conn.escape(Object.keys(detail).map((key) => `${key} = ?`).join(', '));
+    const sql3 = ' WHERE id = ?';
+    const sql = sql1 + sql2.replace(/['']+/g, '') + sql3;
+    const parameters = [...Object.values(detail), productId];
+    const updateResult = await conn.query(sql, parameters);
+    await conn.commit();
     return {
       data: updateResult,
       status: 'success',
@@ -202,6 +204,8 @@ const updateProductDetail = async (
     return {
       status: 'error',
     };
+  } finally {
+    conn.release();
   }
 };
 

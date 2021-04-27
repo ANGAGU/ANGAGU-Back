@@ -1,5 +1,4 @@
 import jwt from 'jsonwebtoken';
-import path from 'path';
 
 import { jwtSecret } from '../config.json';
 

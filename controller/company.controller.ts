@@ -3,7 +3,7 @@ import { getCompanyByEmailPassword, getProducts } from '../database/company-serv
 import * as service from '../database/company-service';
 import { jwtSignUser, isEmail } from './utils';
 import * as S3 from './s3';
-import errorCode from './errorCode';
+import errCode from './errCode';
 
 const login = async (req:Request, res:Response):Promise<void> => {
   try {
@@ -13,7 +13,7 @@ const login = async (req:Request, res:Response):Promise<void> => {
         data: {
           errCode: 101,
         },
-        message: errorCode[101],
+        message: errCode[101],
       });
       return;
     }
@@ -36,7 +36,7 @@ const login = async (req:Request, res:Response):Promise<void> => {
           data: {
             errCode: 102,
           },
-          message: errorCode[102],
+          message: errCode[102],
         });
       }
     } else {
@@ -46,7 +46,7 @@ const login = async (req:Request, res:Response):Promise<void> => {
           errCode: 100,
           data: result.data,
         },
-        message: errorCode[100],
+        message: errCode[100],
       });
     }
   } catch (err) {
@@ -56,7 +56,7 @@ const login = async (req:Request, res:Response):Promise<void> => {
         errCode: 0,
         data: err,
       },
-      message: errorCode[0],
+      message: errCode[0],
     });
   }
 };
@@ -70,7 +70,7 @@ const products = async (req:Request, res:Response): Promise<void> => {
         data: {
           errCode: 200,
         },
-        message: errorCode[200],
+        message: errCode[200],
       });
     }
     const result = await getProducts(id);
@@ -85,7 +85,7 @@ const products = async (req:Request, res:Response): Promise<void> => {
         data: {
           errCode: 100,
         },
-        message: errorCode[100],
+        message: errCode[100],
       });
     }
   } catch (err) {
@@ -95,7 +95,7 @@ const products = async (req:Request, res:Response): Promise<void> => {
         errCode: 0,
         data: err,
       },
-      message: errorCode[0],
+      message: errCode[0],
     });
   }
 };
@@ -117,7 +117,7 @@ const addProduct = async (req:Request, res:Response): Promise<void> => {
           data: {
             errCode: 200,
           },
-          message: errorCode[200],
+          message: errCode[200],
         })
         .end();
       return;
@@ -132,7 +132,7 @@ const addProduct = async (req:Request, res:Response): Promise<void> => {
           data: {
             errCode: 302,
           },
-          message: errorCode[302],
+          message: errCode[302],
         })
         .end();
       return;
@@ -156,9 +156,9 @@ const addProduct = async (req:Request, res:Response): Promise<void> => {
         .json({
           status: 'error',
           data: {
-            errorCode: 301,
+            errCode: 301,
           },
-          message: errorCode[301],
+          message: errCode[301],
         })
         .end();
       return;
@@ -177,7 +177,7 @@ const addProduct = async (req:Request, res:Response): Promise<void> => {
       data: {
         errCode: 0,
       },
-      message: errorCode[0],
+      message: errCode[0],
     });
   }
 };
@@ -196,7 +196,7 @@ const deleteProduct = async (req:Request, res:Response): Promise<void> => {
           data: {
             errCode: 200,
           },
-          message: errorCode[200],
+          message: errCode[200],
         })
         .end();
       return;
@@ -210,9 +210,9 @@ const deleteProduct = async (req:Request, res:Response): Promise<void> => {
         .json({
           status: 'error',
           data: {
-            errorCode: 100,
+            errCode: 100,
           },
-          message: errorCode[100],
+          message: errCode[100],
         })
         .end();
       return;
@@ -226,9 +226,9 @@ const deleteProduct = async (req:Request, res:Response): Promise<void> => {
         .json({
           status: 'error',
           data: {
-            errorCode: 100,
+            errCode: 100,
           },
-          message: errorCode[100],
+          message: errCode[100],
         })
         .end();
       return;
@@ -257,9 +257,9 @@ const deleteProduct = async (req:Request, res:Response): Promise<void> => {
         .json({
           status: 'error',
           data: {
-            errorCode: 303,
+            errCode: 303,
           },
-          message: errorCode[303],
+          message: errCode[303],
         })
         .end();
       return;
@@ -278,9 +278,9 @@ const deleteProduct = async (req:Request, res:Response): Promise<void> => {
       .json({
         status: 'error',
         data: {
-          errorCode: 0,
+          errCode: 0,
         },
-        message: errorCode[0],
+        message: errCode[0],
       })
       .end();
   }
@@ -290,12 +290,11 @@ const deleteProduct = async (req:Request, res:Response): Promise<void> => {
 const updateProductDetail = async (req:Request, res:Response): Promise<void> => {
   try {
     const { type } = res.locals;
-    const detail = req.body;
+    const detail:any = JSON.parse(req.body.detail);
     const productId = Number(req.params.productId);
     const fileList:any = req.files;
-    const descImage = fileList.desc_image[0];
-    const thumbImage = fileList.thumb_image[0];
-
+    const descImage = fileList.desc_image ? fileList.desc_image[0] : undefined;
+    const thumbImage = fileList.thumb_image ? fileList.thumb_image[0] : undefined;
     if (type !== 'company') {
       res
         .status(403)
@@ -304,60 +303,62 @@ const updateProductDetail = async (req:Request, res:Response): Promise<void> => 
           data: {
             errCode: 200,
           },
-          message: errorCode[200],
+          message: errCode[200],
         })
         .end();
       return;
     }
 
-    // 해당 상품의 설명 이미지, 썸네일의 경로를 가져와 S3에서 파일 삭제
-    const deleteList = await service.getOtherImageKeys(productId);
-    if (deleteList.status !== 'success') {
-      res
-        .status(400)
-        .json({
-          status: 'error',
-          data: {
-            errorCode: 100,
-          },
-          message: errorCode[100],
-        })
-        .end();
-      return;
+    // description image가 업데이트 된다면
+    // 해당 상품의 설명 이미지 경로를 가져와 S3에서 파일 삭제
+    if (descImage !== undefined) {
+      detail.description_url = descImage.key;
+      const deleteList = await service.getOtherImageKeys(productId);
+      if (deleteList.status !== 'success') {
+        res
+          .status(400)
+          .json({
+            status: 'error',
+            data: {
+              errCode: 100,
+            },
+            message: errCode[100],
+          })
+          .end();
+        return;
+      }
+      const descImageKey:Array<S3.s3Object> = [{
+        Key: deleteList.data[0],
+      }];
+      await S3.deleteFile(descImageKey);
     }
-
-    const keys = deleteList.data.map((key: string) => {
-      const obj:S3.s3Object = {
-        Key: '',
-      };
-      obj.Key = key;
-      return obj;
-    });
-    const deleteResult = await S3.deleteFile(keys);
-    if (deleteResult.status !== 'success') {
-      res
-        .status(400)
-        .json({
-          status: 'error',
-          data: {
-            errorCode: 305,
-          },
-          message: errorCode[305],
-        })
-        .end();
-      return;
+    // thumbnail image가 업데이트 된다면
+    // 해당 상품의 썸네일 이미지 경로를 가져와 S3에서 파일 삭제
+    if (thumbImage !== undefined) {
+      detail.thumb_url = thumbImage.key;
+      const deleteList = await service.getOtherImageKeys(productId);
+      if (deleteList.status !== 'success') {
+        res
+          .status(400)
+          .json({
+            status: 'error',
+            data: {
+              errCode: 100,
+            },
+            message: errCode[100],
+          })
+          .end();
+        return;
+      }
+      const thumbImageKey:Array<S3.s3Object> = [{
+        Key: deleteList.data[1],
+      }];
+      await S3.deleteFile(thumbImageKey);
     }
-
     // 상품 상세 정보 DB를 업데이트
     const result = await service.updateProductDetail(
       productId,
-      descImage.key,
-      thumbImage.key,
-      detail.description,
-      detail.name,
-      detail.price,
-      detail.stock,
-      detail.delivery_charge,
+      detail,
     );
     if (result.status !== 'success') {
       res
@@ -365,9 +366,9 @@ const updateProductDetail = async (req:Request, res:Response): Promise<void> => 
         .json({
           status: 'error',
           data: {
-            errorCode: 304,
+            errCode: 304,
           },
-          message: errorCode[304],
+          message: errCode[304],
         })
         .end();
       return;
@@ -385,9 +386,9 @@ const updateProductDetail = async (req:Request, res:Response): Promise<void> => 
       .json({
         status: 'error',
         data: {
-          errorCode: 0,
+          errCode: 0,
         },
-        message: errorCode[0],
+        message: errCode[0],
       })
       .end();
   }
@@ -409,7 +410,7 @@ const addProductImage = async (req:Request, res:Response): Promise<void> => {
           data: {
             errCode: 200,
           },
-          message: errorCode[200],
+          message: errCode[200],
         })
         .end();
       return;
@@ -427,9 +428,9 @@ const addProductImage = async (req:Request, res:Response): Promise<void> => {
         .json({
           status: 'error',
           data: {
-            errorCode: 301,
+            errCode: 301,
           },
-          message: errorCode[301],
+          message: errCode[301],
         })
         .end();
       return;
@@ -447,9 +448,9 @@ const addProductImage = async (req:Request, res:Response): Promise<void> => {
       .json({
         status: 'error',
         data: {
-          errorCode: 0,
+          errCode: 0,
         },
-        message: errorCode[0],
+        message: errCode[0],
       })
       .end();
   }
@@ -469,7 +470,7 @@ const deleteProductImage = async (req:Request, res:Response): Promise<void> => {
           data: {
             errCode: 200,
           },
-          message: errorCode[200],
+          message: errCode[200],
         })
         .end();
       return;
@@ -483,9 +484,9 @@ const deleteProductImage = async (req:Request, res:Response): Promise<void> => {
         .json({
           status: 'error',
           data: {
-            errorCode: 303,
+            errCode: 303,
           },
-          message: errorCode[303],
+          message: errCode[303],
         })
         .end();
       return;
@@ -507,9 +508,9 @@ const deleteProductImage = async (req:Request, res:Response): Promise<void> => {
         .json({
           status: 'error',
           data: {
-            errorCode: 305,
+            errCode: 305,
           },
-          message: errorCode[305],
+          message: errCode[305],
         })
         .end();
       return;
@@ -523,9 +524,9 @@ const deleteProductImage = async (req:Request, res:Response): Promise<void> => {
         .json({
           status: 'error',
           data: {
-            errorCode: 303,
+            errCode: 303,
           },
-          message: errorCode[303],
+          message: errCode[303],
         })
         .end();
       return;
@@ -543,9 +544,9 @@ const deleteProductImage = async (req:Request, res:Response): Promise<void> => {
       .json({
         status: 'error',
         data: {
-          errorCode: 0,
+          errCode: 0,
         },
-        message: errorCode[0],
+        message: errCode[0],
       })
       .end();
   }
