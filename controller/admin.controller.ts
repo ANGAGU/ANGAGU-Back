@@ -2,9 +2,9 @@ import { Request, Response } from 'express';
 import * as service from '../database/admin-service';
 import errorCode from './errorCode';
 
-const approveList = async (req:Request, res:Response):Promise<void> => {
+const approveProductList = async (req:Request, res:Response):Promise<void> => {
   try {
-    const result = await service.getApproveList();
+    const result = await service.getApproveProductList();
     if (result.status !== 'success') {
       res
         .status(404)
@@ -76,6 +76,6 @@ const approveProduct = async (req:Request, res:Response):Promise<void> => {
 };
 
 export {
-  approveList,
+  approveProductList,
   approveProduct,
 };
