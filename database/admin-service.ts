@@ -15,7 +15,21 @@ const getApproveList = async ():Promise<any> => {
     };
   }
 };
+const approveProduct = async (productId: number):Promise<any> => {
+  try {
+    await pool.query('UPDATE product SET is_approve = 1 WHERE id = ?', productId);
+    return {
+      status: 'success',
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
 
 export {
   getApproveList,
+  approveProduct,
 };

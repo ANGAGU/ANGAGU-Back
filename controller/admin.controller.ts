@@ -39,6 +39,43 @@ const approveList = async (req:Request, res:Response):Promise<void> => {
   }
 };
 
+const approveProduct = async (req:Request, res:Response):Promise<void> => {
+  try {
+    const productId = Number(req.params.productId);
+    const result = await service.approveProduct(productId);
+    if (result.status !== 'success') {
+      res
+        .status(304)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 304,
+          },
+          message: errorCode[304],
+        })
+        .end();
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+        },
+        message: errorCode[0],
+      })
+      .end();
+  }
+};
+
 export {
   approveList,
+  approveProduct,
 };

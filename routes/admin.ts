@@ -5,5 +5,6 @@ import * as auth from '../controller/auth';
 const router = express.Router();
 
 router.get('/approve', controller.approveList);
+router.put('/approve/:productId', controller.approveProduct);
 
 export default router;
