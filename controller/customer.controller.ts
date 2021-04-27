@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
-import { getCustomerByEmailPassword, getProducts, getProductDetailById } from '../database/customer-service';
+import {
+  getCustomerByEmailPassword, getProducts, getProductDetailById, customerSignup,
+} from '../database/customer-service';
 import * as service from '../database/customer-service';
 import errorCode from './errorCode';
 import {
@@ -243,10 +245,34 @@ const orderDetail = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+const signup = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const result = customerSignup();
+    res
+      .status(200)
+      .json({
+        status: 'success',
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          drrCode: 0,
+        },
+        message: errorCode[0],
+      })
+      .end();
+  }
+};
+
 export {
   login,
   products,
   productDetail,
   orderList,
   orderDetail,
+  signup,
 };

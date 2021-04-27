@@ -9,5 +9,6 @@ router.get('/products', controller.products);
 router.get('/products/:productId', controller.productDetail);
 router.get('/order', auth.authorization, controller.orderList);
 router.get('/order/:orderId', auth.authorization, controller.orderDetail);
+router.post('/signup', controller.signup);
 
 export default router;

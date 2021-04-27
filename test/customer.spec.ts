@@ -51,3 +51,10 @@ describe('customer order test', () => {
     expect(getOrderListDetail.status).to.equal('success');
   });
 });
+
+describe('customer signup test', () => {
+  it('customer signup test', async () => {
+    const res = await chai.request(server).post('/customer/signup').send();
+    expect(res.status).to.equal(200);
+  });
+});

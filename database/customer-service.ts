@@ -71,10 +71,24 @@ const getOrderDetail = async (orderId: number): Promise<any> => {
   }
 };
 
+const customerSignup = async (): Promise<any> => {
+  try {
+    return {
+      status: 'success',
+      data: [],
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
 export {
   getCustomerByEmailPassword,
   getProducts,
   getProductDetailById,
   getOrderList,
   getOrderDetail,
+  customerSignup,
 };

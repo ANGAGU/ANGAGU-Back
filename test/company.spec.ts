@@ -30,8 +30,8 @@ describe('company test', () => {
   });
 });
 
-describe('company test', () => {
-  it('company signup test', async () => {
+describe('company signup test', () => {
+  it('company signup ducplicate', async () => {
     const info = {
       email: 'naver@gmail.com',
       name: 'test company',
