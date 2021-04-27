@@ -34,7 +34,20 @@ const getProducts = async (id :number):Promise<DBresult> => {
   }
 };
 
+const companySignup = async ():Promise<any> => {
+  try {
+    return {
+      status: 'success',
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+    };
+  }
+};
+
 export {
   getCompanyByEmailPassword,
   getProducts,
+  companySignup,
 };

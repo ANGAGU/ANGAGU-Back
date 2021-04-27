@@ -29,3 +29,10 @@ describe('company test', () => {
     expect(res.status).to.equal(403);
   });
 });
+
+describe('company test', () => {
+  it('company signup test', async () => {
+    const res = await chai.request(server).post('/company/signup').send();
+    expect(res.status).to.equal(200);
+  });
+});
