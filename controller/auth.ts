@@ -13,19 +13,29 @@ const authorization = (req:Request, res:Response, next:NextFunction):any => {
       message: errorCode[201],
     });
   }
-  const { id, type } = jwtVerify(token as string).data;
-  if (typeof id === 'undefined' || typeof type === 'undefined') {
-    return res.status(403).json({
+  try {
+    const { id, type } = jwtVerify(token as string).data;
+    if (typeof id === 'undefined' || typeof type === 'undefined') {
+      return res.status(403).json({
+        status: 'error',
+        data: {
+          errCode: 201,
+        },
+        message: errorCode[201],
+      });
+    }
+    res.locals.id = id;
+    res.locals.type = type;
+    next();
+  } catch (err) {
+    res.status(403).json({
       status: 'error',
       data: {
-        errCode: 201,
+        errCode: 202,
       },
-      message: errorCode[201],
+      message: errorCode[202],
     });
   }
-  res.locals.id = id;
-  res.locals.type = type;
-  return next();
 };
 
 export {
