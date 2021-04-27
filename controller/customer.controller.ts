@@ -247,11 +247,41 @@ const orderDetail = async (req: Request, res: Response): Promise<void> => {
 
 const signup = async (req: Request, res: Response): Promise<void> => {
   try {
-    const result = customerSignup();
+    const info = req.body;
+    const result = await customerSignup(info);
+    if (result.status === 'duplicate') {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 306,
+          },
+          message: errorCode[306],
+        })
+        .end();
+      return;
+    }
+    if (result.status === 'error') {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 307,
+          },
+          message: errorCode[307],
+        })
+        .end();
+      return;
+    }
     res
       .status(200)
       .json({
         status: 'success',
+        data: {
+          id: result.data,
+        },
       })
       .end();
   } catch (err) {

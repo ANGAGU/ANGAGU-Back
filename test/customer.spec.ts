@@ -54,7 +54,14 @@ describe('customer order test', () => {
 
 describe('customer signup test', () => {
   it('customer signup test', async () => {
-    const res = await chai.request(server).post('/customer/signup').send();
-    expect(res.status).to.equal(200);
+    const info = {
+      email: 'test@naver.com',
+      password: 'test',
+      name: 'whalswo',
+      birth: '1997-04-05',
+      phone_number: '01055559999',
+    };
+    const res = await chai.request(server).post('/customer/signup').send(info);
+    expect(res.status).to.equal(404);
   });
 });

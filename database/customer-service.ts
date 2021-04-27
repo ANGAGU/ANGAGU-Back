@@ -71,13 +71,28 @@ const getOrderDetail = async (orderId: number): Promise<any> => {
   }
 };
 
-const customerSignup = async (): Promise<any> => {
+const customerSignup = async (info:any): Promise<any> => {
   try {
+    const sql = 'INSERT INTO customer(email, password, name, birth, phone_number) VALUES(?,?,?,?,?)';
+    const [result] = await pool.query(sql, [
+      info.email,
+      info.password,
+      info.name,
+      info.birth,
+      info.phone_number,
+    ]);
+    const data:any = result;
     return {
       status: 'success',
-      data: [],
+      data: data.insertId,
     };
   } catch (err) {
+    if (err.errno === 1062) {
+      return {
+        status: 'duplicate',
+        data: err,
+      };
+    }
     return {
       status: 'error',
       data: err,
