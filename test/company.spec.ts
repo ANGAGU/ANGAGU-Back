@@ -32,7 +32,17 @@ describe('company test', () => {
 
 describe('company test', () => {
   it('company signup test', async () => {
-    const res = await chai.request(server).post('/company/signup').send();
-    expect(res.status).to.equal(200);
+    const info = {
+      email: 'naver@gmail.com',
+      name: 'test company',
+      password: 'test',
+      phone_number: '12312341234',
+      business_number: '1256415',
+      account_number: '8654565564',
+      account_holder: '김회사',
+      account_bank: '국민은행',
+    };
+    const res = await chai.request(server).post('/company/signup').send(info);
+    expect(res.status).to.equal(404);
   });
 });

@@ -6,4 +6,6 @@ export default {
   200: 'wrong user type',
   201: 'no auth token',
   300: 'cannot find product',
+  306: 'duplicate user',
+  307: 'db insert error',
 };
