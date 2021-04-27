@@ -201,6 +201,7 @@ const updateProductDetail = async (
       status: 'success',
     };
   } catch (err) {
+    await conn.rollback();
     return {
       status: 'error',
     };
