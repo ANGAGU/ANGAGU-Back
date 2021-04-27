@@ -5,6 +5,7 @@ import indexRouter from './routes/index';
 import usersRouter from './routes/users';
 import customerRouter from './routes/customer';
 import companyRouter from './routes/company';
+import adminRouter from './routes/admin';
 
 export default class App {
   public app: express.Application;
@@ -40,5 +41,6 @@ export default class App {
     this.app.use('/users', usersRouter);
     this.app.use('/customer', customerRouter);
     this.app.use('/company', companyRouter);
+    this.app.use('/admin', adminRouter);
   }
 }
