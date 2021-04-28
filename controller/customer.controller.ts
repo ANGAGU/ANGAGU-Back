@@ -95,8 +95,21 @@ const productDetail = async (req: Request, res: Response):Promise<void> => {
   const productId = Number(req.params.productId);
   try {
     const result = await getProductDetailById(productId);
-    const product:Product = result[0];
-    const productImages:Array<ProductImage> = result[1];
+    if (result.status !== 'success') {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errorCode[100],
+        })
+        .end();
+      return;
+    }
+    const product:Product = result.data;
+    const productImages:Array<ProductImage> = result.images;
     if (!product) {
       res
         .status(404)
