@@ -5,6 +5,7 @@ export default {
   102: 'cannot find user',
   200: 'wrong user type',
   201: 'no auth token',
+  202: 'not valid token',
   300: 'cannot find product',
   301: 'db insert error',
   302: 'no file',

@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { getCompanyByEmailPassword, getProducts, getSale } from '../database/company-service';
-import { getCompanyByEmailPassword, getProducts } from '../database/company-service';
 import * as service from '../database/company-service';
 import { jwtSignUser, isEmail } from './utils';
 import * as S3 from './s3';
@@ -562,7 +561,7 @@ const sale = async (req:Request, res:Response): Promise<void> => {
         data: {
           errCode: 200,
         },
-        message: errorCode[200],
+        message: errCode[200],
       });
     }
     const result = await getSale(id);
@@ -577,7 +576,7 @@ const sale = async (req:Request, res:Response): Promise<void> => {
         data: {
           errCode: 100,
         },
-        message: errorCode[100],
+        message: errCode[100],
       });
     }
   } catch (err) {
@@ -587,7 +586,7 @@ const sale = async (req:Request, res:Response): Promise<void> => {
         errCode: 0,
         data: err,
       },
-      message: errorCode[0],
+      message: errCode[0],
     });
   }
 };

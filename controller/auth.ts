@@ -13,16 +13,6 @@ const authorization = (req:Request, res:Response, next:NextFunction):any => {
       message: errCode[201],
     });
   }
-  const { id, type } = jwtVerify(token as string).data;
-  if (typeof id === 'undefined' || typeof type === 'undefined') {
-    return res.status(403).json({
-      status: 'error',
-      data: {
-        errCode: 201,
-      },
-      message: errCode[201],
-    });
-  }
   try {
     const { id, type } = jwtVerify(token as string).data;
     if (typeof id === 'undefined' || typeof type === 'undefined') {
@@ -31,7 +21,7 @@ const authorization = (req:Request, res:Response, next:NextFunction):any => {
         data: {
           errCode: 201,
         },
-        message: errorCode[201],
+        message: errCode[201],
       });
     }
     res.locals.id = id;
@@ -43,7 +33,7 @@ const authorization = (req:Request, res:Response, next:NextFunction):any => {
       data: {
         errCode: 202,
       },
-      message: errorCode[202],
+      message: errCode[202],
     });
   }
 };
