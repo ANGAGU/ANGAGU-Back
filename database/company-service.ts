@@ -34,7 +34,25 @@ const getProducts = async (id :number):Promise<DBresult> => {
   }
 };
 
+const getSale = async (id :number):Promise<DBresult> => {
+  const result:DBresult = {
+    status: 'error',
+    data: [],
+  };
+  try {
+    const [rows] = await pool.query('SELECT * FROM sale WHERE company_id = ?', id);
+    result.status = 'success';
+    result.data = JSON.parse(JSON.stringify(rows));
+    return result;
+  } catch (err) {
+    result.status = 'error';
+    result.data = err;
+    return result;
+  }
+};
+
 export {
   getCompanyByEmailPassword,
   getProducts,
+  getSale,
 };

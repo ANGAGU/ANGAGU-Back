@@ -28,4 +28,14 @@ describe('company test', () => {
     const res = await chai.request(server).get('/company/products').send();
     expect(res.status).to.equal(403);
   });
+
+  it('get sale db test', async () => {
+    const result = await service.getSale(0);
+    expect(result.status).to.equal('success');
+  });
+
+  it('get sale api test', async () => {
+    const res = await chai.request(server).get('/company/sale').send();
+    expect(res.status).to.equal(403);
+  });
 });
