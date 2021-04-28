@@ -11,4 +11,6 @@ export default {
   303: 'db delete error',
   304: 'db update error',
   305: 's3 delete error',
+  306: 'duplicate user',
+  307: 'db insert error',
 };
