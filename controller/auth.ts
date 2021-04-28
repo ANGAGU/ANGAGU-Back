@@ -5,24 +5,26 @@ import errCode from './errCode';
 const authorization = (req:Request, res:Response, next:NextFunction):any => {
   const { authorization: token } = req.headers;
   if (typeof token === 'undefined') {
-    return res.status(403).json({
+    res.status(403).json({
       status: 'error',
       data: {
         errCode: 201,
       },
       message: errCode[201],
     });
+    return;
   }
   try {
     const { id, type } = jwtVerify(token as string).data;
     if (typeof id === 'undefined' || typeof type === 'undefined') {
-      return res.status(403).json({
+      res.status(403).json({
         status: 'error',
         data: {
           errCode: 201,
         },
         message: errCode[201],
       });
+      return;
     }
     res.locals.id = id;
     res.locals.type = type;
