@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import * as service from '../database/admin-service';
-import errorCode from './errorCode';
+import errorCode from './errCode';
 
 const approveProductList = async (req:Request, res:Response):Promise<void> => {
   try {

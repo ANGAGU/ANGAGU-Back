@@ -39,3 +39,14 @@ describe('company test', () => {
     expect(res.status).to.equal(403);
   });
 });
+
+describe('company products test', () => {
+  it('delete product detail test', async () => {
+    const delDetailResult = await service.deleteProduct(100);
+    expect(delDetailResult.status).to.equal('success');
+  });
+  it('delete product image test', async () => {
+    const delImResult = await service.deleteProductImage(100);
+    expect(delImResult.status).to.equal('success');
+  });
+});
