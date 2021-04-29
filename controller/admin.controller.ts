@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import * as service from '../database/admin-service';
 import errorCode from './errCode';
+import { jwtSignUser } from './utils';
 
 const approveProductList = async (req:Request, res:Response):Promise<void> => {
   try {
@@ -75,7 +76,54 @@ const approveProduct = async (req:Request, res:Response):Promise<void> => {
   }
 };
 
+const login = async (req:Request, res:Response):Promise<void> => {
+  try {
+    const result = await service.getAdminByIdPassword(req.body.email, req.body.password);
+    if (result.status === 'success') {
+      if (result.data.length === 1) {
+        const user:any = result.data[0];
+        user.type = 'admin';
+        const token = jwtSignUser(user);
+        res.json({
+          status: 'success',
+          data: {
+            user,
+            token,
+          },
+        });
+      } else {
+        res.status(202).json({
+          status: 'error',
+          data: {
+            errCode: 102,
+          },
+          message: errorCode[102],
+        });
+      }
+    } else {
+      res.status(500).json({
+        status: 'error',
+        data: {
+          errCode: 100,
+          data: result.data,
+        },
+        message: errorCode[100],
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      status: 'error',
+      data: {
+        errCode: 0,
+        data: err,
+      },
+      message: errorCode[0],
+    });
+  }
+};
+
 export {
   approveProductList,
   approveProduct,
+  login,
 };
