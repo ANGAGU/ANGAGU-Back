@@ -6,7 +6,7 @@ const getCustomerByEmailPassword = async (email:string, password:string):Promise
     data: [],
   };
   try {
-    const [rows] = await pool.query('SELECT id,email,birth,phone_number FROM CUSTOMER WHERE email = ? AND password = ?', [email, password]);
+    const [rows] = await pool.query('SELECT id,email,birth,phone_number FROM customer WHERE email = ? AND password = ?', [email, password]);
     result.status = 'success';
     result.data = JSON.parse(JSON.stringify(rows));
     return result;
@@ -35,13 +35,26 @@ const getProducts = async ():Promise<DBresult> => {
 };
 
 const getProductDetailById = async (productId: number): Promise<any> => {
+  const conn = await pool.getConnection();
   try {
-    const [result] = await pool.query('SELECT * FROM product WHERE id = (?)', productId);
-    const [images] = await pool.query('SELECT image_url, image_order FROM product_image WHERE product_id = (?)', productId);
+    await conn.beginTransaction();
+    await conn.query('UPDATE product SET view_count = view_count+1 WHERE id = (?)', productId);
+    const [result] = await conn.query('SELECT * FROM product WHERE id = (?)', productId);
+    const [images] = await conn.query('SELECT image_url, image_order FROM product_image WHERE product_id = (?)', productId);
     const data:any = result;
-    return [data[0], images];
+    await conn.commit();
+    return {
+      status: 'success',
+      data: data[0],
+      images,
+    };
   } catch (err) {
-    throw Error(err);
+    await conn.rollback();
+    return {
+      status: 'error',
+    };
+  } finally {
+    conn.release();
   }
 };
 
@@ -54,7 +67,9 @@ const getOrderList = async (customerId: number): Promise<any> => {
       status: 'success',
     };
   } catch (err) {
-    throw Error(err);
+    return {
+      status: 'error',
+    };
   }
 };
 
@@ -67,7 +82,9 @@ const getOrderDetail = async (orderId: number): Promise<any> => {
       status: 'success',
     };
   } catch (err) {
-    throw Error(err);
+    return {
+      status: 'error',
+    };
   }
 };
 

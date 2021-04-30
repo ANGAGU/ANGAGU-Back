@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
+import { getCustomerByEmailPassword, getProducts, getProductDetailById } from '../database/customer-service';
+import errCode from './errCode';
 import {
   getCustomerByEmailPassword, getProducts, getProductDetailById, customerSignup,
 } from '../database/customer-service';
 import * as service from '../database/customer-service';
-import errorCode from './errorCode';
 import {
   jwtSignUser, isEmail, Product, ProductImage,
 } from './utils';
@@ -16,7 +17,7 @@ const login = async (req:Request, res:Response):Promise<void> => {
         data: {
           errCode: 101,
         },
-        message: errorCode[101],
+        message: errCode[101],
       });
       return;
     }
@@ -39,7 +40,7 @@ const login = async (req:Request, res:Response):Promise<void> => {
           data: {
             errCode: 102,
           },
-          message: errorCode[102],
+          message: errCode[102],
         });
       }
     } else {
@@ -49,7 +50,7 @@ const login = async (req:Request, res:Response):Promise<void> => {
           errCode: 100,
           data: result.data,
         },
-        message: errorCode[100],
+        message: errCode[100],
       });
     }
   } catch (err) {
@@ -59,7 +60,7 @@ const login = async (req:Request, res:Response):Promise<void> => {
         errCode: 0,
         data: err,
       },
-      message: errorCode[0],
+      message: errCode[0],
     });
   }
 };
@@ -78,7 +79,7 @@ const products = async (req:Request, res:Response):Promise<void> => {
         data: {
           errCode: 100,
         },
-        message: errorCode[100],
+        message: errCode[100],
       });
     }
   } catch (err) {
@@ -88,7 +89,7 @@ const products = async (req:Request, res:Response):Promise<void> => {
         errCode: 0,
         data: err,
       },
-      message: errorCode[0],
+      message: errCode[0],
     });
   }
 };
@@ -97,8 +98,21 @@ const productDetail = async (req: Request, res: Response):Promise<void> => {
   const productId = Number(req.params.productId);
   try {
     const result = await getProductDetailById(productId);
-    const product:Product = result[0];
-    const productImages:Array<ProductImage> = result[1];
+    if (result.status !== 'success') {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+    const product:Product = result.data;
+    const productImages:Array<ProductImage> = result.images;
     if (!product) {
       res
         .status(404)
@@ -107,14 +121,12 @@ const productDetail = async (req: Request, res: Response):Promise<void> => {
           data: {
             errCode: 300,
           },
-          message: errorCode[300],
+          message: errCode[300],
         })
         .end();
       return;
     }
-
     product.images = productImages;
-
     res
       .status(200)
       .json({
@@ -130,7 +142,7 @@ const productDetail = async (req: Request, res: Response):Promise<void> => {
         data: {
           errCode: 100,
         },
-        message: errorCode[100],
+        message: errCode[100],
       })
       .end();
   }
@@ -148,7 +160,7 @@ const orderList = async (req: Request, res: Response): Promise<void> => {
           data: {
             errCode: 200,
           },
-          message: errorCode[200],
+          message: errCode[200],
         })
         .end();
       return;
@@ -164,7 +176,7 @@ const orderList = async (req: Request, res: Response): Promise<void> => {
           data: {
             errCode: 100,
           },
-          message: errorCode[100],
+          message: errCode[100],
         })
         .end();
       return;
@@ -184,7 +196,7 @@ const orderList = async (req: Request, res: Response): Promise<void> => {
         data: {
           errCode: 100,
         },
-        message: errorCode[100],
+        message: errCode[100],
       })
       .end();
   }
@@ -203,7 +215,7 @@ const orderDetail = async (req: Request, res: Response): Promise<void> => {
           data: {
             errCode: 200,
           },
-          message: errorCode[200],
+          message: errCode[200],
         })
         .end();
       return;
@@ -219,7 +231,7 @@ const orderDetail = async (req: Request, res: Response): Promise<void> => {
           data: {
             errCode: 100,
           },
-          message: errorCode[100],
+          message: errCode[100],
         })
         .end();
       return;
@@ -239,7 +251,7 @@ const orderDetail = async (req: Request, res: Response): Promise<void> => {
         data: {
           errCode: 0,
         },
-        message: errorCode[0],
+        message: errCode[0],
       })
       .end();
   }
