@@ -1,4 +1,4 @@
-import { pool } from './pool';
+import { pool, DBresult } from './pool';
 
 const getApproveProductList = async ():Promise<any> => {
   try {
@@ -29,7 +29,25 @@ const approveProduct = async (productId: number):Promise<any> => {
   }
 };
 
+const getAdminByIdPassword = async (id:string, password:string):Promise<DBresult> => {
+  const result:DBresult = {
+    status: 'error',
+    data: [],
+  };
+  try {
+    const [rows] = await pool.query('SELECT id FROM admin WHERE id = ? AND password = ?', [id, password]);
+    result.status = 'success';
+    result.data = JSON.parse(JSON.stringify(rows));
+    return result;
+  } catch (err) {
+    result.status = 'error';
+    result.data = err;
+    return result;
+  }
+};
+
 export {
   getApproveProductList,
   approveProduct,
+  getAdminByIdPassword,
 };

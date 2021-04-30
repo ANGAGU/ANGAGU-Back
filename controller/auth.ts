@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { jwtVerify } from './utils';
 import errCode from './errCode';
 
-const authorization = (req:Request, res:Response, next:NextFunction):any => {
+const authorization = (req:Request, res:Response, next:NextFunction):void => {
   const { authorization: token } = req.headers;
   if (typeof token === 'undefined') {
     res.status(403).json({
