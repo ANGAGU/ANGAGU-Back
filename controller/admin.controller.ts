@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import * as service from '../database/admin-service';
-import errorCode from './errCode';
+import errCode from './errCode';
 import { jwtSignUser } from './utils';
 
 const approveProductList = async (req:Request, res:Response):Promise<void> => {
@@ -14,7 +14,7 @@ const approveProductList = async (req:Request, res:Response):Promise<void> => {
           data: {
             errCode: 100,
           },
-          message: errorCode[100],
+          message: errCode[100],
         })
         .end();
       return;
@@ -34,7 +34,7 @@ const approveProductList = async (req:Request, res:Response):Promise<void> => {
         data: {
           errCode: 0,
         },
-        message: errorCode[0],
+        message: errCode[0],
       })
       .end();
   }
@@ -52,7 +52,7 @@ const approveProduct = async (req:Request, res:Response):Promise<void> => {
           data: {
             errCode: 304,
           },
-          message: errorCode[304],
+          message: errCode[304],
         })
         .end();
     }
@@ -70,7 +70,7 @@ const approveProduct = async (req:Request, res:Response):Promise<void> => {
         data: {
           errCode: 0,
         },
-        message: errorCode[0],
+        message: errCode[0],
       })
       .end();
   }
@@ -97,7 +97,7 @@ const login = async (req:Request, res:Response):Promise<void> => {
           data: {
             errCode: 102,
           },
-          message: errorCode[102],
+          message: errCode[102],
         });
       }
     } else {
@@ -107,7 +107,7 @@ const login = async (req:Request, res:Response):Promise<void> => {
           errCode: 100,
           data: result.data,
         },
-        message: errorCode[100],
+        message: errCode[100],
       });
     }
   } catch (err) {
@@ -117,8 +117,31 @@ const login = async (req:Request, res:Response):Promise<void> => {
         errCode: 0,
         data: err,
       },
-      message: errorCode[0],
+      message: errCode[0],
     });
+  }
+};
+
+const sale = async (req:Request, res:Response):Promise<void> => {
+  try {
+    const result = await service.getSale();
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: result.data,
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+        },
+        message: errCode[0],
+      });
   }
 };
 
@@ -126,4 +149,5 @@ export {
   approveProductList,
   approveProduct,
   login,
+  sale,
 };

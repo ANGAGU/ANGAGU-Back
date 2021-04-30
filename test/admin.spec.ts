@@ -25,3 +25,10 @@ describe('admin test', () => {
     expect(res.status).to.equal(202);
   });
 });
+
+describe('admin test', () => {
+  it('get sale test', async () => {
+    const getSaleResult = await service.getSale();
+    expect(getSaleResult.status).to.equal('success');
+  });
+});

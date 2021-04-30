@@ -46,8 +46,24 @@ const getAdminByIdPassword = async (id:string, password:string):Promise<DBresult
   }
 };
 
+const getSale = async ():Promise<any> => {
+  try {
+    const result = 0;
+    return {
+      status: 'success',
+      data: result,
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
+
 export {
   getApproveProductList,
   approveProduct,
   getAdminByIdPassword,
+  getSale,
 };
