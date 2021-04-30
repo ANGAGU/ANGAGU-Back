@@ -7,12 +7,12 @@ chai.use(chaiHttp);
 
 describe('admin test', () => {
   it('get approve product list test', async () => {
-    const getResult = await chai.request(server).get('/admin/products');
-    expect(getResult).to.have.status(200);
+    const getResult = await service.getApproveProductList();
+    expect(getResult.status).to.equal('success');
   });
   it('approve a product', async () => {
-    const approveResult = await chai.request(server).put('/admin/products/1');
-    expect(approveResult).to.have.status(200);
+    const approveResult = await service.approveProduct(1);
+    expect(approveResult.status).to.equal('success');
   });
 
   it('login db test', async () => {

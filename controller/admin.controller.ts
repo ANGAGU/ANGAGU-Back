@@ -5,6 +5,21 @@ import { jwtSignUser } from './utils';
 
 const approveProductList = async (req:Request, res:Response):Promise<void> => {
   try {
+    const { type } = res.locals;
+
+    if (type !== 'admin') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
     const result = await service.getApproveProductList();
     if (result.status !== 'success') {
       res
@@ -42,7 +57,22 @@ const approveProductList = async (req:Request, res:Response):Promise<void> => {
 
 const approveProduct = async (req:Request, res:Response):Promise<void> => {
   try {
+    const { type } = res.locals;
     const productId = Number(req.params.productId);
+
+    if (type !== 'admin') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
     const result = await service.approveProduct(productId);
     if (result.status !== 'success') {
       res
@@ -124,6 +154,21 @@ const login = async (req:Request, res:Response):Promise<void> => {
 
 const sale = async (req:Request, res:Response):Promise<void> => {
   try {
+    const { type } = res.locals;
+
+    if (type !== 'admin') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
     const result = await service.getSale();
     if (result.status !== 'success') {
       res

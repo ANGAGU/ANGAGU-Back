@@ -5,8 +5,8 @@ import * as auth from '../controller/auth';
 const router = express.Router();
 
 router.post('/login', controller.login);
-router.get('/products', controller.approveProductList);
-router.put('/products/:productId', controller.approveProduct);
-router.get('/sale', controller.sale);
+router.get('/products', auth.authorization, controller.approveProductList);
+router.put('/products/:productId', auth.authorization, controller.approveProduct);
+router.get('/sale', auth.authorization, controller.sale);
 
 export default router;
