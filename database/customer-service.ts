@@ -88,10 +88,26 @@ const getOrderDetail = async (orderId: number): Promise<any> => {
   }
 };
 
+const getModelUrl = async (productId: number): Promise<any> => {
+  try {
+    const result = 0;
+    return {
+      status: 'success',
+      data: result,
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
+
 export {
   getCustomerByEmailPassword,
   getProducts,
   getProductDetailById,
   getOrderList,
   getOrderDetail,
+  getModelUrl,
 };
