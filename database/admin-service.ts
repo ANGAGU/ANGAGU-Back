@@ -48,10 +48,10 @@ const getAdminByIdPassword = async (id:string, password:string):Promise<DBresult
 
 const getSale = async ():Promise<any> => {
   try {
-    const result = 0;
+    const [getSaleResult] = await pool.query('SELECT * FROM sale');
     return {
       status: 'success',
-      data: result,
+      data: getSaleResult,
     };
   } catch (err) {
     return {

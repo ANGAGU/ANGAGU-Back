@@ -125,6 +125,19 @@ const login = async (req:Request, res:Response):Promise<void> => {
 const sale = async (req:Request, res:Response):Promise<void> => {
   try {
     const result = await service.getSale();
+    if (result.status !== 'success') {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
     res
       .status(200)
       .json({
