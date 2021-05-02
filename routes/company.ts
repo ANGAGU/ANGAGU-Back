@@ -14,5 +14,8 @@ router.post('/products/:productId/image', auth.authorization, upload.fileUpload,
 router.delete('/products/:productId/image', auth.authorization, controller.deleteProductImage);
 router.get('/sale', auth.authorization, controller.sale);
 router.post('/signup', controller.signup);
+router.post('/signup/sms/code', controller.reqVerifyCode);
+router.post('/signup/sms/verification', controller.conVerifyCode);
+router.post('/signup/email', controller.checkEmail);
 
 export default router;

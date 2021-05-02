@@ -259,6 +259,27 @@ const companySignup = async (info:any):Promise<any> => {
   }
 };
 
+const checkEmailDuplicate = async (email:string): Promise<any> => {
+  try {
+    const [result] = await pool.query('SELECT * FROM company WHERE email = (?)', email);
+    const data:any = result;
+    if (!data[0]) {
+      return {
+        status: 'success',
+      };
+    }
+    return {
+      status: 'error',
+      errCode: 402,
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
+
 export {
   getCompanyByEmailPassword,
   getProducts,
@@ -271,4 +292,5 @@ export {
   getOtherImageKeys,
   addProductImage,
   getSale,
+  checkEmailDuplicate,
 };
