@@ -191,7 +191,7 @@ CREATE TABLE `company` (
   `name` varchar(45) NOT NULL,
   `email` varchar(45) NOT NULL,
   `phone_number` varchar(45) NOT NULL,
-  `business_number` varchar(45) NOT NULL,
+  `business_number` varchar(45) DEFAULT NULL,
   `account_number` varchar(45) NOT NULL,
   `account_holder` varchar(45) NOT NULL,
   `account_bank` varchar(45) NOT NULL,

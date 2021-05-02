@@ -38,6 +38,11 @@ describe('company test', () => {
     const res = await chai.request(server).get('/company/sale').send();
     expect(res.status).to.equal(403);
   });
+
+  it('business api test', async () => {
+    const res = await chai.request(server).post('/company/info/business').send();
+    expect(res.status).to.equal(403);
+  });
 });
 
 describe('company products test', () => {
