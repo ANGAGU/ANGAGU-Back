@@ -102,7 +102,7 @@ const products = async (req:Request, res:Response): Promise<void> => {
 const signup = async (req:Request, res:Response): Promise<void> => {
   try {
     const info = req.body;
-    const result = await companySignup(info);
+    const result = await service.companySignup(info);
     if (result.status === 'duplicate') {
       res
         .status(404)
@@ -111,7 +111,7 @@ const signup = async (req:Request, res:Response): Promise<void> => {
           data: {
             errCode: 306,
           },
-          message: errorCode[306],
+          message: errCode[306],
         })
         .end();
       return;
@@ -124,7 +124,7 @@ const signup = async (req:Request, res:Response): Promise<void> => {
           data: {
             errCode: 307,
           },
-          message: errorCode[307],
+          message: errCode[307],
         })
         .end();
       return;
@@ -147,7 +147,7 @@ const signup = async (req:Request, res:Response): Promise<void> => {
           errCode: 0,
           data: err,
         },
-        message: errorCode[0],
+        message: errCode[0],
       })
       .end();
   }

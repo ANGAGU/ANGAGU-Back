@@ -1,9 +1,8 @@
 import { Request, Response } from 'express';
-import { getCustomerByEmailPassword, getProducts, getProductDetailById } from '../database/customer-service';
-import errCode from './errCode';
 import {
   getCustomerByEmailPassword, getProducts, getProductDetailById, customerSignup,
 } from '../database/customer-service';
+import errCode from './errCode';
 import * as service from '../database/customer-service';
 import {
   jwtSignUser, isEmail, Product, ProductImage,
@@ -269,7 +268,7 @@ const signup = async (req: Request, res: Response): Promise<void> => {
           data: {
             errCode: 306,
           },
-          message: errorCode[306],
+          message: errCode[306],
         })
         .end();
       return;
@@ -282,7 +281,7 @@ const signup = async (req: Request, res: Response): Promise<void> => {
           data: {
             errCode: 307,
           },
-          message: errorCode[307],
+          message: errCode[307],
         })
         .end();
       return;
@@ -304,7 +303,7 @@ const signup = async (req: Request, res: Response): Promise<void> => {
         data: {
           drrCode: 0,
         },
-        message: errorCode[0],
+        message: errCode[0],
       })
       .end();
   }
