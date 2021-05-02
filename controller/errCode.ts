@@ -3,6 +3,8 @@ export default {
   100: 'db select error',
   101: 'wrong email format',
   102: 'cannot find user',
+  103: 'wrong password format',
+  104: 'wrong phone number format',
   200: 'wrong user type',
   201: 'no auth token',
   202: 'not valid token',
@@ -14,4 +16,9 @@ export default {
   305: 's3 delete error',
   306: 'duplicate user',
   307: 'db insert error',
+  400: 'verify code expired',
+  401: 'verify code not matched',
+  402: 'email duplicated',
+  403: 'fail send verification code',
+  404: 'phone number is not verified',
 };
