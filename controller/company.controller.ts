@@ -591,6 +591,46 @@ const sale = async (req:Request, res:Response): Promise<void> => {
   }
 };
 
+const addBusinessInfo = async (req:Request, res:Response): Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+    if (type !== 'company') {
+      res.status(403).json({
+        status: 'error',
+        data: {
+          errCode: 200,
+        },
+        message: errCode[200],
+      });
+    }
+    const result = await service.addBusinessInfo(id, req.body.businessNumber);
+    if (result.status === 'success') {
+      res.json({
+        status: 'success',
+        data: result.data,
+      });
+    } else {
+      res.status(202).json({
+        status: 'error',
+        data: {
+          errCode: 307,
+          data: result.data,
+        },
+        message: errCode[307],
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      status: 'error',
+      data: {
+        errCode: 0,
+        data: err,
+      },
+      message: errCode[0],
+    });
+  }
+};
+
 export {
   login,
   products,
@@ -600,4 +640,5 @@ export {
   addProductImage,
   deleteProductImage,
   sale,
+  addBusinessInfo,
 };

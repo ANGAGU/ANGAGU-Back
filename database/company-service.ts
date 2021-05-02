@@ -227,6 +227,22 @@ const getSale = async (id :number):Promise<DBresult> => {
   }
 };
 
+const addBusinessInfo = async (id :number, businessNumber:string):Promise<DBresult> => {
+  const result:DBresult = {
+    status: 'error',
+    data: [],
+  };
+  try {
+    await pool.query('UPDATE company SET `business_number` = ? WHERE id = ?', [businessNumber, id]);
+    result.status = 'success';
+    return result;
+  } catch (err) {
+    result.status = 'error';
+    result.data = err;
+    return result;
+  }
+};
+
 export {
   getCompanyByEmailPassword,
   getProducts,
@@ -238,4 +254,5 @@ export {
   getOtherImageKeys,
   addProductImage,
   getSale,
+  addBusinessInfo,
 };
