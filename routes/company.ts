@@ -13,5 +13,6 @@ router.put('/products/:productId', auth.authorization, upload.fileUpload, contro
 router.post('/products/:productId/image', auth.authorization, upload.fileUpload, controller.addProductImage);
 router.delete('/products/:productId/image', auth.authorization, controller.deleteProductImage);
 router.get('/sale', auth.authorization, controller.sale);
+router.post('/info/business', auth.authorization, controller.addBusinessInfo);
 
 export default router;
