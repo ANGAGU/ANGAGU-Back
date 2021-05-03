@@ -1,12 +1,12 @@
 import { pool, DBresult } from './pool';
 
-const getCustomerByEmailPassword = async (email:string, password:string):Promise<DBresult> => {
+const getCustomerByEmail = async (email:string):Promise<DBresult> => {
   const result:DBresult = {
     status: 'error',
     data: [],
   };
   try {
-    const [rows] = await pool.query('SELECT id,email,birth,phone_number FROM customer WHERE email = ? AND password = ?', [email, password]);
+    const [rows] = await pool.query('SELECT id,email,password,birth,phone_number FROM customer WHERE email = ?', [email]);
     result.status = 'success';
     result.data = JSON.parse(JSON.stringify(rows));
     return result;
@@ -98,6 +98,7 @@ const customerSignup = async (info:any): Promise<any> => {
       info.birth,
       info.phone_number,
     ]);
+
     const data:any = result;
     return {
       status: 'success',
@@ -139,7 +140,7 @@ const checkEmailDuplicate = async (email:string): Promise<any> => {
 };
 
 export {
-  getCustomerByEmailPassword,
+  getCustomerByEmail,
   getProducts,
   getProductDetailById,
   getOrderList,

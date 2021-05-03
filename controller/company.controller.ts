@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { getCompanyByEmailPassword, getProducts, getSale } from '../database/company-service';
+import { getCompanyByEmail, getProducts, getSale } from '../database/company-service';
 import * as service from '../database/company-service';
 import {
-  jwtSignUser, isEmail, isPassword, isPhone,
+  jwtSignUser, isEmail, isPassword, isPhone, compareHash, hashing,
 } from './utils';
 import * as S3 from './s3';
 import errCode from './errCode';
@@ -26,11 +26,25 @@ const login = async (req:Request, res:Response):Promise<void> => {
       });
       return;
     }
-    const result = await getCompanyByEmailPassword(req.body.email, req.body.password);
+    const result = await getCompanyByEmail(req.body.email);
     if (result.status === 'success') {
       if (result.data.length === 1) {
         const user:any = result.data[0];
+        if (!await compareHash(req.body.password, user.password)) {
+          res
+            .status(405)
+            .json({
+              status: 'error',
+              data: {
+                errCode: 405,
+              },
+              message: errCode[405],
+            })
+            .end();
+          return;
+        }
         user.type = 'company';
+        delete user.password;
         const token = jwtSignUser(user);
         res.json({
           status: 'success',
@@ -150,6 +164,7 @@ const signup = async (req:Request, res:Response): Promise<void> => {
         .end();
       return;
     }
+    info.password = await hashing(info.password);
     const result = await service.companySignup(info);
     if (result.status === 'duplicate') {
       res

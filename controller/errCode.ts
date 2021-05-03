@@ -21,4 +21,5 @@ export default {
   402: 'email duplicated',
   403: 'fail send verification code',
   404: 'phone number is not verified',
+  405: 'incorrect password',
 };

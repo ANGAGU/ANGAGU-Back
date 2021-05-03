@@ -7,6 +7,7 @@ import usersRouter from './routes/users';
 import customerRouter from './routes/customer';
 import companyRouter from './routes/company';
 import adminRouter from './routes/admin';
+import { sessionSecret } from './config.json';
 
 export default class App {
   public app: express.Application;
@@ -14,7 +15,7 @@ export default class App {
   constructor() {
     this.app = express();
     this.app.use(session({
-      secret: 'asadlfkj!@#!@#dfgasdg',
+      secret: sessionSecret,
       resave: false,
       saveUninitialized: true,
     }));

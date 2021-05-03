@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import {
-  getCustomerByEmailPassword, getProducts, getProductDetailById, customerSignup,
+  getCustomerByEmail, getProducts, getProductDetailById, customerSignup,
 } from '../database/customer-service';
 import errCode from './errCode';
 import * as service from '../database/customer-service';
 import {
-  jwtSignUser, isEmail, Product, ProductImage, isPhone, isPassword,
+  jwtSignUser, isEmail, Product, ProductImage, isPhone, isPassword, hashing, compareHash,
 } from './utils';
 import { postVerifyCode, confirmVerifyCode } from './smsVerification';
 
@@ -27,11 +27,25 @@ const login = async (req:Request, res:Response):Promise<void> => {
       });
       return;
     }
-    const result = await getCustomerByEmailPassword(req.body.email, req.body.password);
+    const result = await getCustomerByEmail(req.body.email);
     if (result.status === 'success') {
       if (result.data.length === 1) {
         const user:any = result.data[0];
+        if (!await compareHash(req.body.password, user.password)) {
+          res
+            .status(405)
+            .json({
+              status: 'error',
+              data: {
+                errCode: 405,
+              },
+              message: errCode[405],
+            })
+            .end();
+          return;
+        }
         user.type = 'customer';
+        delete user.password;
         const token = jwtSignUser(user);
         res.json({
           status: 'success',
@@ -305,6 +319,7 @@ const signup = async (req: Request, res: Response): Promise<void> => {
         .end();
       return;
     }
+    info.password = await hashing(info.password);
     const result = await customerSignup(info);
     if (result.status === 'duplicate') {
       res
@@ -342,7 +357,6 @@ const signup = async (req: Request, res: Response): Promise<void> => {
       })
       .end();
   } catch (err) {
-    console.log(err);
     res
       .status(500)
       .json({

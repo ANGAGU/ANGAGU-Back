@@ -1,12 +1,12 @@
 import { pool, DBresult } from './pool';
 
-const getCompanyByEmailPassword = async (email:string, password:string):Promise<DBresult> => {
+const getCompanyByEmail = async (email:string):Promise<DBresult> => {
   const result:DBresult = {
     status: 'error',
     data: [],
   };
   try {
-    const [rows] = await pool.query('SELECT id,email,name,phone_number, business_number, is_approve, is_block FROM company WHERE email = ? AND password = ?', [email, password]);
+    const [rows] = await pool.query('SELECT id,email,password,name,phone_number, business_number, is_approve, is_block FROM company WHERE email = ?', email);
     result.status = 'success';
     result.data = JSON.parse(JSON.stringify(rows));
     return result;
@@ -281,7 +281,7 @@ const checkEmailDuplicate = async (email:string): Promise<any> => {
 };
 
 export {
-  getCompanyByEmailPassword,
+  getCompanyByEmail,
   getProducts,
   companySignup,
   addProduct,
