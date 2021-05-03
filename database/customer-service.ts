@@ -88,10 +88,27 @@ const getOrderDetail = async (orderId: number): Promise<any> => {
   }
 };
 
+const getModelUrl = async (productId: number): Promise<any> => {
+  try {
+    const [result] = await pool.query('SELECT 3d_model_url FROM product WHERE id = (?)', productId);
+    const data:any = result;
+    return {
+      status: 'success',
+      data: data[0],
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
+
 export {
   getCustomerByEmailPassword,
   getProducts,
   getProductDetailById,
   getOrderList,
   getOrderDetail,
+  getModelUrl,
 };

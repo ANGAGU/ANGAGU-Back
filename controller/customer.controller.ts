@@ -254,10 +254,49 @@ const orderDetail = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+const modelUrl = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const productId = Number(req.params.productId);
+    const modelUrlResult = await service.getModelUrl(productId);
+    if (modelUrlResult.status !== 'success') {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: modelUrlResult.data,
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+        },
+        message: errCode[0],
+      })
+      .end();
+  }
+};
+
 export {
   login,
   products,
   productDetail,
   orderList,
   orderDetail,
+  modelUrl,
 };

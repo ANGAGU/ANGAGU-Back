@@ -51,3 +51,10 @@ describe('customer order test', () => {
     expect(getOrderListDetail.status).to.equal('success');
   });
 });
+
+describe('customer ar detail test', () => {
+  it('it should get a 3d model s3 url', async () => {
+    const modelUrl = await chai.request(server).get('/customer/products/1/ar');
+    expect(modelUrl.status).to.equal(200);
+  });
+});
