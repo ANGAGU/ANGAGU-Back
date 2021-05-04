@@ -1,5 +1,4 @@
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
 import { jwtSecret } from '../config.json';
 
 export interface User {
@@ -44,6 +43,13 @@ function jwtSignUser(user:User):string {
   });
 }
 
+function jwtSignPhone(phoneNumber:string):string {
+  const timeout = 300;
+  return jwt.sign({ data: phoneNumber }, jwtSecret, {
+    expiresIn: timeout,
+  });
+}
+
 function jwtVerify(token:string):any {
   try {
     const decode = jwt.verify(token, jwtSecret);
@@ -52,35 +58,6 @@ function jwtVerify(token:string):any {
     return {};
   }
 }
-
-const hashing = async (password:string):Promise<string> => new Promise((resolve, reject) => {
-  bcrypt.genSalt(10, (err, salt) => {
-    if (err) {
-      reject(err);
-    } else {
-      bcrypt.hash(password, salt, (error, hash) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(hash);
-        }
-      });
-    }
-  });
-});
-
-const compareHash = async (
-  password: string, hash:string,
-):Promise<boolean> => new Promise((resolve, reject) => {
-  bcrypt.compare(password, hash, (err, res) => {
-    if (err) {
-      reject(err);
-    } else if (res) resolve(true);
-    else {
-      resolve(false);
-    }
-  });
-});
 
 function isEmail(asValue: string):boolean {
   const regExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
@@ -99,10 +76,9 @@ function isPhone(input: string):boolean {
 
 export {
   jwtSignUser,
+  jwtSignPhone,
   jwtVerify,
   isEmail,
   isPhone,
   isPassword,
-  hashing,
-  compareHash,
 };

@@ -12,6 +12,5 @@
     "accessKey": "ncloud accessKey",
     "secretKey": "ncloud secretKey",
     "serviceId": "ncloud sms service id",
-    "myPhone": "sms calling number",
-    "sessionSecret": "sesscion secret key"
+    "myPhone": "sms calling number"
 }

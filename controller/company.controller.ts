@@ -1,18 +1,13 @@
 import { Request, Response } from 'express';
+import bcrypt from 'bcrypt';
 import { getCompanyByEmail, getProducts, getSale } from '../database/company-service';
 import * as service from '../database/company-service';
 import {
-  jwtSignUser, isEmail, isPassword, isPhone, compareHash, hashing,
+  jwtSignUser, isEmail, isPassword, isPhone, jwtVerify,
 } from './utils';
 import * as S3 from './s3';
 import errCode from './errCode';
 import { postVerifyCode, confirmVerifyCode } from './smsVerification';
-
-declare module 'express-session' {
-  interface SessionData {
-    phoneNumber: string
-  }
-}
 
 const login = async (req:Request, res:Response):Promise<void> => {
   try {
@@ -30,7 +25,7 @@ const login = async (req:Request, res:Response):Promise<void> => {
     if (result.status === 'success') {
       if (result.data.length === 1) {
         const user:any = result.data[0];
-        if (!await compareHash(req.body.password, user.password)) {
+        if (!await bcrypt.compare(req.body.password, user.password)) {
           res
             .status(405)
             .json({
@@ -125,7 +120,11 @@ const products = async (req:Request, res:Response): Promise<void> => {
 const signup = async (req:Request, res:Response): Promise<void> => {
   try {
     const info = req.body;
-    if (req.session.phoneNumber !== info.phone_number) {
+    const saltRounds = 10;
+    const { verification: token } = req.headers;
+    const verifiedPhoneNumber = jwtVerify(token as string).data;
+
+    if (verifiedPhoneNumber !== info.phone_number) {
       res
         .status(404)
         .json({
@@ -164,7 +163,7 @@ const signup = async (req:Request, res:Response): Promise<void> => {
         .end();
       return;
     }
-    info.password = await hashing(info.password);
+    info.password = await bcrypt.hash(info.password, saltRounds);
     const result = await service.companySignup(info);
     if (result.status === 'duplicate') {
       res
@@ -724,7 +723,7 @@ const reqVerifyCode = async (req: Request, res: Response):Promise<void> => {
       return;
     }
     const result = await postVerifyCode(phoneNumber);
-    if (result.statusCode === '202') {
+    if (result.data.statusCode === '202') {
       res
         .status(200)
         .json({
@@ -786,12 +785,13 @@ const conVerifyCode = async (req: Request, res: Response):Promise<void> => {
         .end();
       return;
     }
-    req.session.phoneNumber = phoneNumber;
     res
       .status(200)
       .json({
         status: 'success',
-        data: {},
+        data: {
+          token: result.token,
+        },
       })
       .end();
   } catch (err) {

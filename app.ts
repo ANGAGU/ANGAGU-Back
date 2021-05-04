@@ -1,24 +1,17 @@
 import express, { Request, Response } from 'express';
 import path from 'path';
 import createError from 'http-errors';
-import session from 'express-session';
 import indexRouter from './routes/index';
 import usersRouter from './routes/users';
 import customerRouter from './routes/customer';
 import companyRouter from './routes/company';
 import adminRouter from './routes/admin';
-import { sessionSecret } from './config.json';
 
 export default class App {
   public app: express.Application;
 
   constructor() {
     this.app = express();
-    this.app.use(session({
-      secret: sessionSecret,
-      resave: false,
-      saveUninitialized: true,
-    }));
     this.app.set('views', path.join(__dirname, 'views'));
     this.app.set('view engine', 'jade');
 

@@ -4,6 +4,7 @@ import axios from 'axios';
 import {
   serviceId, accessKey, secretKey, myPhone,
 } from '../config.json';
+import { jwtSignPhone } from './utils';
 
 const space = ' ';
 const newLine = '\n';
@@ -63,7 +64,6 @@ export const postVerifyCode = async (phoneNumber:string):Promise<any> => {
 };
 export const confirmVerifyCode = async (phoneNumber: string, code: string):Promise<any> => {
   const CacheData = Cache.get(phoneNumber);
-
   if (!CacheData) {
     return {
       status: 'error',
@@ -77,8 +77,10 @@ export const confirmVerifyCode = async (phoneNumber: string, code: string):Promi
       errCode: 401,
     };
   }
+  const token = jwtSignPhone(phoneNumber);
   Cache.del(phoneNumber);
   return {
     status: 'success',
+    token,
   };
 };

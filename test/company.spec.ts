@@ -7,7 +7,7 @@ chai.use(chaiHttp);
 
 describe('company test', () => {
   it('login db test', async () => {
-    const result = await service.getCompanyByEmailPassword('abcd', 'abcd');
+    const result = await service.getCompanyByEmail('abcd');
     expect(result.status).to.equal('success');
   });
 
