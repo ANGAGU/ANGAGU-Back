@@ -31,4 +31,9 @@ describe('admin test', () => {
     const getSaleResult = await service.getSale();
     expect(getSaleResult.status).to.equal('success');
   });
+
+  it('get a company list', async () => {
+    const getCompaniesResult = await service.getCompanyList();
+    expect(getCompaniesResult.status).to.equal('success');
+  });
 });

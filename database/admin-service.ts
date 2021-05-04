@@ -61,9 +61,26 @@ const getSale = async ():Promise<any> => {
   }
 };
 
+const getCompanyList = async ():Promise<any> => {
+  try {
+    const [getCompanyListResult] = await pool.query('SELECT id, name, email, phone_number, business_number, account_number, account_holder, account_bank, is_approve, is_block, create_time, update_time FROM company');
+    const data:any = getCompanyListResult;
+    return {
+      status: 'success',
+      data,
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
+
 export {
   getApproveProductList,
   approveProduct,
   getAdminByIdPassword,
   getSale,
+  getCompanyList,
 };
