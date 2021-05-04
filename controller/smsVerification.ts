@@ -1,6 +1,6 @@
 import Cache from 'memory-cache';
-import request from 'request';
 import crypto from 'crypto';
+import axios from 'axios';
 import {
   serviceId, accessKey, secretKey, myPhone,
 } from '../config.json';
@@ -34,33 +34,32 @@ export const postVerifyCode = async (phoneNumber:string):Promise<any> => {
   message.push(accessKey);
   const signature = hmac.update(message.join('')).digest('base64');
 
-  return new Promise((resolve, reject) => {
-    request({
-      method,
-      uri: url,
-      json: true,
-      headers: {
-        'Content-Type': 'application/json;charset=utf-8',
-        'x-ncp-iam-access-key': accessKey,
-        'x-ncp-apigw-timestamp': timestamp,
-        'x-ncp-apigw-signature-v2': signature,
-      },
-      body: {
-        type: 'sms',
-        contentType: 'COMM',
-        countryCode: '82',
-        from: `${myPhone}`,
-        content: `인증번호는 ${code}입니다. 정확히 입력해주세요.`,
-        messages: [
-          {
-            to: `${phoneNumber}`,
-          },
-        ],
-      },
-    }, (err, res, html) => {
-      resolve(html);
-    });
-  });
+  const config = {
+    headers: {
+      'Content-Type': 'application/json;charset=utf-8',
+      'x-ncp-iam-access-key': accessKey,
+      'x-ncp-apigw-timestamp': timestamp,
+      'x-ncp-apigw-signature-v2': signature,
+    },
+  };
+  try {
+    const response = await axios.post(url, {
+      type: 'sms',
+      contentType: 'COMM',
+      countryCode: '82',
+      from: `${myPhone}`,
+      content: `인증번호는 ${code}입니다. 정확히 입력해주세요.`,
+      messages: [
+        {
+          to: `${phoneNumber}`,
+        },
+      ],
+    },
+    config);
+    return response;
+  } catch (err) {
+    return err;
+  }
 };
 export const confirmVerifyCode = async (phoneNumber: string, code: string):Promise<any> => {
   const CacheData = Cache.get(phoneNumber);

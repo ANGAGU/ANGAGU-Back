@@ -386,7 +386,7 @@ const reqVerifyCode = async (req: Request, res: Response):Promise<void> => {
       return;
     }
     const result = await postVerifyCode(phoneNumber);
-    if (result.statusCode === '202') {
+    if (result.data.statusCode === '202') {
       res
         .status(200)
         .json({
