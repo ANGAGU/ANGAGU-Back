@@ -46,9 +46,9 @@ const getAdminByIdPassword = async (id:string, password:string):Promise<DBresult
   }
 };
 
-const getSale = async ():Promise<any> => {
+const getSale = async (companyId:number, from:Date, to:Date):Promise<any> => {
   try {
-    const [getSaleResult] = await pool.query('SELECT * FROM sale');
+    const [getSaleResult] = await pool.query('SELECT * FROM sale WHERE create_time BETWEEN (?) and DATE_ADD(?, INTERVAL 1 DAY) AND company_id = (?)', [from, to, companyId]);
     return {
       status: 'success',
       data: getSaleResult,
@@ -77,10 +77,28 @@ const getCompanyList = async ():Promise<any> => {
   }
 };
 
+const getTotalFee = async (from:Date, to:Date):Promise<any> => {
+  try {
+    const [feeResult] = await pool.query('SELECT SUM(fee) as fee FROM sale WHERE create_time BETWEEN (?) and DATE_ADD(?, INTERVAL 1 DAY)', [from, to]);
+    const result:any = feeResult;
+    const data = result[0].fee ? Number(result[0].fee) : 0;
+    return {
+      status: 'success',
+      data,
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
+
 export {
   getApproveProductList,
   approveProduct,
   getAdminByIdPassword,
   getSale,
   getCompanyList,
+  getTotalFee,
 };

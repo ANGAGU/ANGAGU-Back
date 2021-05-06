@@ -191,10 +191,11 @@ const companies = async (req:Request, res:Response):Promise<void> => {
   }
 };
 
-const sale = async (req:Request, res:Response):Promise<void> => {
+const companySale = async (req:Request, res:Response):Promise<void> => {
   try {
     const { type } = res.locals;
-
+    const { from, to } = req.body;
+    const companyId = Number(req.params.companyId);
     if (type !== 'admin') {
       res
         .status(403)
@@ -208,7 +209,7 @@ const sale = async (req:Request, res:Response):Promise<void> => {
         .end();
       return;
     }
-    const result = await service.getSale();
+    const result = await service.getSale(companyId, from, to);
     if (result.status !== 'success') {
       res
         .status(404)
@@ -242,11 +243,53 @@ const sale = async (req:Request, res:Response):Promise<void> => {
       .end();
   }
 };
+const totalFee = async (req:Request, res:Response):Promise<void> => {
+  try {
+    const { from, to } = req.body;
+    const result = await service.getTotalFee(from, to);
+    if (result.status !== 'success') {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        data: {
+          status: 'success',
+          data: {
+            fee: result.data,
+          },
+        },
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+        },
+        message: errCode[0],
+      })
+      .end();
+  }
+};
 
 export {
   approveProductList,
   approveProduct,
   login,
-  sale,
+  companySale,
+  totalFee,
   companies,
 };
