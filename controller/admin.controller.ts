@@ -154,6 +154,21 @@ const login = async (req:Request, res:Response):Promise<void> => {
 
 const companies = async (req:Request, res:Response):Promise<void> => {
   try {
+    const { type } = res.locals;
+
+    if (type !== 'admin') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
     const result = await service.getCompanyList();
     if (result.status !== 'success') {
       res
@@ -194,8 +209,10 @@ const companies = async (req:Request, res:Response):Promise<void> => {
 const companySale = async (req:Request, res:Response):Promise<void> => {
   try {
     const { type } = res.locals;
-    const { from, to } = req.body;
     const companyId = Number(req.params.companyId);
+    const dates:any = req.query;
+    const { from, to } = dates;
+
     if (type !== 'admin') {
       res
         .status(403)
@@ -245,7 +262,24 @@ const companySale = async (req:Request, res:Response):Promise<void> => {
 };
 const totalFee = async (req:Request, res:Response):Promise<void> => {
   try {
-    const { from, to } = req.body;
+    const { type } = res.locals;
+    const dates:any = req.query;
+    const { from, to } = dates;
+
+    if (type !== 'admin') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+
     const result = await service.getTotalFee(from, to);
     if (result.status !== 'success') {
       res

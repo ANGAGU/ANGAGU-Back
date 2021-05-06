@@ -46,7 +46,7 @@ const getAdminByIdPassword = async (id:string, password:string):Promise<DBresult
   }
 };
 
-const getSale = async (companyId:number, from:Date, to:Date):Promise<any> => {
+const getSale = async (companyId:number, from:string, to:string):Promise<any> => {
   try {
     const [getSaleResult] = await pool.query('SELECT * FROM sale WHERE create_time BETWEEN (?) and DATE_ADD(?, INTERVAL 1 DAY) AND company_id = (?)', [from, to, companyId]);
     return {
@@ -77,7 +77,7 @@ const getCompanyList = async ():Promise<any> => {
   }
 };
 
-const getTotalFee = async (from:Date, to:Date):Promise<any> => {
+const getTotalFee = async (from:string, to:string):Promise<any> => {
   try {
     const [feeResult] = await pool.query('SELECT SUM(fee) as fee FROM sale WHERE create_time BETWEEN (?) and DATE_ADD(?, INTERVAL 1 DAY)', [from, to]);
     const result:any = feeResult;
