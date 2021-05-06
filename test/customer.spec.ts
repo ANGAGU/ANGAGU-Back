@@ -7,7 +7,7 @@ chai.use(chaiHttp);
 
 describe('customer test', () => {
   it('login db test', async () => {
-    const result = await service.getCustomerByEmailPassword('abcd', 'abcd');
+    const result = await service.getCustomerByEmail('abcd');
     expect(result.status).to.equal('success');
   });
 
@@ -56,5 +56,19 @@ describe('customer ar detail test', () => {
   it('it should get a 3d model s3 url', async () => {
     const modelUrl = await chai.request(server).get('/customer/products/1/ar');
     expect(modelUrl.status).to.equal(200);
+  });
+});
+
+describe('customer signup test', () => {
+  it('customer signup test', async () => {
+    const info = {
+      email: 'test@naver.com',
+      password: 'test',
+      name: 'whalswo',
+      birth: '1997-04-05',
+      phone_number: '01055559999',
+    };
+    const res = await chai.request(server).post('/customer/signup').send(info);
+    expect(res.status).to.equal(404);
   });
 });
