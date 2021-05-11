@@ -18,6 +18,14 @@ export default class App {
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: false }));
     this.app.use(express.static(path.join(__dirname, 'public')));
+
+    this.app.all('/*', (req:Request, res:Response, next) => {
+      res.header('Access-Control-Allow-Origin', '*');
+      res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+      res.header('Access-Control-Allow-Headers', 'Origin,X-Requested-With,Content-Type,authorization,verification');
+      next();
+    });
+
     this.router();
     // catch 404 and forward to error handler
     this.app.use((req, res, next) => {
