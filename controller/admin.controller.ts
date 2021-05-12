@@ -85,6 +85,7 @@ const approveProduct = async (req:Request, res:Response):Promise<void> => {
           message: errCode[304],
         })
         .end();
+      return;
     }
     res
       .status(200)

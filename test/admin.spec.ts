@@ -27,9 +27,14 @@ describe('admin test', () => {
 });
 
 describe('admin test', () => {
-  it('get sale test', async () => {
-    const getSaleResult = await service.getSale();
+  it('get a company sale test', async () => {
+    const getSaleResult = await service.getSale(1, '2021-04-29', '2021-05-05');
     expect(getSaleResult.status).to.equal('success');
+  });
+
+  it('get sum of fee test', async () => {
+    const getFeeResult = await service.getTotalFee('2021-04-29', '2021-05-05');
+    expect(getFeeResult.status).to.equal('success');
   });
 
   it('get a company list', async () => {
