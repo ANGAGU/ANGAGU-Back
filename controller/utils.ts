@@ -20,13 +20,15 @@ export interface Product {
   id: number,
   companyId: number,
   descriptionUrl: string,
+  thumbUrl: string,
+  objectUrl: string,
+  description: string,
   name: string,
   price: string,
   stock: number,
   sellCount: number,
   viewCount: number,
   deliveryCharge: number,
-  category?: string,
   freeDeliveryCondition?: string,
   isApprove: number,
   createTime: Date,
@@ -38,6 +40,13 @@ function jwtSignUser(user:User):string {
   const ONE_WEEK = 60 * 60 * 24 * 7;
   return jwt.sign({ data: user }, jwtSecret, {
     expiresIn: ONE_WEEK,
+  });
+}
+
+function jwtSignPhone(phoneNumber:string):string {
+  const timeout = 300;
+  return jwt.sign({ data: phoneNumber }, jwtSecret, {
+    expiresIn: timeout,
   });
 }
 
@@ -55,8 +64,21 @@ function isEmail(asValue: string):boolean {
   return regExp.test(asValue);
 }
 
+function isPassword(input: string):boolean {
+  const regExpPw = /^.*(?=^.{8,15}$)(?=.*\d)(?=.*[a-zA-Z])(?=.*[!@#$%^&+=]).*$/;
+  return regExpPw.test(input);
+}
+
+function isPhone(input: string):boolean {
+  const regExpPw = /^01([0|1|6|7|8|9])([0-9]{4})([0-9]{4})$/;
+  return regExpPw.test(input);
+}
+
 export {
   jwtSignUser,
+  jwtSignPhone,
   jwtVerify,
   isEmail,
+  isPhone,
+  isPassword,
 };
