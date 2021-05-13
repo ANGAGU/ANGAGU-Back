@@ -8,5 +8,9 @@
         "waitForConnections":true,
         "connectionLimit":10
     },
-    "jwtSecret": "insert jwt secret key"
+    "jwtSecret": "insert jwt secret key",
+    "accessKey": "ncloud accessKey",
+    "secretKey": "ncloud secretKey",
+    "serviceId": "ncloud sms service id",
+    "myPhone": "sms calling number"
 }

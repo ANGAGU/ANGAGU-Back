@@ -1,5 +1,4 @@
 import jwt from 'jsonwebtoken';
-
 import { jwtSecret } from '../config.json';
 
 export interface User {
@@ -44,6 +43,13 @@ function jwtSignUser(user:User):string {
   });
 }
 
+function jwtSignPhone(phoneNumber:string):string {
+  const timeout = 300;
+  return jwt.sign({ data: phoneNumber }, jwtSecret, {
+    expiresIn: timeout,
+  });
+}
+
 function jwtVerify(token:string):any {
   try {
     const decode = jwt.verify(token, jwtSecret);
@@ -58,8 +64,21 @@ function isEmail(asValue: string):boolean {
   return regExp.test(asValue);
 }
 
+function isPassword(input: string):boolean {
+  const regExpPw = /^.*(?=^.{8,15}$)(?=.*\d)(?=.*[a-zA-Z])(?=.*[!@#$%^&+=]).*$/;
+  return regExpPw.test(input);
+}
+
+function isPhone(input: string):boolean {
+  const regExpPw = /^01([0|1|6|7|8|9])([0-9]{4})([0-9]{4})$/;
+  return regExpPw.test(input);
+}
+
 export {
   jwtSignUser,
+  jwtSignPhone,
   jwtVerify,
   isEmail,
+  isPhone,
+  isPassword,
 };

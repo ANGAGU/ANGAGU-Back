@@ -1,9 +1,13 @@
 import { Request, Response } from 'express';
-import { getCompanyByEmailPassword, getProducts, getSale } from '../database/company-service';
+import bcrypt from 'bcrypt';
+import { getCompanyByEmail, getProducts, getSale } from '../database/company-service';
 import * as service from '../database/company-service';
-import { jwtSignUser, isEmail } from './utils';
+import {
+  jwtSignUser, isEmail, isPassword, isPhone, jwtVerify,
+} from './utils';
 import * as S3 from './s3';
 import errCode from './errCode';
+import { postVerifyCode, confirmVerifyCode } from './smsVerification';
 
 const login = async (req:Request, res:Response):Promise<void> => {
   try {
@@ -17,11 +21,25 @@ const login = async (req:Request, res:Response):Promise<void> => {
       });
       return;
     }
-    const result = await getCompanyByEmailPassword(req.body.email, req.body.password);
+    const result = await getCompanyByEmail(req.body.email);
     if (result.status === 'success') {
       if (result.data.length === 1) {
         const user:any = result.data[0];
+        if (!await bcrypt.compare(req.body.password, user.password)) {
+          res
+            .status(405)
+            .json({
+              status: 'error',
+              data: {
+                errCode: 405,
+              },
+              message: errCode[405],
+            })
+            .end();
+          return;
+        }
         user.type = 'company';
+        delete user.password;
         const token = jwtSignUser(user);
         res.json({
           status: 'success',
@@ -97,6 +115,103 @@ const products = async (req:Request, res:Response): Promise<void> => {
       },
       message: errCode[0],
     });
+  }
+};
+const signup = async (req:Request, res:Response): Promise<void> => {
+  try {
+    const info = req.body;
+    const saltRounds = 10;
+    const { verification: token } = req.headers;
+    const verifiedPhoneNumber = jwtVerify(token as string).data;
+
+    if (verifiedPhoneNumber !== info.phone_number) {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 404,
+          },
+          message: errCode[404],
+        })
+        .end();
+      return;
+    }
+    if (!isPassword(info.password)) {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 103,
+          },
+          message: errCode[103],
+        })
+        .end();
+      return;
+    }
+    if (!isEmail(info.email)) {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 101,
+          },
+          message: errCode[101],
+        })
+        .end();
+      return;
+    }
+    info.password = await bcrypt.hash(info.password, saltRounds);
+    const result = await service.companySignup(info);
+    if (result.status === 'duplicate') {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 306,
+          },
+          message: errCode[306],
+        })
+        .end();
+      return;
+    }
+    if (result.status === 'error') {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 307,
+          },
+          message: errCode[307],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: {
+          id: result.data,
+        },
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+          data: err,
+        },
+        message: errCode[0],
+      })
+      .end();
   }
 };
 
@@ -591,13 +706,224 @@ const sale = async (req:Request, res:Response): Promise<void> => {
   }
 };
 
+const addBusinessInfo = async (req:Request, res:Response): Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+    if (type !== 'company') {
+      res.status(403).json({
+        status: 'error',
+        data: {
+          errCode: 200,
+        },
+        message: errCode[200],
+      });
+    }
+    const result = await service.addBusinessInfo(id, req.body.businessNumber);
+    if (result.status === 'success') {
+      res.json({
+        status: 'success',
+        data: result.data,
+      });
+    } else {
+      res.status(202).json({
+        status: 'error',
+        data: {
+          errCode: 307,
+          data: result.data,
+        },
+        message: errCode[307],
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      status: 'error',
+      data: {
+        errCode: 0,
+        data: err,
+      },
+      message: errCode[0],
+    });
+  }
+};
+
+const reqVerifyCode = async (req: Request, res: Response):Promise<void> => {
+  try {
+    const phoneNumber = req.body.phone_number;
+    if (!isPhone(phoneNumber)) {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 104,
+          },
+          message: errCode[104],
+        })
+        .end();
+      return;
+    }
+    const result = await postVerifyCode(phoneNumber);
+    if (result.data.statusCode === '202') {
+      res
+        .status(200)
+        .json({
+          status: 'success',
+          data: {},
+        })
+        .end();
+      return;
+    }
+    res
+      .status(404)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 403,
+        },
+        message: errCode[403],
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: {},
+      })
+      .end();
+  }
+};
+
+const conVerifyCode = async (req: Request, res: Response):Promise<void> => {
+  try {
+    const { code } = req.body;
+    const phoneNumber = req.body.phone_number;
+    const result = await confirmVerifyCode(phoneNumber, code);
+    if (result.status !== 'success') {
+      if (result.errCode === 400) {
+        res
+          .status(404)
+          .json({
+            status: 'error',
+            data: {
+              errCode: 400,
+            },
+            message: errCode[400],
+          })
+          .end();
+        return;
+      }
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 401,
+          },
+          message: errCode[401],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: {
+          token: result.token,
+        },
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+        },
+        message: errCode[0],
+      })
+      .end();
+  }
+};
+
+const checkEmail = async (req: Request, res: Response):Promise<void> => {
+  try {
+    const { email } = req.body;
+    if (!isEmail(email)) {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 101,
+          },
+          message: errCode[101],
+        })
+        .end();
+      return;
+    }
+    const result = await service.checkEmailDuplicate(email);
+    if (result.status === 'error') {
+      if (result.errCode === 402) {
+        res
+          .status(404)
+          .json({
+            status: 'error',
+            data: {
+              errCode: 402,
+            },
+            message: errCode[402],
+          })
+          .end();
+        return;
+      }
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: {},
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+        },
+        message: errCode[0],
+      })
+      .end();
+  }
+};
+
 export {
   login,
   products,
+  signup,
   addProduct,
   deleteProduct,
   updateProductDetail,
   addProductImage,
   deleteProductImage,
   sale,
+  addBusinessInfo,
+  reqVerifyCode,
+  conVerifyCode,
+  checkEmail,
 };

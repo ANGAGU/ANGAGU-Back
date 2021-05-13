@@ -4,7 +4,11 @@ import * as auth from '../controller/auth';
 
 const router = express.Router();
 
-router.get('/products', controller.approveProductList);
-router.put('/products/:productId', controller.approveProduct);
+router.post('/login', controller.login);
+router.get('/products', auth.authorization, controller.approveProductList);
+router.put('/products/:productId', auth.authorization, controller.approveProduct);
+router.get('/sale/:companyId', auth.authorization, controller.companySale);
+router.get('/sale', auth.authorization, controller.totalFee);
+router.get('/companies', auth.authorization, controller.companies);
 
 export default router;

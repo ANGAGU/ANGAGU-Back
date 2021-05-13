@@ -7,7 +7,7 @@ chai.use(chaiHttp);
 
 describe('company test', () => {
   it('login db test', async () => {
-    const result = await service.getCompanyByEmailPassword('abcd', 'abcd');
+    const result = await service.getCompanyByEmail('abcd');
     expect(result.status).to.equal('success');
   });
 
@@ -38,6 +38,11 @@ describe('company test', () => {
     const res = await chai.request(server).get('/company/sale').send();
     expect(res.status).to.equal(403);
   });
+
+  it('business api test', async () => {
+    const res = await chai.request(server).post('/company/info/business').send();
+    expect(res.status).to.equal(403);
+  });
 });
 
 describe('company products test', () => {
@@ -48,5 +53,22 @@ describe('company products test', () => {
   it('delete product image test', async () => {
     const delImResult = await service.deleteProductImage(100);
     expect(delImResult.status).to.equal('success');
+  });
+});
+
+describe('company signup test', () => {
+  it('company signup ducplicate', async () => {
+    const info = {
+      email: 'naver@gmail.com',
+      name: 'test company',
+      password: 'test',
+      phone_number: '12312341234',
+      business_number: '1256415',
+      account_number: '8654565564',
+      account_holder: '김회사',
+      account_bank: '국민은행',
+    };
+    const res = await chai.request(server).post('/company/signup').send(info);
+    expect(res.status).to.equal(404);
   });
 });
