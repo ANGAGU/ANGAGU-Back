@@ -88,7 +88,7 @@ const getOrderDetail = async (orderId: number): Promise<any> => {
   }
 };
 
-const customerSignup = async (info:any): Promise<any> => {
+const customerSignup = async (info:any, verifiedPhoneNumber:string): Promise<any> => {
   try {
     const sql = 'INSERT INTO customer(email, password, name, birth, phone_number) VALUES(?,?,?,?,?)';
     const [result] = await pool.query(sql, [
@@ -96,7 +96,7 @@ const customerSignup = async (info:any): Promise<any> => {
       info.password,
       info.name,
       info.birth,
-      info.phone_number,
+      verifiedPhoneNumber,
     ]);
 
     const data:any = result;

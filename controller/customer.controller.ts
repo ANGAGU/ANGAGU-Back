@@ -279,7 +279,7 @@ const signup = async (req: Request, res: Response): Promise<void> => {
     const { verification: token } = req.headers;
     const verifiedPhoneNumber = jwtVerify(token as string).data;
 
-    if (verifiedPhoneNumber !== info.phone_number) {
+    if (verifiedPhoneNumber === undefined) {
       res
         .status(404)
         .json({
@@ -319,7 +319,7 @@ const signup = async (req: Request, res: Response): Promise<void> => {
       return;
     }
     info.password = await bcrypt.hash(info.password, saltRounds);
-    const result = await customerSignup(info);
+    const result = await customerSignup(info, verifiedPhoneNumber);
     if (result.status === 'duplicate') {
       res
         .status(404)
