@@ -71,7 +71,6 @@ export const confirmVerifyCode = async (phoneNumber: string, code: string):Promi
     };
   }
   if (CacheData !== code) {
-    Cache.del(phoneNumber);
     return {
       status: 'error',
       errCode: 401,
