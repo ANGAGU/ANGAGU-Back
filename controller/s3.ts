@@ -15,7 +15,7 @@ export const imageStorage = multerS3({
   bucket: 'angagu',
   key: (req, file, cb) => {
     const name = shortId.generate();
-    if (file.filename === 'product_ar') {
+    if (file.fieldname === 'product_ar') {
       cb(null, `product/ar/${name.toString()}`);
     } else if (file.fieldname === 'product_image') {
       cb(null, `product/productImages/${name.toString()}`);
