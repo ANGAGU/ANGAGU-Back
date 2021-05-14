@@ -311,6 +311,32 @@ const getInfo = async (id:number): Promise<any> => {
   }
 };
 
+const updateInfo = async (id:number, detail:any): Promise<any> => {
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+    const sql1 = 'UPDATE company SET ';
+    const sql2 = conn.escape(Object.keys(detail).map((key) => `${key} = ?`).join(', '));
+    const sql3 = ' WHERE id = ?';
+    const sql = sql1 + sql2.replace(/['']+/g, '') + sql3;
+    const parameters = [...Object.values(detail), id];
+    const updateResult = await conn.query(sql, parameters);
+    await conn.commit();
+    return {
+      data: updateResult,
+      status: 'success',
+    };
+  } catch (err) {
+    await conn.rollback();
+    return {
+      status: 'error',
+      data: err,
+    };
+  } finally {
+    conn.release();
+  }
+};
+
 export {
   getCompanyByEmail,
   getProducts,
@@ -326,4 +352,5 @@ export {
   addBusinessInfo,
   checkEmailDuplicate,
   getInfo,
+  updateInfo,
 };
