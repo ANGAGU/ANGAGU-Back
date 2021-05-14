@@ -667,6 +667,114 @@ const deleteProductImage = async (req:Request, res:Response): Promise<void> => {
   }
 };
 
+const addProductAr = async (req:Request, res:Response): Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+    const productId = Number(req.params.productId);
+    const fileList: any = req.files;
+
+    if (type !== 'company') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+
+    const result = await service.getCompanyByProduct(productId);
+    if (result.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+
+    if (result.data.length === 1) {
+      const company:any = result.data[0];
+      if (company.company_id !== id) {
+        res.status(403).json({
+          status: 'error',
+          data: {
+            errCode: 500,
+          },
+          message: errCode[500],
+        }).end();
+        return;
+      }
+    } else {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 300,
+          },
+          message: errCode[300],
+        })
+        .end();
+      return;
+    }
+
+    if (!fileList.product_ar) {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 302,
+          },
+          message: errCode[302],
+        })
+        .end();
+      return;
+    }
+
+    const addResult = await service.addProductAr(productId, fileList.product_ar[0].key);
+    if (addResult.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 301,
+          },
+          message: errCode[301],
+        })
+        .end();
+      return;
+    }
+
+    res.status(200)
+      .json({
+        status: 'success',
+        data: {},
+      })
+      .end();
+  } catch (err) {
+    res.status(500).json({
+      status: 'error',
+      data: {
+        errCode: 0,
+        data: err,
+      },
+      message: errCode[0],
+    });
+  }
+};
+
 const sale = async (req:Request, res:Response): Promise<void> => {
   try {
     const { id, type } = res.locals;
@@ -921,6 +1029,7 @@ export {
   updateProductDetail,
   addProductImage,
   deleteProductImage,
+  addProductAr,
   sale,
   addBusinessInfo,
   reqVerifyCode,

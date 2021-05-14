@@ -6,14 +6,21 @@ import * as upload from '../controller/s3';
 const router = express.Router();
 
 router.post('/login', controller.login);
+
 router.get('/products', auth.authorization, controller.products);
 router.post('/products', auth.authorization, upload.fileUpload, controller.addProduct);
+
 router.delete('/products/:productId', auth.authorization, controller.deleteProduct);
 router.put('/products/:productId', auth.authorization, upload.fileUpload, controller.updateProductDetail);
+
 router.post('/products/:productId/image', auth.authorization, upload.fileUpload, controller.addProductImage);
 router.delete('/products/:productId/image', auth.authorization, controller.deleteProductImage);
+
+router.post('/products/:productId/ar', auth.authorization, upload.fileUpload, controller.addProductAr);
+
 router.get('/sale', auth.authorization, controller.sale);
 router.post('/info/business', auth.authorization, controller.addBusinessInfo);
+
 router.post('/signup', controller.signup);
 router.post('/signup/sms/code', controller.reqVerifyCode);
 router.post('/signup/sms/verification', controller.conVerifyCode);
