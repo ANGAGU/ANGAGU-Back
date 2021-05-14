@@ -74,26 +74,18 @@ const getOrderList = async (customerId: number): Promise<any> => {
 };
 
 const getOrderDetail = async (orderId: number): Promise<any> => {
-  const conn = await pool.getConnection();
   try {
-    await conn.beginTransaction();
-    const [result] = await conn.query('SELECT * FROM `order` WHERE order_list_id = (?)', orderId);
+    const [result] = await pool.query('SELECT ord.*, product.name FROM `order` AS ord JOIN product ON ord.product_id = product.id WHERE ord.id=?', orderId);
     const data:any = result;
-    const [productName] = await conn.query('SELECT name FROM `product` WHERE id = (?)', data[0].product_id);
-    const data2:any = productName;
-    data[0].product_name = data2[0].name;
-    conn.commit();
     return {
       data: data[0],
       status: 'success',
     };
   } catch (err) {
-    conn.rollback();
     return {
+      data: err,
       status: 'error',
     };
-  } finally {
-    conn.release();
   }
 };
 
