@@ -295,6 +295,21 @@ const checkEmailDuplicate = async (email:string): Promise<any> => {
     };
   }
 };
+const getInfo = async (id:number): Promise<any> => {
+  try {
+    const [result] = await pool.query('SELECT id, name, email, phone_number, business_number, account_number, account_holder, account_bank, is_approve, is_block, create_time, update_time FROM company WHERE id = ?', id);
+    const data:any = result;
+    return {
+      status: 'success',
+      data,
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
 
 export {
   getCompanyByEmail,
@@ -310,4 +325,5 @@ export {
   getSale,
   addBusinessInfo,
   checkEmailDuplicate,
+  getInfo,
 };
