@@ -8,6 +8,11 @@
         "waitForConnections":true,
         "connectionLimit":10
     },
+    "awsConfig":{
+        "keyId":"aws key id",
+        "secretAccessKey":"aws secret access key",
+        "region":"aws region"
+    },
     "jwtSecret": "insert jwt secret key",
     "accessKey": "ncloud accessKey",
     "secretKey": "ncloud secretKey",
