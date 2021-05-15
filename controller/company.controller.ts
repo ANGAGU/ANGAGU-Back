@@ -564,6 +564,7 @@ const addProductImage = async (req:Request, res:Response): Promise<void> => {
         status: 'error',
         data: {
           errCode: 0,
+          err,
         },
         message: errCode[0],
       })
