@@ -219,8 +219,8 @@ const orderList = async (req: Request, res: Response): Promise<void> => {
 
 const orderDetail = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { type } = res.locals;
-    const orderId = Number(req.params.orderId);
+    const { id, type } = res.locals;
+    const orderListId = Number(req.params.orderListId);
 
     if (type !== 'customer') {
       res
@@ -236,7 +236,7 @@ const orderDetail = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const orderDetailResult = await service.getOrderDetail(orderId);
+    const orderDetailResult = await service.getOrderDetail(orderListId, id);
 
     if (orderDetailResult.status !== 'success') {
       res
@@ -394,7 +394,6 @@ const signup = async (req: Request, res: Response): Promise<void> => {
       })
       .end();
   } catch (err) {
-    console.log(err);
     res
       .status(500)
       .json({

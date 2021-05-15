@@ -73,12 +73,12 @@ const getOrderList = async (customerId: number): Promise<any> => {
   }
 };
 
-const getOrderDetail = async (orderId: number): Promise<any> => {
+const getOrderDetail = async (orderListId: number, customerId: number): Promise<any> => {
   try {
-    const [result] = await pool.query('SELECT ord.*, product.name FROM `order` AS ord JOIN product ON ord.product_id = product.id WHERE ord.id=?', orderId);
+    const [result] = await pool.query('SELECT ord.*, product.name FROM `order` AS ord JOIN product ON ord.product_id = product.id JOIN order_list ON ord.order_list_id = order_list.id WHERE ord.order_list_id=? AND order_list.customer_id=?', [orderListId, customerId]);
     const data:any = result;
     return {
-      data: data[0],
+      data,
       status: 'success',
     };
   } catch (err) {
