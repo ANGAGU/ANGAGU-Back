@@ -34,6 +34,23 @@ const getProducts = async (id :number):Promise<DBresult> => {
   }
 };
 
+const getCompanyByProduct = async (id :number):Promise<DBresult> => {
+  const result:DBresult = {
+    status: 'error',
+    data: [],
+  };
+  try {
+    const [rows] = await pool.query('SELECT company_id FROM product WHERE id = ?', id);
+    result.status = 'success';
+    result.data = JSON.parse(JSON.stringify(rows));
+    return result;
+  } catch (err) {
+    result.status = 'error';
+    result.data = err;
+    return result;
+  }
+};
+
 // 상품 등록
 const addProduct = async (
   productImages: Array<any>,
@@ -296,9 +313,25 @@ const checkEmailDuplicate = async (email:string): Promise<any> => {
   }
 };
 
+const addProductAr = async (id:number, url:string): Promise<any> => {
+  const result:DBresult = {
+    status: 'error',
+    data: [],
+  };
+  try {
+    const addArQuery = 'UPDATE product SET 3d_model_url = ? where id = ?';
+    await pool.query(addArQuery, [url, id]);
+    result.status = 'success';
+    return result;
+  } catch (err) {
+    return result;
+  }
+};
+
 export {
   getCompanyByEmail,
   getProducts,
+  getCompanyByProduct,
   companySignup,
   addProduct,
   deleteProduct,
@@ -307,6 +340,7 @@ export {
   getProductImageKeys,
   getOtherImageKeys,
   addProductImage,
+  addProductAr,
   getSale,
   addBusinessInfo,
   checkEmailDuplicate,

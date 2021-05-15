@@ -22,4 +22,5 @@ export default {
   403: 'fail send verification code',
   404: 'phone number is not verified',
   405: 'incorrect password',
+  500: 'permission deny product',
 };
