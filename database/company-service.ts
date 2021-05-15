@@ -243,14 +243,14 @@ const addBusinessInfo = async (id :number, businessNumber:string):Promise<DBresu
   }
 };
 
-const companySignup = async (info:any):Promise<any> => {
+const companySignup = async (info:any, verifiedPhoneNumber:string):Promise<any> => {
   try {
     const sql = 'INSERT INTO company(email, name, password, phone_number, business_number, account_number, account_holder, account_bank) VALUES(?,?,?,?,?,?,?,?)';
     const [result] = await pool.query(sql, [
       info.email,
       info.name,
       info.password,
-      info.phone_number,
+      verifiedPhoneNumber,
       info.business_number,
       info.account_number,
       info.account_holder,
