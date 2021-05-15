@@ -210,6 +210,7 @@ const orderList = async (req: Request, res: Response): Promise<void> => {
         status: 'error',
         data: {
           errCode: 100,
+          err,
         },
         message: errCode[100],
       })
@@ -235,8 +236,46 @@ const orderDetail = async (req: Request, res: Response): Promise<void> => {
         .end();
       return;
     }
+    const result = await service.getCustomerByOrderList(orderListId);
+    if (result.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
 
-    const orderDetailResult = await service.getOrderDetail(orderListId, id);
+    if (result.data) {
+      if (result.data.customer_id !== id) {
+        res.status(403).json({
+          status: 'error',
+          data: {
+            errCode: 501,
+          },
+          message: errCode[501],
+        }).end();
+        return;
+      }
+    } else {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 102,
+          },
+          message: errCode[102],
+        })
+        .end();
+      return;
+    }
+    const orderDetailResult = await service.getOrderDetail(orderListId);
 
     if (orderDetailResult.status !== 'success') {
       res
@@ -265,6 +304,7 @@ const orderDetail = async (req: Request, res: Response): Promise<void> => {
         status: 'error',
         data: {
           errCode: 0,
+          err,
         },
         message: errCode[0],
       })
@@ -399,7 +439,7 @@ const signup = async (req: Request, res: Response): Promise<void> => {
       .json({
         status: 'error',
         data: {
-          drrCode: 0,
+          errCode: 0,
         },
         message: errCode[0],
       })

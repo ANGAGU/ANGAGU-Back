@@ -60,7 +60,7 @@ const getProductDetailById = async (productId: number): Promise<any> => {
 
 const getOrderList = async (customerId: number): Promise<any> => {
   try {
-    const [result] = await pool.query('SELECT * FROM order_list WHERE customer_id = (?)', customerId);
+    const [result] = await pool.query('SELECT order_list.*, product.name FROM order_list JOIN `order` as ord on ord.order_list_id = order_list.id JOIN product on product.id = ord.product_id WHERE customer_id = ?', customerId);
     const data:any = result;
     return {
       data,
@@ -73,9 +73,9 @@ const getOrderList = async (customerId: number): Promise<any> => {
   }
 };
 
-const getOrderDetail = async (orderListId: number, customerId: number): Promise<any> => {
+const getOrderDetail = async (orderListId: number): Promise<any> => {
   try {
-    const [result] = await pool.query('SELECT ord.*, product.name FROM `order` AS ord JOIN product ON ord.product_id = product.id JOIN order_list ON ord.order_list_id = order_list.id WHERE ord.order_list_id=? AND order_list.customer_id=?', [orderListId, customerId]);
+    const [result] = await pool.query('SELECT ord.*, product.name FROM `order` AS ord JOIN product ON ord.product_id = product.id WHERE ord.order_list_id=?', orderListId);
     const data:any = result;
     return {
       data,
@@ -156,6 +156,22 @@ const checkEmailDuplicate = async (email:string): Promise<any> => {
   }
 };
 
+const getCustomerByOrderList = async (orderListId:number): Promise<any> => {
+  try {
+    const [result] = await pool.query('SELECT customer_id FROM order_list WHERE id = ?', orderListId);
+    const data:any = result;
+    return {
+      status: 'success',
+      data: data[0],
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
+
 export {
   getCustomerByEmail,
   getProducts,
@@ -165,4 +181,5 @@ export {
   getModelUrl,
   customerSignup,
   checkEmailDuplicate,
+  getCustomerByOrderList,
 };
