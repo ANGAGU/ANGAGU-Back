@@ -300,7 +300,7 @@ const addProduct = async (req:Request, res:Response): Promise<void> => {
 // 상품 삭제하기
 const deleteProduct = async (req:Request, res:Response): Promise<void> => {
   try {
-    const { type } = res.locals;
+    const { id, type } = res.locals;
     const productId = Number(req.params.productId);
 
     if (type !== 'company') {
@@ -312,6 +312,47 @@ const deleteProduct = async (req:Request, res:Response): Promise<void> => {
             errCode: 200,
           },
           message: errCode[200],
+        })
+        .end();
+      return;
+    }
+
+    const result = await service.getCompanyByProduct(productId);
+    if (result.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+
+    if (result.data.length === 1) {
+      const company:any = result.data[0];
+      if (company.company_id !== id) {
+        res.status(403).json({
+          status: 'error',
+          data: {
+            errCode: 500,
+          },
+          message: errCode[500],
+        }).end();
+        return;
+      }
+    } else {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 300,
+          },
+          message: errCode[300],
         })
         .end();
       return;
@@ -404,7 +445,7 @@ const deleteProduct = async (req:Request, res:Response): Promise<void> => {
 // 상품 상세정보(설명 이미지, 썸네일 포함)를 업데이트
 const updateProductDetail = async (req:Request, res:Response): Promise<void> => {
   try {
-    const { type } = res.locals;
+    const { id, type } = res.locals;
     const detail:any = JSON.parse(req.body.detail);
     const productId = Number(req.params.productId);
     const fileList:any = req.files;
@@ -419,6 +460,47 @@ const updateProductDetail = async (req:Request, res:Response): Promise<void> => 
             errCode: 200,
           },
           message: errCode[200],
+        })
+        .end();
+      return;
+    }
+
+    const result = await service.getCompanyByProduct(productId);
+    if (result.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+
+    if (result.data.length === 1) {
+      const company:any = result.data[0];
+      if (company.company_id !== id) {
+        res.status(403).json({
+          status: 'error',
+          data: {
+            errCode: 500,
+          },
+          message: errCode[500],
+        }).end();
+        return;
+      }
+    } else {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 300,
+          },
+          message: errCode[300],
         })
         .end();
       return;
@@ -471,11 +553,11 @@ const updateProductDetail = async (req:Request, res:Response): Promise<void> => 
       await S3.deleteFile(thumbImageKey);
     }
     // 상품 상세 정보 DB를 업데이트
-    const result = await service.updateProductDetail(
+    const upDateResult = await service.updateProductDetail(
       productId,
       detail,
     );
-    if (result.status !== 'success') {
+    if (upDateResult.status !== 'success') {
       res
         .status(400)
         .json({
@@ -512,7 +594,7 @@ const updateProductDetail = async (req:Request, res:Response): Promise<void> => 
 // 상품 상세이미지 등록
 const addProductImage = async (req:Request, res:Response): Promise<void> => {
   try {
-    const { type } = res.locals;
+    const { id, type } = res.locals;
     const productId = Number(req.params.productId);
     const orders = JSON.parse(req.body.order);
     const fileList:any = req.files;
@@ -526,6 +608,47 @@ const addProductImage = async (req:Request, res:Response): Promise<void> => {
             errCode: 200,
           },
           message: errCode[200],
+        })
+        .end();
+      return;
+    }
+
+    const result = await service.getCompanyByProduct(productId);
+    if (result.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+
+    if (result.data.length === 1) {
+      const company:any = result.data[0];
+      if (company.company_id !== id) {
+        res.status(403).json({
+          status: 'error',
+          data: {
+            errCode: 500,
+          },
+          message: errCode[500],
+        }).end();
+        return;
+      }
+    } else {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 300,
+          },
+          message: errCode[300],
         })
         .end();
       return;
@@ -574,7 +697,7 @@ const addProductImage = async (req:Request, res:Response): Promise<void> => {
 // 상품 상세이미지 삭제
 const deleteProductImage = async (req:Request, res:Response): Promise<void> => {
   try {
-    const { type } = res.locals;
+    const { id, type } = res.locals;
     const productId = Number(req.params.productId);
 
     if (type !== 'company') {
@@ -586,6 +709,47 @@ const deleteProductImage = async (req:Request, res:Response): Promise<void> => {
             errCode: 200,
           },
           message: errCode[200],
+        })
+        .end();
+      return;
+    }
+
+    const result = await service.getCompanyByProduct(productId);
+    if (result.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+
+    if (result.data.length === 1) {
+      const company:any = result.data[0];
+      if (company.company_id !== id) {
+        res.status(403).json({
+          status: 'error',
+          data: {
+            errCode: 500,
+          },
+          message: errCode[500],
+        }).end();
+        return;
+      }
+    } else {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 300,
+          },
+          message: errCode[300],
         })
         .end();
       return;
