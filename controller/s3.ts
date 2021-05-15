@@ -1,16 +1,23 @@
 import AWS from 'aws-sdk';
 import shortId from 'shortid';
-import multerS3 = require('multer-s3');
-import multer = require('multer');
+import multerS3 from 'multer-s3';
+import multer from 'multer';
+import { awsConfig } from '../config.json';
 
-const s3 = new AWS.S3();
+const s3 = new AWS.S3({
+  accessKeyId: awsConfig.keyId,
+  secretAccessKey: awsConfig.secretAccessKey,
+  region: awsConfig.region,
+});
 
 export const imageStorage = multerS3({
   s3,
   bucket: 'angagu',
   key: (req, file, cb) => {
     const name = shortId.generate();
-    if (file.fieldname === 'product_image') {
+    if (file.fieldname === 'product_ar') {
+      cb(null, `product/ar/${name.toString()}`);
+    } else if (file.fieldname === 'product_image') {
       cb(null, `product/productImages/${name.toString()}`);
     } else if (file.fieldname === 'desc_image') {
       cb(null, `product/desc/${name.toString()}`);
@@ -25,6 +32,9 @@ export const imageUpload = multer({
 });
 
 export const fileUpload = imageUpload.fields([
+  {
+    name: 'product_ar', maxCount: 1,
+  },
   {
     name: 'product_image', maxCount: 20,
   },
