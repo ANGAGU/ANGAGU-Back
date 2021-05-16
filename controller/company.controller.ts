@@ -925,7 +925,9 @@ const addProductAr = async (req:Request, res:Response): Promise<void> => {
     res.status(200)
       .json({
         status: 'success',
-        data: {},
+        data: {
+          url: fileList.product_ar[0].key,
+        },
       })
       .end();
   } catch (err) {
