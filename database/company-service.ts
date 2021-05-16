@@ -312,6 +312,50 @@ const checkEmailDuplicate = async (email:string): Promise<any> => {
     };
   }
 };
+const getInfo = async (id:number): Promise<any> => {
+  try {
+    const [result] = await pool.query('SELECT id, name, email, phone_number, business_number, account_number, account_holder, account_bank, is_approve, is_block, create_time, update_time FROM company WHERE id = ?', id);
+    const data:any = result;
+    return {
+      status: 'success',
+      data,
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
+
+const updateInfo = async (id:number, detail:any): Promise<any> => {
+  const conn = await pool.getConnection();
+  try {
+    const keys = Object.keys(detail).filter((key) => detail[key]);
+
+    await conn.beginTransaction();
+    const sql1 = 'UPDATE company SET ';
+    const sql2 = conn.escape(keys.map((key) => `${key} = ?`).join(', '));
+    const sql3 = ' WHERE id = ?';
+    const sql = sql1 + sql2.replace(/['']+/g, '') + sql3;
+
+    const parameters = [...keys.map((key) => detail[key]), id];
+    const updateResult = await conn.query(sql, parameters);
+    await conn.commit();
+    return {
+      data: updateResult,
+      status: 'success',
+    };
+  } catch (err) {
+    await conn.rollback();
+    return {
+      status: 'error',
+      data: err,
+    };
+  } finally {
+    conn.release();
+  }
+};
 
 const addProductAr = async (id:number, url:string): Promise<any> => {
   const result:DBresult = {
@@ -344,4 +388,6 @@ export {
   getSale,
   addBusinessInfo,
   checkEmailDuplicate,
+  getInfo,
+  updateInfo,
 };

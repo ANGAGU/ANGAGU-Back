@@ -1185,6 +1185,137 @@ const checkEmail = async (req: Request, res: Response):Promise<void> => {
   }
 };
 
+const getInfo = async (req: Request, res: Response):Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+    if (type !== 'company') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+    const companyInfo = await service.getInfo(id);
+    if (companyInfo.status !== 'success') {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: companyInfo.data[0],
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+        },
+        message: errCode[0],
+      })
+      .end();
+  }
+};
+
+const updateInfo = async (req:Request, res:Response):Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+    const detail:any = req.body;
+    const saltRounds = 10;
+    let newPassword;
+
+    if (type !== 'company') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+    if (detail.password) {
+      if (!isPassword(detail.password)) {
+        res
+          .status(404)
+          .json({
+            status: 'error',
+            data: {
+              errCode: 103,
+            },
+            message: errCode[103],
+          })
+          .end();
+        return;
+      }
+      newPassword = await bcrypt.hash(detail.password, saltRounds);
+    }
+    const newInfo = {
+      name: detail.name,
+      password: newPassword,
+      account_number: detail.accountNumber,
+      account_holder: detail.accountHolder,
+      account_bank: detail.accountBank,
+    };
+
+    const result = await service.updateInfo(id, newInfo);
+    if (result.status !== 'success') {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 304,
+          },
+          message: errCode[304],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: {},
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+          err,
+        },
+        message: errCode[0],
+      })
+      .end();
+  }
+};
+
 export {
   login,
   products,
@@ -1200,4 +1331,6 @@ export {
   reqVerifyCode,
   conVerifyCode,
   checkEmail,
+  getInfo,
+  updateInfo,
 };
