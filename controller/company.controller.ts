@@ -968,6 +968,7 @@ const updateInfo = async (req:Request, res:Response):Promise<void> => {
     const { id, type } = res.locals;
     const detail:any = req.body;
     const saltRounds = 10;
+    let newPassword;
 
     if (type !== 'company') {
       res
@@ -996,9 +997,17 @@ const updateInfo = async (req:Request, res:Response):Promise<void> => {
           .end();
         return;
       }
-      detail.password = await bcrypt.hash(detail.password, saltRounds);
+      newPassword = await bcrypt.hash(detail.password, saltRounds);
     }
-    const result = await service.updateInfo(id, detail);
+    const newInfo = {
+      name: detail.name,
+      password: newPassword,
+      account_number: detail.accountNumber,
+      account_holder: detail.accountHolder,
+      account_bank: detail.accountBank,
+    };
+
+    const result = await service.updateInfo(id, newInfo);
     if (result.status !== 'success') {
       res
         .status(404)
@@ -1026,6 +1035,7 @@ const updateInfo = async (req:Request, res:Response):Promise<void> => {
         status: 'error',
         data: {
           errCode: 0,
+          err,
         },
         message: errCode[0],
       })
