@@ -82,3 +82,10 @@ describe('company signup test', () => {
     expect(res.status).to.equal(404);
   });
 });
+
+describe('company info test', () => {
+  it('get company information test', async () => {
+    const result = await service.getInfo(1);
+    expect(result.status).to.equal('success');
+  });
+});
