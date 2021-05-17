@@ -3,6 +3,7 @@ import { jwtSecret } from '../config.json';
 
 export interface User {
   id:number;
+  name:string;
   type:string;
   email:string;
   birth:Date;
