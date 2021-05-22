@@ -23,4 +23,5 @@ export default {
   404: 'phone number is not verified',
   405: 'incorrect password',
   500: 'permission deny product',
+  501: 'wrong parameter',
 };

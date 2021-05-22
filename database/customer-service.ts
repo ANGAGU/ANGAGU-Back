@@ -155,6 +155,40 @@ const checkEmailDuplicate = async (email:string): Promise<any> => {
   }
 };
 
+const getProductBoard = async (productId: number): Promise<DBresult> => {
+  const result:DBresult = {
+    status: 'error',
+    data: [],
+  };
+  try {
+    const [rows] = await pool.query('SELECT * FROM board WHERE product_id = (?)', productId);
+    result.status = 'success';
+    result.data = JSON.parse(JSON.stringify(rows));
+    return result;
+  } catch (err) {
+    result.status = 'error';
+    result.data = err;
+    return result;
+  }
+};
+
+const postProductBoard = async (id:number, productId: number, boardData:any): Promise<DBresult> => {
+  try {
+    const sql = 'INSERT INTO board(product_id, customer_id, title, content) VALUES(?,?,?,?)';
+    const [result] = await pool.query(sql, [id, productId, boardData.title, boardData.content]);
+    const data:any = result;
+    return {
+      status: 'success',
+      data: data.insertId,
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
+
 export {
   getCustomerByEmail,
   getProducts,
@@ -164,4 +198,6 @@ export {
   getModelUrl,
   customerSignup,
   checkEmailDuplicate,
+  getProductBoard,
+  postProductBoard,
 };

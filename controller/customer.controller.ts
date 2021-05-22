@@ -573,6 +573,109 @@ const checkEmail = async (req: Request, res: Response):Promise<void> => {
   }
 };
 
+const getProductBoard = async (req: Request, res: Response):Promise<void> => {
+  try {
+    const productId = Number(req.params.productId);
+
+    const result = await service.getProductBoard(productId);
+    if (result.status === 'success') {
+      res.json({
+        status: 'success',
+        data: result.data,
+      });
+    } else {
+      res.status(202).json({
+        status: 'error',
+        data: {
+          errCode: 100,
+          err: result.data,
+        },
+        message: errCode[100],
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      status: 'error',
+      data: {
+        errCode: 0,
+        data: err,
+      },
+      message: errCode[0],
+    });
+  }
+};
+
+const postProductBoard = async (req: Request, res: Response):Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+    if (type !== 'customer') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+
+    const productId = Number(req.params.productId);
+    const { title, content } = req.body;
+    if (title === undefined || content === undefined) {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 501,
+          },
+          message: errCode[501],
+        })
+        .end();
+      return;
+    }
+    const boardData = { title, content };
+    const result:any = await service.postProductBoard(id, productId, boardData);
+    if (result.status === 'error') {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 307,
+          },
+          message: errCode[307],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: {
+          id: result.data,
+        },
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+          err,
+        },
+        message: errCode[0],
+      })
+      .end();
+  }
+};
+
 export {
   login,
   products,
@@ -584,4 +687,6 @@ export {
   reqVerifyCode,
   conVerifyCode,
   checkEmail,
+  getProductBoard,
+  postProductBoard,
 };
