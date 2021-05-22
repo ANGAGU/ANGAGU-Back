@@ -52,6 +52,17 @@ describe('customer order test', () => {
   });
 });
 
+describe('product board test', () => {
+  it('get product board', async () => {
+    const result = await service.getProductBoard(1);
+    expect(result.status).to.equal('success');
+  });
+  it('post product board', async () => {
+    const result = await service.postProductBoard(1, 1, {});
+    expect(result.status).to.equal('error');
+  });
+});
+
 describe('customer ar detail test', () => {
   it('it should get a 3d model s3 url', async () => {
     const modelUrl = await chai.request(server).get('/customer/products/1/ar');
