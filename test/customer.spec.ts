@@ -28,6 +28,16 @@ describe('customer test', () => {
     const res = await chai.request(server).get('/customer/products').send();
     expect(res.body.status).to.equal('success');
   });
+
+  it('get address db test', async () => {
+    const result = await service.getAddress(0);
+    expect(result.status).to.equal('success');
+  });
+
+  it('get address api test', async () => {
+    const res = await chai.request(server).get('/customer/address').send();
+    expect(res.status).to.equal(403);
+  });
 });
 
 describe('product information test', () => {
