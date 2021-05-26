@@ -40,11 +40,17 @@ describe('customer test', () => {
   });
 
   it('post address db test', async () => {
-    const result = await service.postAddress({});
+    const result = await service.postAddress({
+      id: 0,
+      recipient: 'test recipient',
+      land: 'test land',
+      detail: 'test detail',
+      is_default: 1,
+    });
     expect(result.status).to.equal('success');
   });
 
-  it('get address api test', async () => {
+  it('post address api test', async () => {
     const res = await chai.request(server).post('/customer/address').send();
     expect(res.status).to.equal(403);
   });
