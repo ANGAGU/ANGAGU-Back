@@ -903,6 +903,100 @@ const putAddress = async (req:Request, res:Response):Promise<void> => {
   }
 };
 
+const setDefaultAddress = async (req:Request, res:Response):Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+    if (type !== 'customer') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+
+    const addressId = Number(req.params.addressId);
+    const result = await service.getCustomerByAddress(addressId);
+    if (result.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+
+    if (result.data.length === 1) {
+      const customer:any = result.data[0];
+      if (customer.customer_id !== id) {
+        res.status(403).json({
+          status: 'error',
+          data: {
+            errCode: 502,
+          },
+          message: errCode[502],
+        }).end();
+        return;
+      }
+    } else {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 503,
+          },
+          message: errCode[503],
+        })
+        .end();
+      return;
+    }
+
+    const setResult = await service.setDefaultAddress(id, addressId);
+    if (setResult.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 304,
+          },
+          message: errCode[304],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+          err,
+        },
+        message: errCode[0],
+      })
+      .end();
+  }
+};
+
 export {
   login,
   products,
@@ -918,4 +1012,5 @@ export {
   postAddress,
   deleteAddress,
   putAddress,
+  setDefaultAddress,
 };

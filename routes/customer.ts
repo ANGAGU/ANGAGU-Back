@@ -19,5 +19,6 @@ router.get('/address', auth.authorization, controller.getAddress);
 router.post('/address', auth.authorization, controller.postAddress);
 router.delete('/address/:addressId', auth.authorization, controller.deleteAddress);
 router.put('/address/:addressId', auth.authorization, controller.putAddress);
+router.post('/address/default/:addressId', auth.authorization, controller.setDefaultAddress);
 
 export default router;

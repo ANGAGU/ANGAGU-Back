@@ -246,6 +246,24 @@ const getCustomerByAddress = async (id :number):Promise<DBresult> => {
   }
 };
 
+const setDefaultAddress = async (id :number, addressId:number):Promise<DBresult> => {
+  const result:DBresult = {
+    status: 'error',
+    data: [],
+  };
+  try {
+    const sql = 'UPDATE customer SET address_id = ? WHERE id = ?';
+    const [rows] = await pool.query(sql, [addressId, id]);
+    result.status = 'success';
+    result.data = JSON.parse(JSON.stringify(rows));
+    return result;
+  } catch (err) {
+    result.status = 'error';
+    result.data = err;
+    return result;
+  }
+};
+
 export {
   getCustomerByEmail,
   getProducts,
@@ -260,4 +278,5 @@ export {
   deleteAddress,
   putAddress,
   getCustomerByAddress,
+  setDefaultAddress,
 };
