@@ -45,7 +45,6 @@ describe('customer test', () => {
       recipient: 'test recipient',
       land: 'test land',
       detail: 'test detail',
-      is_default: 1,
     });
     expect(result.status).to.equal('success');
   });
