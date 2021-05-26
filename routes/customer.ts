@@ -15,4 +15,6 @@ router.post('/signup/sms/code', controller.reqVerifyCode);
 router.post('/signup/sms/verification', controller.conVerifyCode);
 router.post('/signup/email', controller.checkEmail);
 
+router.get('/address', auth.authorization, controller.getAddress);
+
 export default router;

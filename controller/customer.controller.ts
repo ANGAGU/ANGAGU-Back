@@ -573,6 +573,62 @@ const checkEmail = async (req: Request, res: Response):Promise<void> => {
   }
 };
 
+const getAddress = async (req:Request, res:Response):Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+
+    console.log(res.locals);
+
+    if (type !== 'customer') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+
+    const result = await service.getAddress(id);
+
+    if (result.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: result.data,
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 100,
+        },
+        message: errCode[100],
+      })
+      .end();
+  }
+};
+
 export {
   login,
   products,
@@ -584,4 +640,5 @@ export {
   reqVerifyCode,
   conVerifyCode,
   checkEmail,
+  getAddress,
 };
