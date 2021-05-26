@@ -645,7 +645,8 @@ const postAddress = async (req:Request, res:Response):Promise<void> => {
     data.id = id;
 
     if ((data.road === undefined && data.land === undefined)
-    || (data.road !== undefined && data.land !== undefined)) {
+    || (data.road !== undefined && data.land !== undefined)
+    || (data.recipient === undefined || data.detail === undefined)) {
       res
         .status(400)
         .json({
@@ -791,6 +792,117 @@ const deleteAddress = async (req:Request, res:Response):Promise<void> => {
   }
 };
 
+const putAddress = async (req:Request, res:Response):Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+    if (type !== 'customer') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+
+    const addressId = Number(req.params.addressId);
+    const result = await service.getCustomerByAddress(addressId);
+    if (result.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+
+    if (result.data.length === 1) {
+      const customer:any = result.data[0];
+      if (customer.customer_id !== id) {
+        res.status(403).json({
+          status: 'error',
+          data: {
+            errCode: 502,
+          },
+          message: errCode[502],
+        }).end();
+        return;
+      }
+    } else {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 503,
+          },
+          message: errCode[503],
+        })
+        .end();
+      return;
+    }
+
+    const data = req.body;
+    if ((data.road === undefined && data.land === undefined)
+    || (data.road !== undefined && data.land !== undefined)
+    || (data.recipient === undefined || data.detail === undefined)) {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 501,
+          },
+          message: errCode[501],
+        })
+        .end();
+      return;
+    }
+    const putResult = await service.putAddress(addressId, data);
+    if (putResult.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 304,
+          },
+          message: errCode[304],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: result.data,
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 100,
+          err,
+        },
+        message: errCode[100],
+      })
+      .end();
+  }
+};
+
 export {
   login,
   products,
@@ -805,4 +917,5 @@ export {
   getAddress,
   postAddress,
   deleteAddress,
+  putAddress,
 };

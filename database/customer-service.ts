@@ -207,6 +207,28 @@ const deleteAddress = async (id: number): Promise<any> => {
   }
 };
 
+const putAddress = async (id: number, data:any): Promise<any> => {
+  try {
+    const sql = 'UPDATE address SET recipient = ?, road = ?, land = ?, detail = ? WHERE id = ?';
+    const [result]:any = await pool.query(sql, [
+      data.recipient,
+      data.road,
+      data.land,
+      data.detail,
+      id,
+    ]);
+
+    return {
+      data,
+      status: 'success',
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+    };
+  }
+};
+
 const getCustomerByAddress = async (id :number):Promise<DBresult> => {
   const result:DBresult = {
     status: 'error',
@@ -236,5 +258,6 @@ export {
   getAddress,
   postAddress,
   deleteAddress,
+  putAddress,
   getCustomerByAddress,
 };

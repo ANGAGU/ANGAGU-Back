@@ -18,5 +18,6 @@ router.post('/signup/email', controller.checkEmail);
 router.get('/address', auth.authorization, controller.getAddress);
 router.post('/address', auth.authorization, controller.postAddress);
 router.delete('/address/:addressId', auth.authorization, controller.deleteAddress);
+router.put('/address/:addressId', auth.authorization, controller.putAddress);
 
 export default router;
