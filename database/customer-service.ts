@@ -193,6 +193,38 @@ const postAddress = async (data:any): Promise<any> => {
   }
 };
 
+const deleteAddress = async (id: number): Promise<any> => {
+  try {
+    const [result] = await pool.query('DELETE FROM address WHERE id = (?)', id);
+    const data:any = result;
+    return {
+      data,
+      status: 'success',
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+    };
+  }
+};
+
+const getCustomerByAddress = async (id :number):Promise<DBresult> => {
+  const result:DBresult = {
+    status: 'error',
+    data: [],
+  };
+  try {
+    const [rows] = await pool.query('SELECT customer_id FROM address WHERE id = ?', id);
+    result.status = 'success';
+    result.data = JSON.parse(JSON.stringify(rows));
+    return result;
+  } catch (err) {
+    result.status = 'error';
+    result.data = err;
+    return result;
+  }
+};
+
 export {
   getCustomerByEmail,
   getProducts,
@@ -204,4 +236,6 @@ export {
   checkEmailDuplicate,
   getAddress,
   postAddress,
+  deleteAddress,
+  getCustomerByAddress,
 };
