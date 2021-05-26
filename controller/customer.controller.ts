@@ -394,7 +394,6 @@ const signup = async (req: Request, res: Response): Promise<void> => {
       })
       .end();
   } catch (err) {
-    console.log(err);
     res
       .status(500)
       .json({
@@ -576,9 +575,6 @@ const checkEmail = async (req: Request, res: Response):Promise<void> => {
 const getAddress = async (req:Request, res:Response):Promise<void> => {
   try {
     const { id, type } = res.locals;
-
-    console.log(res.locals);
-
     if (type !== 'customer') {
       res
         .status(403)
@@ -629,6 +625,77 @@ const getAddress = async (req:Request, res:Response):Promise<void> => {
   }
 };
 
+const postAddress = async (req:Request, res:Response):Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+    if (type !== 'customer') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+    const data = req.body;
+    data.id = id;
+
+    if ((data.road === undefined && data.land === undefined)
+    || (data.road !== undefined && data.land !== undefined)) {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 501,
+          },
+          message: errCode[501],
+        })
+        .end();
+      return;
+    }
+    const result = await service.postAddress(data);
+    if (result.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 301,
+            err: result.err,
+          },
+          message: errCode[301],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: {
+          id: result.data,
+        },
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 100,
+        },
+        message: errCode[100],
+      })
+      .end();
+  }
+};
+
 export {
   login,
   products,
@@ -641,4 +708,5 @@ export {
   conVerifyCode,
   checkEmail,
   getAddress,
+  postAddress,
 };

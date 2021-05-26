@@ -170,6 +170,29 @@ const getAddress = async (customerId: number): Promise<any> => {
   }
 };
 
+const postAddress = async (data:any): Promise<any> => {
+  try {
+    const sql = 'INSERT INTO address(customer_id, recipient, road, land, detail, is_default) VALUES(?,?,?,?,?,?)';
+    const [result]:any = await pool.query(sql, [
+      data.id,
+      data.recipient,
+      data.road,
+      data.land,
+      data.detail,
+      data.is_default,
+    ]);
+    return {
+      status: 'success',
+      data: result.insertId,
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      err,
+    };
+  }
+};
+
 export {
   getCustomerByEmail,
   getProducts,
@@ -180,4 +203,5 @@ export {
   customerSignup,
   checkEmailDuplicate,
   getAddress,
+  postAddress,
 };
