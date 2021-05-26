@@ -29,7 +29,6 @@ CREATE TABLE `address` (
   `road` varchar(45) DEFAULT NULL,
   `land` varchar(45) DEFAULT NULL,
   `detail` varchar(45) NOT NULL,
-  `is_default` tinyint NOT NULL DEFAULT '1',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
@@ -230,12 +229,14 @@ CREATE TABLE `customer` (
   `password` varchar(100) NOT NULL,
   `name` varchar(45) NOT NULL,
   `birth` date NOT NULL,
+  `address_id` int DEFAULT NULL,
   `phone_number` varchar(45) NOT NULL,
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email_UNIQUE` (`email`),
   UNIQUE KEY `idx_UNIQUE` (`id`),
+  UNIQUE KEY `address_id_UNIQUE` (`address_id`)
   UNIQUE KEY `phone_number_UNIQUE` (`phone_number`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
