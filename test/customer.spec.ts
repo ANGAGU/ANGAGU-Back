@@ -75,6 +75,17 @@ describe('customer test', () => {
   });
 });
 
+describe('product board test', () => {
+  it('get product board', async () => {
+    const result = await service.getProductBoard(1);
+    expect(result.status).to.equal('success');
+  });
+  it('post product board', async () => {
+    const result = await service.postProductBoard(1, 1, {});
+    expect(result.status).to.equal('error');
+  });
+});
+
 describe('product information test', () => {
   it('it should get a product', async () => {
     const getProductResult = await chai.request(server).get('/customer/products/1');

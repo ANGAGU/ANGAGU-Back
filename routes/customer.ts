@@ -14,6 +14,8 @@ router.post('/signup', controller.signup);
 router.post('/signup/sms/code', controller.reqVerifyCode);
 router.post('/signup/sms/verification', controller.conVerifyCode);
 router.post('/signup/email', controller.checkEmail);
+router.get('/products/:productId/board', controller.getProductBoard);
+router.post('/products/:productId/board', auth.authorization, controller.postProductBoard);
 
 router.get('/address', auth.authorization, controller.getAddress);
 router.post('/address', auth.authorization, controller.postAddress);
