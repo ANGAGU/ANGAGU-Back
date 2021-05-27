@@ -23,4 +23,7 @@ export default {
   404: 'phone number is not verified',
   405: 'incorrect password',
   500: 'permission deny product',
+  501: 'wrong request parameter',
+  502: 'permission deny address',
+  503: 'cannot find address',
 };

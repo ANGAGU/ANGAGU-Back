@@ -28,6 +28,51 @@ describe('customer test', () => {
     const res = await chai.request(server).get('/customer/products').send();
     expect(res.body.status).to.equal('success');
   });
+
+  it('get address db test', async () => {
+    const result = await service.getAddress(0);
+    expect(result.status).to.equal('success');
+  });
+
+  it('get address api test', async () => {
+    const res = await chai.request(server).get('/customer/address').send();
+    expect(res.status).to.equal(403);
+  });
+
+  it('post address db test', async () => {
+    const result = await service.postAddress({
+      id: 0,
+      recipient: 'test recipient',
+      land: 'test land',
+      detail: 'test detail',
+    });
+    expect(result.status).to.equal('success');
+  });
+
+  it('post address api test', async () => {
+    const res = await chai.request(server).post('/customer/address').send();
+    expect(res.status).to.equal(403);
+  });
+
+  it('delete address db test', async () => {
+    const result = await service.deleteAddress(0);
+    expect(result.status).to.equal('success');
+  });
+
+  it('delete address api test', async () => {
+    const res = await chai.request(server).delete('/customer/address/0').send();
+    expect(res.status).to.equal(403);
+  });
+
+  it('put address db test', async () => {
+    const result = await service.putAddress(0, {});
+    expect(result.status).to.equal('success');
+  });
+
+  it('put address api test', async () => {
+    const res = await chai.request(server).put('/customer/address/0').send();
+    expect(res.status).to.equal(403);
+  });
 });
 
 describe('product information test', () => {
