@@ -28,4 +28,6 @@ router.post('/signup/email', controller.checkEmail);
 router.get('/info', auth.authorization, controller.getInfo);
 router.post('/info', auth.authorization, controller.updateInfo);
 
+router.get('/order', auth.authorization, controller.getOrder);
+
 export default router;

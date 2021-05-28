@@ -372,6 +372,22 @@ const addProductAr = async (id:number, url:string): Promise<any> => {
   }
 };
 
+const getOrder = async (id:number): Promise<any> => {
+  try {
+    const [result] = await pool.query('SELECT * FROM `order` WHERE company_id = ?', id);
+    const data:any = result;
+    return {
+      status: 'success',
+      data,
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
+
 export {
   getCompanyByEmail,
   getProducts,
@@ -390,4 +406,5 @@ export {
   checkEmailDuplicate,
   getInfo,
   updateInfo,
+  getOrder,
 };
