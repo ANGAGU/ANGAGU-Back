@@ -34,6 +34,23 @@ const getProducts = async ():Promise<DBresult> => {
   }
 };
 
+const getProductById = async (id:number):Promise<DBresult> => {
+  const result:DBresult = {
+    status: 'error',
+    data: [],
+  };
+  try {
+    const [rows] = await pool.query('SELECT * FROM product where id = ?', id);
+    result.status = 'success';
+    result.data = JSON.parse(JSON.stringify(rows));
+    return result;
+  } catch (err) {
+    result.status = 'error';
+    result.data = err;
+    return result;
+  }
+};
+
 const getProductDetailById = async (productId: number): Promise<any> => {
   const conn = await pool.getConnection();
   try {
@@ -60,7 +77,7 @@ const getProductDetailById = async (productId: number): Promise<any> => {
 
 const getOrderList = async (customerId: number): Promise<any> => {
   try {
-    const [result] = await pool.query('SELECT * FROM order_list WHERE customer_id = (?)', customerId);
+    const [result] = await pool.query('SELECT * FROM `order` WHERE customer_id = (?)', customerId);
     const data:any = result;
     return {
       data,
@@ -73,17 +90,29 @@ const getOrderList = async (customerId: number): Promise<any> => {
   }
 };
 
-const getOrderDetail = async (orderId: number): Promise<any> => {
+const postOrder = async (info:any): Promise<any> => {
   try {
-    const [result] = await pool.query('SELECT * FROM `order` WHERE order_list_id = (?)', orderId);
+    const sql = 'INSERT INTO `order`(product_id, company_id,customer_id, import_1, import_2, count, price, address_id) VALUES(?,?,?,?,?,?,?,?)';
+    const [result] = await pool.query(sql, [
+      info.productId,
+      info.companyId,
+      info.customerId,
+      info.import1,
+      info.import2,
+      info.count,
+      info.price,
+      info.addressId,
+    ]);
     const data:any = result;
     return {
       data,
       status: 'success',
     };
   } catch (err) {
+    console.log(err);
     return {
       status: 'error',
+      err,
     };
   }
 };
@@ -301,9 +330,10 @@ const postProductBoard = async (id:number, productId: number, boardData:any): Pr
 export {
   getCustomerByEmail,
   getProducts,
+  getProductById,
   getProductDetailById,
   getOrderList,
-  getOrderDetail,
+  postOrder,
   getModelUrl,
   customerSignup,
   checkEmailDuplicate,
