@@ -102,9 +102,20 @@ describe('customer order test', () => {
     const getOrderListDetail = await service.getOrderList(1);
     expect(getOrderListDetail.status).to.equal('success');
   });
-  it('it should get a order detail', async () => {
-    const getOrderListDetail = await service.getOrderDetail(1);
-    expect(getOrderListDetail.status).to.equal('success');
+  it('it should post order ', async () => {
+    const postOrder = await service.postOrder(
+      {
+        productId: 0,
+        companyId: 0,
+        customerId: 0,
+        import1: 'test',
+        import2: 'test',
+        count: 0,
+        price: 0,
+        addressId: 0,
+      },
+    );
+    expect(postOrder.status).to.equal('success');
   });
 });
 

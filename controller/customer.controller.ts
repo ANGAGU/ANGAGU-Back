@@ -217,10 +217,9 @@ const orderList = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-const orderDetail = async (req: Request, res: Response): Promise<void> => {
+const postOrder = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { type } = res.locals;
-    const orderId = Number(req.params.orderId);
+    const { id, type } = res.locals;
 
     if (type !== 'customer') {
       res
@@ -236,17 +235,49 @@ const orderDetail = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const orderDetailResult = await service.getOrderDetail(orderId);
-
-    if (orderDetailResult.status !== 'success') {
+    const info = req.body;
+    const productResult = await service.getProductById(info.productId);
+    if (productResult.status !== 'success') {
       res
         .status(400)
         .json({
           status: 'error',
           data: {
-            errCode: 100,
+            errCode: 300,
           },
-          message: errCode[100],
+          message: errCode[300],
+        })
+        .end();
+      return;
+    }
+
+    const data:any = productResult.data[0];
+    if (data.price * info.count !== info.price) {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 501,
+          },
+          message: errCode[501],
+        })
+        .end();
+      return;
+    }
+    info.companyId = data.company_id;
+    info.customerId = id;
+    const result = await service.postOrder(info);
+    if (result.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 301,
+            err: result.err,
+          },
+          message: errCode[301],
         })
         .end();
       return;
@@ -255,7 +286,7 @@ const orderDetail = async (req: Request, res: Response): Promise<void> => {
       .status(200)
       .json({
         status: 'success',
-        data: orderDetailResult.data,
+        data: result.data,
       })
       .end();
   } catch (err) {
@@ -265,6 +296,7 @@ const orderDetail = async (req: Request, res: Response): Promise<void> => {
         status: 'error',
         data: {
           errCode: 0,
+          err,
         },
         message: errCode[0],
       })
@@ -1105,7 +1137,7 @@ export {
   products,
   productDetail,
   orderList,
-  orderDetail,
+  postOrder,
   modelUrl,
   signup,
   reqVerifyCode,
