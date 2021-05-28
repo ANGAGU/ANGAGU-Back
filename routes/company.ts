@@ -29,5 +29,6 @@ router.get('/info', auth.authorization, controller.getInfo);
 router.post('/info', auth.authorization, controller.updateInfo);
 
 router.get('/order', auth.authorization, controller.getOrder);
+router.put('/order', auth.authorization, controller.addDeliveryNumber);
 
 export default router;

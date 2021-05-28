@@ -388,6 +388,26 @@ const getOrder = async (id:number): Promise<any> => {
   }
 };
 
+const addDeliveryNumber = async (
+  orderId: number,
+  companyId:number,
+  deliveryNumber:string,
+): Promise<any> => {
+  try {
+    const [result] = await pool.query('UPDATE `order` SET delivery_number = ? WHERE company_id = ? AND id = ?', [deliveryNumber, companyId, orderId]);
+    const data:any = result;
+    return {
+      status: 'success',
+      data,
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
+
 export {
   getCompanyByEmail,
   getProducts,
@@ -407,4 +427,5 @@ export {
   getInfo,
   updateInfo,
   getOrder,
+  addDeliveryNumber,
 };

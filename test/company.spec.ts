@@ -95,4 +95,9 @@ describe('company order test', () => {
     const result = await service.getOrder(3);
     expect(result.status).to.equal('success');
   });
+
+  it('put delivery number test', async () => {
+    const result = await service.addDeliveryNumber(1, 1, '1111');
+    expect(result.status).to.equal('success');
+  });
 });
