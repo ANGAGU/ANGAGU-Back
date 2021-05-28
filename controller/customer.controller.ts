@@ -217,10 +217,9 @@ const orderList = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-const orderDetail = async (req: Request, res: Response): Promise<void> => {
+const postOrder = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { type } = res.locals;
-    const orderId = Number(req.params.orderId);
+    const { id, type } = res.locals;
 
     if (type !== 'customer') {
       res
@@ -236,17 +235,49 @@ const orderDetail = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const orderDetailResult = await service.getOrderDetail(orderId);
-
-    if (orderDetailResult.status !== 'success') {
+    const info = req.body;
+    const productResult = await service.getProductById(info.productId);
+    if (productResult.status !== 'success') {
       res
         .status(400)
         .json({
           status: 'error',
           data: {
-            errCode: 100,
+            errCode: 300,
           },
-          message: errCode[100],
+          message: errCode[300],
+        })
+        .end();
+      return;
+    }
+
+    const data:any = productResult.data[0];
+    if (data.price * info.count !== info.price) {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 501,
+          },
+          message: errCode[501],
+        })
+        .end();
+      return;
+    }
+    info.companyId = data.company_id;
+    info.customerId = id;
+    const result = await service.postOrder(info);
+    if (result.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 301,
+            err: result.err,
+          },
+          message: errCode[301],
         })
         .end();
       return;
@@ -255,7 +286,7 @@ const orderDetail = async (req: Request, res: Response): Promise<void> => {
       .status(200)
       .json({
         status: 'success',
-        data: orderDetailResult.data,
+        data: result.data,
       })
       .end();
   } catch (err) {
@@ -265,6 +296,7 @@ const orderDetail = async (req: Request, res: Response): Promise<void> => {
         status: 'error',
         data: {
           errCode: 0,
+          err,
         },
         message: errCode[0],
       })
@@ -394,7 +426,6 @@ const signup = async (req: Request, res: Response): Promise<void> => {
       })
       .end();
   } catch (err) {
-    console.log(err);
     res
       .status(500)
       .json({
@@ -573,15 +604,550 @@ const checkEmail = async (req: Request, res: Response):Promise<void> => {
   }
 };
 
+const getAddress = async (req:Request, res:Response):Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+    if (type !== 'customer') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+
+    const result = await service.getAddress(id);
+
+    if (result.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: result.data,
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 100,
+        },
+        message: errCode[100],
+      })
+      .end();
+  }
+};
+
+const postAddress = async (req:Request, res:Response):Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+    if (type !== 'customer') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+    const data = req.body;
+    data.id = id;
+
+    if ((data.road === undefined && data.land === undefined)
+    || (data.road !== undefined && data.land !== undefined)
+    || (data.recipient === undefined || data.detail === undefined)) {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 501,
+          },
+          message: errCode[501],
+        })
+        .end();
+      return;
+    }
+    const result = await service.postAddress(data);
+    if (result.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 301,
+            err: result.err,
+          },
+          message: errCode[301],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: {
+          id: result.data,
+        },
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 100,
+        },
+        message: errCode[100],
+      })
+      .end();
+  }
+};
+
+const deleteAddress = async (req:Request, res:Response):Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+    if (type !== 'customer') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+
+    const addressId = Number(req.params.addressId);
+    const result = await service.getCustomerByAddress(addressId);
+    if (result.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+
+    if (result.data.length === 1) {
+      const customer:any = result.data[0];
+      if (customer.customer_id !== id) {
+        res.status(403).json({
+          status: 'error',
+          data: {
+            errCode: 502,
+          },
+          message: errCode[502],
+        }).end();
+        return;
+      }
+    } else {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 503,
+          },
+          message: errCode[503],
+        })
+        .end();
+      return;
+    }
+
+    const delResult = await service.deleteAddress(addressId);
+    if (delResult.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 303,
+          },
+          message: errCode[303],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: result.data,
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 100,
+          err,
+        },
+        message: errCode[100],
+      })
+      .end();
+  }
+};
+
+const putAddress = async (req:Request, res:Response):Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+    if (type !== 'customer') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+
+    const addressId = Number(req.params.addressId);
+    const result = await service.getCustomerByAddress(addressId);
+    if (result.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+
+    if (result.data.length === 1) {
+      const customer:any = result.data[0];
+      if (customer.customer_id !== id) {
+        res.status(403).json({
+          status: 'error',
+          data: {
+            errCode: 502,
+          },
+          message: errCode[502],
+        }).end();
+        return;
+      }
+    } else {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 503,
+          },
+          message: errCode[503],
+        })
+        .end();
+      return;
+    }
+
+    const data = req.body;
+    if ((data.road === undefined && data.land === undefined)
+    || (data.road !== undefined && data.land !== undefined)
+    || (data.recipient === undefined || data.detail === undefined)) {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 501,
+          },
+          message: errCode[501],
+        })
+        .end();
+      return;
+    }
+    const putResult = await service.putAddress(addressId, data);
+    if (putResult.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 304,
+          },
+          message: errCode[304],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: result.data,
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 100,
+          err,
+        },
+        message: errCode[100],
+      })
+      .end();
+  }
+};
+
+const setDefaultAddress = async (req:Request, res:Response):Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+    if (type !== 'customer') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+
+    const addressId = Number(req.params.addressId);
+    const result = await service.getCustomerByAddress(addressId);
+    if (result.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+
+    if (result.data.length === 1) {
+      const customer:any = result.data[0];
+      if (customer.customer_id !== id) {
+        res.status(403).json({
+          status: 'error',
+          data: {
+            errCode: 502,
+          },
+          message: errCode[502],
+        }).end();
+        return;
+      }
+    } else {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 503,
+          },
+          message: errCode[503],
+        })
+        .end();
+      return;
+    }
+
+    const setResult = await service.setDefaultAddress(id, addressId);
+    if (setResult.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 304,
+          },
+          message: errCode[304],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+          err,
+        },
+        message: errCode[0],
+      })
+      .end();
+  }
+};
+
+const getProductBoard = async (req: Request, res: Response):Promise<void> => {
+  try {
+    const productId = Number(req.params.productId);
+
+    const result = await service.getProductBoard(productId);
+    if (result.status === 'success') {
+      res.json({
+        status: 'success',
+        data: result.data,
+      });
+    } else {
+      res.status(202).json({
+        status: 'error',
+        data: {
+          errCode: 100,
+          err: result.data,
+        },
+        message: errCode[100],
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      status: 'error',
+      data: {
+        errCode: 0,
+        data: err,
+      },
+      message: errCode[0],
+    });
+  }
+};
+
+const postProductBoard = async (req: Request, res: Response):Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+    if (type !== 'customer') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+
+    const productId = Number(req.params.productId);
+    const { title, content } = req.body;
+    if (title === undefined || content === undefined) {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 501,
+          },
+          message: errCode[501],
+        })
+        .end();
+      return;
+    }
+    const boardData = { title, content };
+    const result:any = await service.postProductBoard(id, productId, boardData);
+    if (result.status === 'error') {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 307,
+          },
+          message: errCode[307],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: {
+          id: result.data,
+        },
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+          err,
+        },
+        message: errCode[0],
+      })
+      .end();
+  }
+};
+
 export {
   login,
   products,
   productDetail,
   orderList,
-  orderDetail,
+  postOrder,
   modelUrl,
   signup,
   reqVerifyCode,
   conVerifyCode,
   checkEmail,
+  getAddress,
+  postAddress,
+  deleteAddress,
+  putAddress,
+  setDefaultAddress,
+  getProductBoard,
+  postProductBoard,
 };

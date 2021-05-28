@@ -8,11 +8,19 @@ router.post('/login', controller.login);
 router.get('/products', controller.products);
 router.get('/products/:productId', controller.productDetail);
 router.get('/order', auth.authorization, controller.orderList);
-router.get('/order/:orderId', auth.authorization, controller.orderDetail);
+router.post('/order', auth.authorization, controller.postOrder);
 router.get('/products/:productId/ar', controller.modelUrl);
 router.post('/signup', controller.signup);
 router.post('/signup/sms/code', controller.reqVerifyCode);
 router.post('/signup/sms/verification', controller.conVerifyCode);
 router.post('/signup/email', controller.checkEmail);
+router.get('/products/:productId/board', controller.getProductBoard);
+router.post('/products/:productId/board', auth.authorization, controller.postProductBoard);
+
+router.get('/address', auth.authorization, controller.getAddress);
+router.post('/address', auth.authorization, controller.postAddress);
+router.delete('/address/:addressId', auth.authorization, controller.deleteAddress);
+router.put('/address/:addressId', auth.authorization, controller.putAddress);
+router.post('/address/default/:addressId', auth.authorization, controller.setDefaultAddress);
 
 export default router;

@@ -34,6 +34,23 @@ const getProducts = async ():Promise<DBresult> => {
   }
 };
 
+const getProductById = async (id:number):Promise<DBresult> => {
+  const result:DBresult = {
+    status: 'error',
+    data: [],
+  };
+  try {
+    const [rows] = await pool.query('SELECT * FROM product where id = ?', id);
+    result.status = 'success';
+    result.data = JSON.parse(JSON.stringify(rows));
+    return result;
+  } catch (err) {
+    result.status = 'error';
+    result.data = err;
+    return result;
+  }
+};
+
 const getProductDetailById = async (productId: number): Promise<any> => {
   const conn = await pool.getConnection();
   try {
@@ -60,7 +77,7 @@ const getProductDetailById = async (productId: number): Promise<any> => {
 
 const getOrderList = async (customerId: number): Promise<any> => {
   try {
-    const [result] = await pool.query('SELECT * FROM order_list WHERE customer_id = (?)', customerId);
+    const [result] = await pool.query('SELECT * FROM `order` WHERE customer_id = (?)', customerId);
     const data:any = result;
     return {
       data,
@@ -73,17 +90,29 @@ const getOrderList = async (customerId: number): Promise<any> => {
   }
 };
 
-const getOrderDetail = async (orderId: number): Promise<any> => {
+const postOrder = async (info:any): Promise<any> => {
   try {
-    const [result] = await pool.query('SELECT * FROM `order` WHERE order_list_id = (?)', orderId);
+    const sql = 'INSERT INTO `order`(product_id, company_id,customer_id, import_1, import_2, count, price, address_id) VALUES(?,?,?,?,?,?,?,?)';
+    const [result] = await pool.query(sql, [
+      info.productId,
+      info.companyId,
+      info.customerId,
+      info.import1,
+      info.import2,
+      info.count,
+      info.price,
+      info.addressId,
+    ]);
     const data:any = result;
     return {
       data,
       status: 'success',
     };
   } catch (err) {
+    console.log(err);
     return {
       status: 'error',
+      err,
     };
   }
 };
@@ -155,13 +184,165 @@ const checkEmailDuplicate = async (email:string): Promise<any> => {
   }
 };
 
+const getAddress = async (customerId: number): Promise<any> => {
+  try {
+    const [result] = await pool.query('SELECT * FROM address WHERE customer_id = (?)', customerId);
+    const data:any = result;
+    return {
+      data,
+      status: 'success',
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+    };
+  }
+};
+
+const postAddress = async (data:any): Promise<any> => {
+  try {
+    const sql = 'INSERT INTO address(customer_id, recipient, road, land, detail) VALUES(?,?,?,?,?)';
+    const [result]:any = await pool.query(sql, [
+      data.id,
+      data.recipient,
+      data.road,
+      data.land,
+      data.detail,
+    ]);
+    return {
+      status: 'success',
+      data: result.insertId,
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      err,
+    };
+  }
+};
+
+const deleteAddress = async (id: number): Promise<any> => {
+  try {
+    const [result] = await pool.query('DELETE FROM address WHERE id = (?)', id);
+    const data:any = result;
+    return {
+      data,
+      status: 'success',
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+    };
+  }
+};
+
+const putAddress = async (id: number, data:any): Promise<any> => {
+  try {
+    const sql = 'UPDATE address SET recipient = ?, road = ?, land = ?, detail = ? WHERE id = ?';
+    const [result]:any = await pool.query(sql, [
+      data.recipient,
+      data.road,
+      data.land,
+      data.detail,
+      id,
+    ]);
+
+    return {
+      data,
+      status: 'success',
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+    };
+  }
+};
+
+const getCustomerByAddress = async (id :number):Promise<DBresult> => {
+  const result:DBresult = {
+    status: 'error',
+    data: [],
+  };
+  try {
+    const [rows] = await pool.query('SELECT customer_id FROM address WHERE id = ?', id);
+    result.status = 'success';
+    result.data = JSON.parse(JSON.stringify(rows));
+    return result;
+  } catch (err) {
+    result.status = 'error';
+    result.data = err;
+    return result;
+  }
+};
+
+const setDefaultAddress = async (id :number, addressId:number):Promise<DBresult> => {
+  const result:DBresult = {
+    status: 'error',
+    data: [],
+  };
+  try {
+    const sql = 'UPDATE customer SET address_id = ? WHERE id = ?';
+    const [rows] = await pool.query(sql, [addressId, id]);
+    result.status = 'success';
+    result.data = JSON.parse(JSON.stringify(rows));
+    return result;
+  } catch (err) {
+    result.status = 'error';
+    result.data = err;
+    return result;
+  }
+};
+
+const getProductBoard = async (productId: number): Promise<DBresult> => {
+  const result:DBresult = {
+    status: 'error',
+    data: [],
+  };
+  try {
+    const [rows] = await pool.query('SELECT * FROM board WHERE product_id = (?)', productId);
+    result.status = 'success';
+    result.data = JSON.parse(JSON.stringify(rows));
+    return result;
+  } catch (err) {
+    result.status = 'error';
+    result.data = err;
+    return result;
+  }
+};
+
+const postProductBoard = async (id:number, productId: number, boardData:any): Promise<DBresult> => {
+  try {
+    const sql = 'INSERT INTO board(product_id, customer_id, title, content) VALUES(?,?,?,?)';
+    const [result] = await pool.query(sql, [id, productId, boardData.title, boardData.content]);
+    const data:any = result;
+    return {
+      status: 'success',
+      data: data.insertId,
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
+
 export {
   getCustomerByEmail,
   getProducts,
+  getProductById,
   getProductDetailById,
   getOrderList,
-  getOrderDetail,
+  postOrder,
   getModelUrl,
   customerSignup,
   checkEmailDuplicate,
+  getAddress,
+  postAddress,
+  deleteAddress,
+  putAddress,
+  getCustomerByAddress,
+  setDefaultAddress,
+  getProductBoard,
+  postProductBoard,
 };

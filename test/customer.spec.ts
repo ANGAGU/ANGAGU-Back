@@ -28,6 +28,62 @@ describe('customer test', () => {
     const res = await chai.request(server).get('/customer/products').send();
     expect(res.body.status).to.equal('success');
   });
+
+  it('get address db test', async () => {
+    const result = await service.getAddress(0);
+    expect(result.status).to.equal('success');
+  });
+
+  it('get address api test', async () => {
+    const res = await chai.request(server).get('/customer/address').send();
+    expect(res.status).to.equal(403);
+  });
+
+  it('post address db test', async () => {
+    const result = await service.postAddress({
+      id: 0,
+      recipient: 'test recipient',
+      land: 'test land',
+      detail: 'test detail',
+    });
+    expect(result.status).to.equal('success');
+  });
+
+  it('post address api test', async () => {
+    const res = await chai.request(server).post('/customer/address').send();
+    expect(res.status).to.equal(403);
+  });
+
+  it('delete address db test', async () => {
+    const result = await service.deleteAddress(0);
+    expect(result.status).to.equal('success');
+  });
+
+  it('delete address api test', async () => {
+    const res = await chai.request(server).delete('/customer/address/0').send();
+    expect(res.status).to.equal(403);
+  });
+
+  it('put address db test', async () => {
+    const result = await service.putAddress(0, {});
+    expect(result.status).to.equal('success');
+  });
+
+  it('put address api test', async () => {
+    const res = await chai.request(server).put('/customer/address/0').send();
+    expect(res.status).to.equal(403);
+  });
+});
+
+describe('product board test', () => {
+  it('get product board', async () => {
+    const result = await service.getProductBoard(1);
+    expect(result.status).to.equal('success');
+  });
+  it('post product board', async () => {
+    const result = await service.postProductBoard(1, 1, {});
+    expect(result.status).to.equal('error');
+  });
 });
 
 describe('product information test', () => {
@@ -46,9 +102,20 @@ describe('customer order test', () => {
     const getOrderListDetail = await service.getOrderList(1);
     expect(getOrderListDetail.status).to.equal('success');
   });
-  it('it should get a order detail', async () => {
-    const getOrderListDetail = await service.getOrderDetail(1);
-    expect(getOrderListDetail.status).to.equal('success');
+  it('it should post order ', async () => {
+    const postOrder = await service.postOrder(
+      {
+        productId: 0,
+        companyId: 0,
+        customerId: 0,
+        import1: 'test',
+        import2: 'test',
+        count: 0,
+        price: 0,
+        addressId: 0,
+      },
+    );
+    expect(postOrder.status).to.equal('success');
   });
 });
 

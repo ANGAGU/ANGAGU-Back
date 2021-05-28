@@ -26,10 +26,9 @@ CREATE TABLE `address` (
   `id` int NOT NULL AUTO_INCREMENT,
   `customer_id` int NOT NULL,
   `recipient` varchar(45) NOT NULL,
-  `road_name` varchar(45) NOT NULL,
-  `land_name` varchar(45) NOT NULL,
-  `detail_address` varchar(45) NOT NULL,
-  `is_default` tinyint NOT NULL DEFAULT '1',
+  `road` varchar(45) DEFAULT NULL,
+  `land` varchar(45) DEFAULT NULL,
+  `detail` varchar(45) NOT NULL,
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
@@ -230,12 +229,14 @@ CREATE TABLE `customer` (
   `password` varchar(100) NOT NULL,
   `name` varchar(45) NOT NULL,
   `birth` date NOT NULL,
+  `address_id` int DEFAULT NULL,
   `phone_number` varchar(45) NOT NULL,
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email_UNIQUE` (`email`),
   UNIQUE KEY `idx_UNIQUE` (`id`),
+  UNIQUE KEY `address_id_UNIQUE` (`address_id`)
   UNIQUE KEY `phone_number_UNIQUE` (`phone_number`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -259,16 +260,16 @@ DROP TABLE IF EXISTS `order`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `order` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `order_list_id` int NOT NULL,
   `product_id` int NOT NULL,
   `company_id` int NOT NULL,
+  `customer_id` int NOT NULL,
+  `import_1` varchar(45) NOT NULL,
+  `import_2` varchar(45) NOT NULL,
   `count` int NOT NULL,
-  `is_review` tinyint NOT NULL DEFAULT '0',
   `price` int NOT NULL,
-  `is_confirm` tinyint NOT NULL DEFAULT '0',
-  `delivery_status` varchar(45) NOT NULL DEFAULT '상품준비중',
+  `address_id` int NOT NULL,
   `delivery_number` varchar(45) DEFAULT NULL,
-  `confirm_time` datetime DEFAULT NULL,
+  `review_id` int DEFAULT NULL,
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
@@ -283,35 +284,6 @@ LOCK TABLES `order` WRITE;
 /*!40000 ALTER TABLE `order` DISABLE KEYS */;
 INSERT INTO `order` VALUES (1,1,1,1,1,0,111111,0,'상품준비중',NULL,NULL,'2021-04-14 11:13:45','2021-04-14 11:13:45'),(2,2,1,1,2,0,222222,0,'상품준비중',NULL,NULL,'2021-04-14 11:24:37','2021-04-14 11:24:37');
 /*!40000 ALTER TABLE `order` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `order_list`
---
-
-DROP TABLE IF EXISTS `order_list`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `order_list` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `customer_id` int NOT NULL,
-  `address_id` int NOT NULL,
-  `payment_method` varchar(45) NOT NULL,
-  `price` int NOT NULL,
-  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `order_list`
---
-
-LOCK TABLES `order_list` WRITE;
-/*!40000 ALTER TABLE `order_list` DISABLE KEYS */;
-INSERT INTO `order_list` VALUES (1,1,1,'\'신용카드\'',111111,'2021-04-27 18:09:40','2021-04-27 18:09:40'),(2,1,1,'\'카카오페이\'',222222,'2021-04-27 18:09:40','2021-04-27 18:09:40');
-/*!40000 ALTER TABLE `order_list` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
