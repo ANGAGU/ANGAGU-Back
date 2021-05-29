@@ -1029,6 +1029,59 @@ const setDefaultAddress = async (req:Request, res:Response):Promise<void> => {
   }
 };
 
+const getDefaultAddress = async (req:Request, res:Response):Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+    if (type !== 'customer') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+
+    const result = await service.getDefaultAddress(id);
+    if (result.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 304,
+          },
+          message: errCode[304],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: result.data,
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+          err,
+        },
+        message: errCode[0],
+      })
+      .end();
+  }
+};
+
 const getProductBoard = async (req: Request, res: Response):Promise<void> => {
   try {
     const productId = Number(req.params.productId);
@@ -1148,6 +1201,7 @@ export {
   deleteAddress,
   putAddress,
   setDefaultAddress,
+  getDefaultAddress,
   getProductBoard,
   postProductBoard,
 };
