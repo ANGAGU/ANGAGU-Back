@@ -424,10 +424,8 @@ DROP TABLE IF EXISTS `sale`;
 CREATE TABLE `sale` (
   `id` int NOT NULL AUTO_INCREMENT,
   `company_id` int NOT NULL,
-  `product_id` int NOT NULL,
   `price` int NOT NULL,
-  `fee` int NOT NULL,
-  `date` datetime NOT NULL,
+  `date` date NOT NULL,
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
