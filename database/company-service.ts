@@ -392,7 +392,7 @@ const addProductAr = async (id:number, url:string): Promise<any> => {
 
 const getOrder = async (id:number): Promise<any> => {
   try {
-    const [result] = await pool.query('SELECT * FROM `order` WHERE company_id = ?', id);
+    const [result] = await pool.query('SELECT ord.*, ct.name as customer_name, pd.name as product_name FROM angagu.`order` as ord JOIN angagu.customer as ct ON ord.customer_id = ct.id JOIN angagu.product as pd ON ord.product_id = pd.id WHERE ord.company_id = ?', id);
     const data:any = result;
     return {
       status: 'success',
