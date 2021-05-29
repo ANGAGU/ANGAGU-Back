@@ -974,7 +974,47 @@ const sale = async (req:Request, res:Response): Promise<void> => {
       status: 'error',
       data: {
         errCode: 0,
-        data: err,
+        err,
+      },
+      message: errCode[0],
+    });
+  }
+};
+
+const saleProduct = async (req:Request, res:Response): Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+    if (type !== 'company') {
+      res.status(403).json({
+        status: 'error',
+        data: {
+          errCode: 200,
+        },
+        message: errCode[200],
+      });
+    }
+    const month = String(req.query.month);
+    const result = await service.getSaleProduct(id, month);
+    if (result.status === 'success') {
+      res.json({
+        status: 'success',
+        data: result.data,
+      });
+    } else {
+      res.status(202).json({
+        status: 'error',
+        data: {
+          errCode: 100,
+        },
+        message: errCode[100],
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      status: 'error',
+      data: {
+        errCode: 0,
+        err,
       },
       message: errCode[0],
     });
@@ -1329,6 +1369,7 @@ export {
   deleteProductImage,
   addProductAr,
   sale,
+  saleProduct,
   addBusinessInfo,
   reqVerifyCode,
   conVerifyCode,

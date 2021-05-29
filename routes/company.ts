@@ -19,6 +19,7 @@ router.delete('/products/:productId/image', auth.authorization, controller.delet
 router.post('/products/:productId/ar', auth.authorization, upload.fileUpload, controller.addProductAr);
 
 router.get('/sale', auth.authorization, controller.sale);
+router.get('/sale/product', auth.authorization, controller.saleProduct);
 router.post('/info/business', auth.authorization, controller.addBusinessInfo);
 
 router.post('/signup', controller.signup);
