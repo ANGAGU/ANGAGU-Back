@@ -233,7 +233,25 @@ const getSale = async (id :number):Promise<DBresult> => {
     data: [],
   };
   try {
-    const [rows] = await pool.query('SELECT * FROM sale WHERE company_id = ?', id);
+    const [rows] = await pool.query('SELECT * FROM angagu.sale where company_id = ? order by `date` desc limit 6', id);
+    result.status = 'success';
+    result.data = JSON.parse(JSON.stringify(rows));
+    return result;
+  } catch (err) {
+    result.status = 'error';
+    result.data = err;
+    return result;
+  }
+};
+
+const getSaleProduct = async (id :number, month:string):Promise<DBresult> => {
+  const result:DBresult = {
+    status: 'error',
+    data: [],
+  };
+  try {
+    const sql = 'SELECT ord.product_id,p.`name`, sum(ord.count) as total_count ,sum(ord.price) as total_price FROM angagu.`order`as ord JOIN angagu.product as p on p.id = ord.product_id WHERE ord.company_id=? AND ord.create_time between ? and date_sub(date_add(?,interval 1 month),interval 1 second) Group by ord.product_id;';
+    const [rows] = await pool.query(sql, [id, month, month]);
     result.status = 'success';
     result.data = JSON.parse(JSON.stringify(rows));
     return result;
@@ -422,6 +440,7 @@ export {
   addProductImage,
   addProductAr,
   getSale,
+  getSaleProduct,
   addBusinessInfo,
   checkEmailDuplicate,
   getInfo,
