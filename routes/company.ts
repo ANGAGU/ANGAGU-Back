@@ -19,6 +19,7 @@ router.delete('/products/:productId/image', auth.authorization, controller.delet
 router.post('/products/:productId/ar', auth.authorization, upload.fileUpload, controller.addProductAr);
 
 router.get('/sale', auth.authorization, controller.sale);
+router.get('/sale/product', auth.authorization, controller.saleProduct);
 router.post('/info/business', auth.authorization, controller.addBusinessInfo);
 
 router.post('/signup', controller.signup);
@@ -27,5 +28,8 @@ router.post('/signup/sms/verification', controller.conVerifyCode);
 router.post('/signup/email', controller.checkEmail);
 router.get('/info', auth.authorization, controller.getInfo);
 router.post('/info', auth.authorization, controller.updateInfo);
+
+router.get('/order', auth.authorization, controller.getOrder);
+router.put('/order', auth.authorization, controller.addDeliveryNumber);
 
 export default router;

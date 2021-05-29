@@ -974,7 +974,47 @@ const sale = async (req:Request, res:Response): Promise<void> => {
       status: 'error',
       data: {
         errCode: 0,
-        data: err,
+        err,
+      },
+      message: errCode[0],
+    });
+  }
+};
+
+const saleProduct = async (req:Request, res:Response): Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+    if (type !== 'company') {
+      res.status(403).json({
+        status: 'error',
+        data: {
+          errCode: 200,
+        },
+        message: errCode[200],
+      });
+    }
+    const month = String(req.query.month);
+    const result = await service.getSaleProduct(id, month);
+    if (result.status === 'success') {
+      res.json({
+        status: 'success',
+        data: result.data,
+      });
+    } else {
+      res.status(202).json({
+        status: 'error',
+        data: {
+          errCode: 100,
+        },
+        message: errCode[100],
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      status: 'error',
+      data: {
+        errCode: 0,
+        err,
       },
       message: errCode[0],
     });
@@ -1318,6 +1358,111 @@ const updateInfo = async (req:Request, res:Response):Promise<void> => {
   }
 };
 
+const getOrder = async (req:Request, res:Response):Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+    if (type !== 'company') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+    const result = await service.getOrder(Number(id));
+    if (result.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: result.data,
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+          err,
+        },
+        message: errCode[0],
+      })
+      .end();
+  }
+};
+
+const addDeliveryNumber = async (req:Request, res:Response):Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+    const { orderId, deliveryNumber } = req.body;
+    if (type !== 'company') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+    const result = await service.addDeliveryNumber(Number(orderId), Number(id), deliveryNumber);
+    if (result.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 304,
+          },
+          message: errCode[304],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: [],
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+          err,
+        },
+        message: errCode[0],
+      })
+      .end();
+  }
+};
+
 export {
   login,
   products,
@@ -1329,10 +1474,13 @@ export {
   deleteProductImage,
   addProductAr,
   sale,
+  saleProduct,
   addBusinessInfo,
   reqVerifyCode,
   conVerifyCode,
   checkEmail,
   getInfo,
   updateInfo,
+  getOrder,
+  addDeliveryNumber,
 };
