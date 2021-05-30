@@ -77,16 +77,32 @@ const getCompanyList = async ():Promise<any> => {
   }
 };
 
-const getTotalFee = async (from:string, to:string):Promise<any> => {
+const get6monthSale = async ():Promise<any> => {
   try {
-    const [feeResult] = await pool.query('SELECT SUM(fee) as fee FROM sale WHERE create_time BETWEEN (?) and DATE_ADD(?, INTERVAL 1 DAY)', [from, to]);
-    const result:any = feeResult;
-    const data = result[0].fee ? Number(result[0].fee) : 0;
+    const sql = 'SELECT sum(price) as total_price, `date` FROM angagu.sale Group by `date` order by `date` desc limit 6';
+    const [rows] = await pool.query(sql);
     return {
       status: 'success',
-      data,
+      data: JSON.parse(JSON.stringify(rows)),
     };
   } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
+
+const getSaleCompany = async (month:string):Promise<any> => {
+  try {
+    const sql = 'SELECT ord.company_id, c.`name`, sum(ord.price) as total_price FROM angagu.`order`as ord JOIN angagu.company as c on c.id = ord.company_id WHERE ord.create_time between ? and date_sub(date_add(?,interval 1 month),interval 1 second) Group by ord.company_id;';
+    const [rows] = await pool.query(sql, [month, month]);
+    return {
+      status: 'success',
+      data: JSON.parse(JSON.stringify(rows)),
+    };
+  } catch (err) {
+    console.log(err);
     return {
       status: 'error',
       data: err,
@@ -100,5 +116,6 @@ export {
   getAdminByIdPassword,
   getSale,
   getCompanyList,
-  getTotalFee,
+  get6monthSale,
+  getSaleCompany,
 };
