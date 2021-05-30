@@ -1463,6 +1463,90 @@ const addDeliveryNumber = async (req:Request, res:Response):Promise<void> => {
   }
 };
 
+const findId = async (req: Request, res: Response):Promise<any> => {
+  try {
+    const name = String(req.query.name);
+    const phone = String(req.query.phone_number);
+    const code = String(req.query.code);
+
+    const result = await confirmVerifyCode(phone, code);
+
+    if (result.status !== 'success') {
+      if (result.errCode === 400) {
+        res
+          .status(404)
+          .json({
+            status: 'error',
+            data: {
+              errCode: 400,
+            },
+            message: errCode[400],
+          })
+          .end();
+        return;
+      }
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 401,
+          },
+          message: errCode[401],
+        })
+        .end();
+      return;
+    }
+    const getIdResult = await service.getIdByNameAndPhone(name, phone);
+
+    if (getIdResult.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+    if (getIdResult.data.length === 0) {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 102,
+          },
+          message: errCode[102],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: getIdResult.data,
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+          err,
+        },
+        message: errCode[0],
+      })
+      .end();
+  }
+};
+
 export {
   login,
   products,
@@ -1483,4 +1567,5 @@ export {
   updateInfo,
   getOrder,
   addDeliveryNumber,
+  findId,
 };

@@ -426,6 +426,23 @@ const addDeliveryNumber = async (
   }
 };
 
+const getIdByNameAndPhone = async (name:string, phone: string):Promise<any> => {
+  try {
+    const [result] = await pool.query('SELECT email FROM company WHERE name = ? AND phone_number = ?', [name, phone]);
+    const data:any = result;
+    return {
+      status: 'success',
+      data: data[0],
+    };
+  } catch (err) {
+    console.log(err);
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
+
 export {
   getCompanyByEmail,
   getProducts,
@@ -447,4 +464,5 @@ export {
   updateInfo,
   getOrder,
   addDeliveryNumber,
+  getIdByNameAndPhone,
 };
