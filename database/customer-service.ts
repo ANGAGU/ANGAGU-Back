@@ -293,6 +293,24 @@ const setDefaultAddress = async (id :number, addressId:number):Promise<DBresult>
   }
 };
 
+const getDefaultAddress = async (id :number):Promise<DBresult> => {
+  const result:DBresult = {
+    status: 'error',
+    data: [],
+  };
+  try {
+    const sql = 'Select address_id FROM customer WHERE id = ?';
+    const [rows] = await pool.query(sql, id);
+    result.status = 'success';
+    result.data = JSON.parse(JSON.stringify(rows));
+    return result;
+  } catch (err) {
+    result.status = 'error';
+    result.data = err;
+    return result;
+  }
+};
+
 const getProductBoard = async (productId: number): Promise<DBresult> => {
   const result:DBresult = {
     status: 'error',
@@ -343,6 +361,7 @@ export {
   putAddress,
   getCustomerByAddress,
   setDefaultAddress,
+  getDefaultAddress,
   getProductBoard,
   postProductBoard,
 };
