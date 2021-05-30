@@ -267,6 +267,7 @@ CREATE TABLE `order` (
   `import_2` varchar(45) NOT NULL,
   `count` int NOT NULL,
   `price` int NOT NULL,
+  `delivery_fee` int NOT NULL,
   `address_id` int NOT NULL,
   `delivery_number` varchar(45) DEFAULT NULL,
   `review_id` int DEFAULT NULL,

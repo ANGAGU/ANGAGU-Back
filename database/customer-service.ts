@@ -77,7 +77,24 @@ const getProductDetailById = async (productId: number): Promise<any> => {
 
 const getOrderList = async (customerId: number): Promise<any> => {
   try {
-    const [result] = await pool.query('SELECT * FROM `order` WHERE customer_id = (?)', customerId);
+    const sql = `SELECT ord.id,
+    ord.product_id,
+    prd.\`name\`,
+    prd.thumb_url,
+    ord.price,
+    ord.delivery_fee,
+    ord.count,
+    ord.delivery_number,
+    ord.create_time,
+    addr.recipient,
+    addr.road,
+    addr.detail,
+    ord.review_id
+    FROM \`order\` as ord 
+    JOIN product as prd on prd.id = ord.product_id 
+    JOIN address as addr on addr.id = ord.address_id
+    WHERE ord.customer_id = ?`;
+    const [result] = await pool.query(sql, customerId);
     const data:any = result;
     return {
       data,
@@ -92,7 +109,7 @@ const getOrderList = async (customerId: number): Promise<any> => {
 
 const postOrder = async (info:any): Promise<any> => {
   try {
-    const sql = 'INSERT INTO `order`(product_id, company_id,customer_id, import_1, import_2, count, price, address_id) VALUES(?,?,?,?,?,?,?,?)';
+    const sql = 'INSERT INTO `order`(product_id, company_id,customer_id, import_1, import_2, count, price, address_id, delivery_fee) VALUES(?,?,?,?,?,?,?,?,?)';
     const [result] = await pool.query(sql, [
       info.productId,
       info.companyId,
@@ -102,6 +119,7 @@ const postOrder = async (info:any): Promise<any> => {
       info.count,
       info.price,
       info.addressId,
+      info.deliveryFee,
     ]);
     const data:any = result;
     return {
