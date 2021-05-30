@@ -50,6 +50,13 @@ function jwtSignPhone(phoneNumber:string):string {
   });
 }
 
+function jwtSignUpdatePw(phone:string, email:string, name:string):string {
+  const timeout = 300;
+  return jwt.sign({ phone, email, name }, jwtSecret, {
+    expiresIn: timeout,
+  });
+}
+
 function jwtVerify(token:string):any {
   try {
     const decode = jwt.verify(token, jwtSecret);
@@ -77,6 +84,7 @@ function isPhone(input: string):boolean {
 export {
   jwtSignUser,
   jwtSignPhone,
+  jwtSignUpdatePw,
   jwtVerify,
   isEmail,
   isPhone,

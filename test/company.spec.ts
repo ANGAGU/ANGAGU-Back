@@ -93,6 +93,11 @@ describe('company info test', () => {
     const result = await service.getIdByNameAndPhone('a', 'a');
     expect(result.status).to.equal('success');
   });
+
+  it('find company by name, email, phone', async () => {
+    const result = await service.getUserByEmailNamePhone('a', 'a', 'a');
+    expect(result.status).to.equal('success');
+  });
 });
 
 describe('company order test', () => {
