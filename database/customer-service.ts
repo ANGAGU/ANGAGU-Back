@@ -363,6 +363,59 @@ const postProductBoard = async (id:number, productId: number, boardData:any): Pr
   }
 };
 
+const getInfoByOrderId = async (orderId:number):Promise<any> => {
+  try {
+    const [result] = await pool.query('SELECT customer_id as customerId, product_id as productId, review_id as reviewId FROM `order` WHERE id = ?', orderId);
+    const data:any = result;
+    return {
+      status: 'success',
+      data: data[0],
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
+
+const postReview = async (
+  orderId:number,
+  id:number,
+  productId:number,
+  star:number,
+  content:string,
+  imageUrl:string,
+):Promise<any> => {
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+    const [result] = await conn.query('INSERT INTO review(product_id, customer_id, star, content, image_url) VALUES(?,?,?,?,?)', [productId, id, star, content, imageUrl]);
+    const data:any = result;
+    const reviewId = data.insertId;
+    const [result2] = await conn.query('UPDATE `order` SET review_id = ? WHERE id = ?', [reviewId, orderId]);
+    const data2:any = result2;
+    if (data2.affectedRows.length === 0) {
+      return {
+        status: 'error',
+      };
+    }
+    await conn.commit();
+    return {
+      status: 'success',
+      data: reviewId,
+    };
+  } catch (err) {
+    await conn.rollback();
+    return {
+      status: 'error',
+      data: err,
+    };
+  } finally {
+    conn.release();
+  }
+};
+
 export {
   getCustomerByEmail,
   getProducts,
@@ -382,4 +435,6 @@ export {
   getDefaultAddress,
   getProductBoard,
   postProductBoard,
+  getInfoByOrderId,
+  postReview,
 };

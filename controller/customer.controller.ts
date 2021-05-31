@@ -1185,6 +1185,105 @@ const postProductBoard = async (req: Request, res: Response):Promise<void> => {
   }
 };
 
+const postReview = async (req: Request, res: Response):Promise<any> => {
+  try {
+    const { id, type } = res.locals;
+    const orderId = Number(req.params.orderId);
+    const {
+      star, content, imageUrl,
+    } = req.body;
+    if (type !== 'customer') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+    const result = await service.getInfoByOrderId(orderId);
+    if (result.status !== 'success' || result.data.length === 0) {
+      res
+        .status(400)
+        .json({
+          data: {
+            status: 'error',
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+    if (result.data.customerId !== id) {
+      res
+        .status(400)
+        .json({
+          data: {
+            status: 'error',
+            errCode: 504,
+          },
+          message: errCode[504],
+        })
+        .end();
+      return;
+    }
+    if (result.data.reviewId !== null) {
+      res
+        .status(400)
+        .json({
+          data: {
+            status: 'error',
+            errCode: 505,
+          },
+          message: errCode[505],
+        })
+        .end();
+      return;
+    }
+    const { productId } = result.data;
+    const postResult = await service.postReview(orderId, id, productId, star, content, imageUrl);
+    if (postResult.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 301,
+          },
+          message: errCode[301],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: {
+          reviewId: postResult.data,
+        },
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+          err,
+        },
+        message: errCode[0],
+      })
+      .end();
+  }
+};
+
 export {
   login,
   products,
@@ -1204,4 +1303,5 @@ export {
   getDefaultAddress,
   getProductBoard,
   postProductBoard,
+  postReview,
 };

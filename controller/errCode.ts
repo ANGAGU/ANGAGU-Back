@@ -26,4 +26,6 @@ export default {
   501: 'wrong request parameter',
   502: 'permission deny address',
   503: 'cannot find address',
+  504: 'no purchase history',
+  505: 'already reviewed product',
 };
