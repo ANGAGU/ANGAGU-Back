@@ -139,3 +139,10 @@ describe('customer signup test', () => {
     expect(res.status).to.equal(404);
   });
 });
+
+describe('customer review test', () => {
+  it('customer get review api test', async () => {
+    const result = await service.getReview(5);
+    expect(result.status).to.equal('success');
+  });
+});

@@ -416,6 +416,22 @@ const postReview = async (
   }
 };
 
+const getReview = async (reviewId:number):Promise<any> => {
+  try {
+    const [result] = await pool.query('SELECT * FROM review WHERE id = ?', reviewId);
+    const data:any = result;
+    return {
+      status: 'success',
+      data,
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
+
 export {
   getCustomerByEmail,
   getProducts,
@@ -437,4 +453,5 @@ export {
   postProductBoard,
   getInfoByOrderId,
   postReview,
+  getReview,
 };

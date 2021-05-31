@@ -10,6 +10,7 @@ router.get('/products/:productId', controller.productDetail);
 router.get('/order', auth.authorization, controller.orderList);
 router.post('/order', auth.authorization, controller.postOrder);
 router.post('/order/:orderId/review', auth.authorization, controller.postReview);
+router.get('/order/:orderId/review', auth.authorization, controller.getReview);
 router.get('/products/:productId/ar', controller.modelUrl);
 router.post('/signup', controller.signup);
 router.post('/signup/sms/code', controller.reqVerifyCode);
