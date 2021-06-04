@@ -1389,28 +1389,28 @@ const updatePw = async (req: Request, res: Response):Promise<any> => {
     }
     const hashedPw = await bcrypt.hash(newPw, saltRounds);
     const result = await service.updateNewPw(hashedPw, phone);
-    if (result.status === 'duplicate') {
+    if (result.status !== 'success') {
+      if (result.errCode === 102) {
+        res
+          .status(400)
+          .json({
+            status: 'error',
+            data: {
+              errCode: 102,
+            },
+            message: errCode[102],
+          })
+          .end();
+        return;
+      }
       res
         .status(400)
         .json({
           status: 'error',
           data: {
-            errCode: 306,
+            errCode: 304,
           },
-          message: errCode[306],
-        })
-        .end();
-      return;
-    }
-    if (result.status === 'error') {
-      res
-        .status(400)
-        .json({
-          status: 'error',
-          data: {
-            errCode: 307,
-          },
-          message: errCode[307],
+          message: errCode[304],
         })
         .end();
       return;
@@ -1419,9 +1419,7 @@ const updatePw = async (req: Request, res: Response):Promise<any> => {
       .status(200)
       .json({
         status: 'success',
-        data: {
-          id: result.data,
-        },
+        data: {},
       })
       .end();
   } catch (err) {
@@ -1438,6 +1436,206 @@ const updatePw = async (req: Request, res: Response):Promise<any> => {
       .end();
   }
 };
+
+const getInfo = async (req:Request, res: Response):Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+    if (type !== 'customer') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+    const result = await service.getInfo(id);
+    if (result.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: result.data,
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+          err,
+        },
+        message: errCode[0],
+      })
+      .end();
+  }
+};
+
+const checkPw = async (req:Request, res: Response):Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+    const { password } = req.body;
+    if (type !== 'customer') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+    const customerPw = await service.getCustomerPwById(id);
+    if (customerPw.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+    if (!await bcrypt.compare(password, customerPw.data.password)) {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 405,
+          },
+          message: errCode[405],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: {},
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+          err,
+        },
+        message: errCode[0],
+      })
+      .end();
+  }
+};
+
+const updateInfo = async (req:Request, res:Response):Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+    const { newPw } = req.body;
+    const saltRounds = 10;
+    if (type !== 'customer') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+    if (!isPassword(newPw)) {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 103,
+          },
+          message: errCode[103],
+        })
+        .end();
+      return;
+    }
+    const hashedPw = await bcrypt.hash(newPw, saltRounds);
+    const result = await service.updateInfo(hashedPw, id);
+    if (result.status !== 'success') {
+      if (result.errCode === 102) {
+        res
+          .status(400)
+          .json({
+            status: 'error',
+            data: {
+              errCode: 102,
+            },
+            message: errCode[102],
+          })
+          .end();
+        return;
+      }
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 304,
+          },
+          message: errCode[304],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: {},
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+          err,
+        },
+        message: errCode[0],
+      })
+      .end();
+  }
+};
+
 export {
   login,
   products,
@@ -1460,4 +1658,7 @@ export {
   findId,
   findPw,
   updatePw,
+  getInfo,
+  checkPw,
+  updateInfo,
 };

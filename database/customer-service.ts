@@ -402,6 +402,61 @@ const getUserByEmailNamePhone = async (
   }
 };
 
+const getInfo = async (id:number):Promise<any> => {
+  try {
+    const [result] = await pool.query('SELECT email, name, birth, phone_number FROM customer WHERE id = ?', id);
+    const data:any = result;
+    return {
+      status: 'success',
+      data: data[0],
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
+
+const getCustomerPwById = async (id:number):Promise<any> => {
+  try {
+    const [result] = await pool.query('SELECT password FROM customer WHERE id = ?', id);
+    const data:any = result;
+    return {
+      status: 'success',
+      data: data[0],
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
+
+const updateInfo = async (newPw:string, id:number):Promise<any> => {
+  try {
+    const [result] = await pool.query('UPDATE customer SET password = ? WHERE id = ?', [newPw, id]);
+    const data:any = result;
+    if (data.affectedRows === 0) {
+      return {
+        errCode: 102,
+        status: 'error',
+      };
+    }
+    return {
+      status: 'success',
+      data: data[0],
+    };
+  } catch (err) {
+    return {
+      errCode: 304,
+      status: 'error',
+      data: err,
+    };
+  }
+};
+
 export {
   getCustomerByEmail,
   getProducts,
@@ -424,4 +479,7 @@ export {
   getIdByNameAndPhone,
   updateNewPw,
   getUserByEmailNamePhone,
+  getInfo,
+  getCustomerPwById,
+  updateInfo,
 };

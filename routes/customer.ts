@@ -30,4 +30,8 @@ router.get('/find/pw', controller.findPw);
 router.post('/find/verification', controller.conVerifyCode);
 router.put('/find/pw', controller.updatePw);
 
+router.post('/info/verification', auth.authorization, controller.checkPw);
+router.get('/info', auth.authorization, controller.getInfo);
+router.post('/info', auth.authorization, controller.updateInfo);
+
 export default router;

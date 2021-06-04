@@ -1667,28 +1667,28 @@ const updatePw = async (req: Request, res: Response):Promise<any> => {
     }
     const hashedPw = await bcrypt.hash(newPw, saltRounds);
     const result = await service.updateNewPw(hashedPw, phone);
-    if (result.status === 'duplicate') {
+    if (result.status !== 'success') {
+      if (result.errCode === 102) {
+        res
+          .status(400)
+          .json({
+            status: 'error',
+            data: {
+              errCode: 102,
+            },
+            message: errCode[102],
+          })
+          .end();
+        return;
+      }
       res
         .status(400)
         .json({
           status: 'error',
           data: {
-            errCode: 306,
+            errCode: 304,
           },
-          message: errCode[306],
-        })
-        .end();
-      return;
-    }
-    if (result.status === 'error') {
-      res
-        .status(400)
-        .json({
-          status: 'error',
-          data: {
-            errCode: 307,
-          },
-          message: errCode[307],
+          message: errCode[304],
         })
         .end();
       return;
@@ -1697,9 +1697,7 @@ const updatePw = async (req: Request, res: Response):Promise<any> => {
       .status(200)
       .json({
         status: 'success',
-        data: {
-          id: result.data,
-        },
+        data: {},
       })
       .end();
   } catch (err) {

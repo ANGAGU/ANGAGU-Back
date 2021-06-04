@@ -141,12 +141,17 @@ describe('customer signup test', () => {
 });
 
 describe('customer info test', () => {
-  it('find company id test', async () => {
+  it('get customer info test', async () => {
+    const result = await service.getInfo(1);
+    expect(result.status).to.equal('success');
+  });
+
+  it('find customer id test', async () => {
     const result = await service.getIdByNameAndPhone('a', 'a');
     expect(result.status).to.equal('success');
   });
 
-  it('find company by name, email, phone', async () => {
+  it('find customer by name, email, phone', async () => {
     const result = await service.getUserByEmailNamePhone('a', 'a', 'a');
     expect(result.status).to.equal('success');
   });
