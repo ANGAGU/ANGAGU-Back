@@ -1185,6 +1185,60 @@ const postProductBoard = async (req: Request, res: Response):Promise<void> => {
   }
 };
 
+const getCart = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+
+    if (type !== 'customer') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+
+    const result = await service.getCart(id);
+
+    if (result.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: result.data,
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+        },
+        message: errCode[0],
+      })
+      .end();
+  }
+};
+
 export {
   login,
   products,
@@ -1204,4 +1258,5 @@ export {
   getDefaultAddress,
   getProductBoard,
   postProductBoard,
+  getCart,
 };

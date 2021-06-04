@@ -363,6 +363,21 @@ const postProductBoard = async (id:number, productId: number, boardData:any): Pr
   }
 };
 
+const getCart = async (customerId: number): Promise<any> => {
+  try {
+    const [result] = await pool.query('SELECT * FROM cart WHERE customer_id = (?)', customerId);
+    const data:any = result;
+    return {
+      data,
+      status: 'success',
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+    };
+  }
+};
+
 export {
   getCustomerByEmail,
   getProducts,
@@ -382,4 +397,5 @@ export {
   getDefaultAddress,
   getProductBoard,
   postProductBoard,
+  getCart,
 };
