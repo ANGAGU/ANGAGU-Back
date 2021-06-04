@@ -363,6 +363,182 @@ const postProductBoard = async (id:number, productId: number, boardData:any): Pr
   }
 };
 
+const getIdByNameAndPhone = async (name:string, phone: string):Promise<any> => {
+  try {
+    const [result] = await pool.query('SELECT email FROM customer WHERE name = ? AND phone_number = ?', [name, phone]);
+    const data:any = result;
+    return {
+      status: 'success',
+      data: data[0],
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
+
+const updateNewPw = async (newPw:string, phone:string):Promise<any> => {
+  try {
+    const [result] = await pool.query('UPDATE customer SET password = ? WHERE phone_number = ?', [newPw, phone]);
+    const data:any = result;
+    if (data.affectedRows === 0) {
+      return {
+        errCode: 102,
+        status: 'error',
+      };
+    }
+    return {
+      status: 'success',
+      data: data[0],
+    };
+  } catch (err) {
+    return {
+      errCode: 304,
+      status: 'error',
+      data: err,
+    };
+  }
+};
+
+const getUserByEmailNamePhone = async (
+  email:string, name:string, phone:string,
+):Promise<any> => {
+  try {
+    const [result] = await pool.query('SELECT * FROM customer WHERE email = ? AND name = ? AND phone_number = ?', [email, name, phone]);
+    const data:any = result;
+    return {
+      status: 'success',
+      data,
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
+
+const getInfo = async (id:number):Promise<any> => {
+  try {
+    const [result] = await pool.query('SELECT email, name, birth, phone_number FROM customer WHERE id = ?', id);
+    const data:any = result;
+    return {
+      status: 'success',
+      data: data[0],
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
+
+const getCustomerPwById = async (id:number):Promise<any> => {
+  try {
+    const [result] = await pool.query('SELECT password FROM customer WHERE id = ?', id);
+    const data:any = result;
+    return {
+      status: 'success',
+      data: data[0],
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
+
+const updateInfo = async (newPw:string, id:number):Promise<any> => {
+  try {
+    const [result] = await pool.query('UPDATE customer SET password = ? WHERE id = ?', [newPw, id]);
+    const data:any = result;
+    if (data.affectedRows === 0) {
+      return {
+        errCode: 102,
+        status: 'error',
+      };
+    }
+    return {
+      status: 'success',
+      data: data[0],
+    };
+  } catch (err) {
+    return {
+      errCode: 304,
+      status: 'error',
+      data: err,
+    };
+  }
+};
+
+const getCart = async (customerId: number): Promise<any> => {
+  try {
+    const [result] = await pool.query('SELECT * FROM cart WHERE customer_id = (?)', customerId);
+    const data:any = result;
+    return {
+      data,
+      status: 'success',
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+    };
+  }
+};
+
+const postCart = async (customerId: number, productId:number): Promise<any> => {
+  try {
+    const sql = 'INSERT INTO cart(customer_id, product_id) VALUES(?,?)';
+    const [result] = await pool.query(sql, [customerId, productId]);
+    const data:any = result;
+    return {
+      status: 'success',
+      data: data.insertId,
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
+
+const deleteCart = async (cartId: number): Promise<any> => {
+  try {
+    const [result] = await pool.query('DELETE FROM cart WHERE id = (?)', cartId);
+    const data:any = result;
+    return {
+      data,
+      status: 'success',
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+    };
+  }
+};
+
+const getCustomerByCart = async (id :number):Promise<DBresult> => {
+  const result:DBresult = {
+    status: 'error',
+    data: [],
+  };
+  try {
+    const [rows] = await pool.query('SELECT customer_id FROM cart WHERE id = ?', id);
+    result.status = 'success';
+    result.data = JSON.parse(JSON.stringify(rows));
+    return result;
+  } catch (err) {
+    result.status = 'error';
+    result.data = err;
+    return result;
+  }
+};
+
 export {
   getCustomerByEmail,
   getProducts,
@@ -382,4 +558,14 @@ export {
   getDefaultAddress,
   getProductBoard,
   postProductBoard,
+  getIdByNameAndPhone,
+  updateNewPw,
+  getUserByEmailNamePhone,
+  getInfo,
+  getCustomerPwById,
+  updateInfo,
+  getCart,
+  postCart,
+  deleteCart,
+  getCustomerByCart,
 };
