@@ -395,6 +395,38 @@ const postCart = async (customerId: number, productId:number): Promise<any> => {
   }
 };
 
+const deleteCart = async (cartId: number): Promise<any> => {
+  try {
+    const [result] = await pool.query('DELETE FROM cart WHERE id = (?)', cartId);
+    const data:any = result;
+    return {
+      data,
+      status: 'success',
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+    };
+  }
+};
+
+const getCustomerByCart = async (id :number):Promise<DBresult> => {
+  const result:DBresult = {
+    status: 'error',
+    data: [],
+  };
+  try {
+    const [rows] = await pool.query('SELECT customer_id FROM cart WHERE id = ?', id);
+    result.status = 'success';
+    result.data = JSON.parse(JSON.stringify(rows));
+    return result;
+  } catch (err) {
+    result.status = 'error';
+    result.data = err;
+    return result;
+  }
+};
+
 export {
   getCustomerByEmail,
   getProducts,
@@ -416,4 +448,6 @@ export {
   postProductBoard,
   getCart,
   postCart,
+  deleteCart,
+  getCustomerByCart,
 };

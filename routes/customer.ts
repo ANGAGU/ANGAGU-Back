@@ -26,5 +26,6 @@ router.get('/address/default', auth.authorization, controller.getDefaultAddress)
 
 router.get('/cart', auth.authorization, controller.getCart);
 router.post('/cart', auth.authorization, controller.postCart);
+router.delete('/cart/:cartId', auth.authorization, controller.deleteCart);
 
 export default router;
