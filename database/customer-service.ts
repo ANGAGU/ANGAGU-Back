@@ -416,9 +416,56 @@ const postReview = async (
   }
 };
 
-const getReview = async (reviewId:number):Promise<any> => {
+const getReview = async (reviewId:number, customerId:number):Promise<any> => {
   try {
-    const [result] = await pool.query('SELECT * FROM review WHERE id = ?', reviewId);
+    const [result] = await pool.query('SELECT * FROM review WHERE id = ? AND customer_id', [reviewId, customerId]);
+    const data:any = result;
+    return {
+      status: 'success',
+      data,
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
+
+const deleteReview = async (orderId:number, reviewId:number, customerId:number):Promise<any> => {
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+    const [result] = await conn.query('DELETE FROM review WHERE id = ? AND customer_id', [reviewId, customerId]);
+    const data:any = result;
+    const [result2] = await conn.query('UPDATE `order` SET review_id = ? WHERE id = ?', [null, orderId]);
+    const data2:any = result2;
+    if (data.affectedRows === 0 || data2.affectedRows === 0) {
+      conn.rollback();
+      return {
+        status: 'error',
+      };
+    }
+    await conn.commit();
+    return {
+      status: 'success',
+    };
+  } catch (err) {
+    await conn.rollback();
+    return {
+      status: 'error',
+      data: err,
+    };
+  } finally {
+    conn.release();
+  }
+};
+
+const updateReview = async (
+  star:number, content:string, reviewId:number, customerId:number,
+):Promise<any> => {
+  try {
+    const [result] = await pool.query('UPDATE review SET star = ?, content = ? WHERE id = ? AND customer_id', [star, content, reviewId, customerId]);
     const data:any = result;
     return {
       status: 'success',
@@ -454,4 +501,6 @@ export {
   getInfoByOrderId,
   postReview,
   getReview,
+  deleteReview,
+  updateReview,
 };
