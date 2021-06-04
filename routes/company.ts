@@ -32,4 +32,9 @@ router.post('/info', auth.authorization, controller.updateInfo);
 router.get('/order', auth.authorization, controller.getOrder);
 router.put('/order', auth.authorization, controller.addDeliveryNumber);
 
+router.post('/find/code', controller.reqVerifyCode);
+router.get('/find/id', controller.findId);
+router.get('/find/pw', controller.findPw);
+router.post('/find/verification', controller.conVerifyCode);
+router.put('/find/pw', controller.updatePw);
 export default router;

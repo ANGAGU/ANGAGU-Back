@@ -64,6 +64,7 @@ export const postVerifyCode = async (phoneNumber:string):Promise<any> => {
 };
 export const confirmVerifyCode = async (phoneNumber: string, code: string):Promise<any> => {
   const CacheData = Cache.get(phoneNumber);
+
   if (!CacheData) {
     return {
       status: 'error',

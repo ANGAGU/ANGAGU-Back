@@ -32,11 +32,6 @@ describe('admin test', () => {
     expect(getSaleResult.status).to.equal('success');
   });
 
-  it('get sum of fee test', async () => {
-    const getFeeResult = await service.getTotalFee('2021-04-29', '2021-05-05');
-    expect(getFeeResult.status).to.equal('success');
-  });
-
   it('get a company list', async () => {
     const getCompaniesResult = await service.getCompanyList();
     expect(getCompaniesResult.status).to.equal('success');
