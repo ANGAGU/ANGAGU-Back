@@ -24,6 +24,16 @@ router.put('/address/:addressId', auth.authorization, controller.putAddress);
 router.post('/address/default/:addressId', auth.authorization, controller.setDefaultAddress);
 router.get('/address/default', auth.authorization, controller.getDefaultAddress);
 
+router.post('/find/code', controller.reqVerifyCode);
+router.get('/find/id', controller.findId);
+router.get('/find/pw', controller.findPw);
+router.post('/find/verification', controller.conVerifyCode);
+router.put('/find/pw', controller.updatePw);
+
+router.post('/info/verification', auth.authorization, controller.checkPw);
+router.get('/info', auth.authorization, controller.getInfo);
+router.post('/info', auth.authorization, controller.updateInfo);
+
 router.get('/cart', auth.authorization, controller.getCart);
 router.post('/cart', auth.authorization, controller.postCart);
 router.delete('/cart/:cartId', auth.authorization, controller.deleteCart);

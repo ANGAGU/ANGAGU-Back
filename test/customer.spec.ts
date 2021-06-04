@@ -169,3 +169,20 @@ describe('customer signup test', () => {
     expect(res.status).to.equal(404);
   });
 });
+
+describe('customer info test', () => {
+  it('get customer info test', async () => {
+    const result = await service.getInfo(1);
+    expect(result.status).to.equal('success');
+  });
+
+  it('find customer id test', async () => {
+    const result = await service.getIdByNameAndPhone('a', 'a');
+    expect(result.status).to.equal('success');
+  });
+
+  it('find customer by name, email, phone', async () => {
+    const result = await service.getUserByEmailNamePhone('a', 'a', 'a');
+    expect(result.status).to.equal('success');
+  });
+});

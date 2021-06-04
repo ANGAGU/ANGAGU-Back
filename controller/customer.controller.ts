@@ -6,7 +6,7 @@ import {
 import errCode from './errCode';
 import * as service from '../database/customer-service';
 import {
-  jwtSignUser, isEmail, Product, ProductImage, isPhone, isPassword, jwtVerify,
+  jwtSignUser, isEmail, Product, ProductImage, isPhone, isPassword, jwtVerify, jwtSignUpdatePw,
 } from './utils';
 import { postVerifyCode, confirmVerifyCode } from './smsVerification';
 
@@ -491,6 +491,7 @@ const conVerifyCode = async (req: Request, res: Response):Promise<void> => {
     const { code } = req.body;
     const phoneNumber = req.body.phone_number;
     const result = await confirmVerifyCode(phoneNumber, code);
+
     if (result.status !== 'success') {
       if (result.errCode === 400) {
         res
@@ -1184,6 +1185,456 @@ const postProductBoard = async (req: Request, res: Response):Promise<void> => {
       .end();
   }
 };
+const findId = async (req: Request, res: Response):Promise<any> => {
+  try {
+    const name = String(req.query.name);
+    const phone = String(req.query.phone_number);
+    const code = String(req.query.code);
+
+    const result = await confirmVerifyCode(phone, code);
+
+    if (result.status !== 'success') {
+      if (result.errCode === 400) {
+        res
+          .status(404)
+          .json({
+            status: 'error',
+            data: {
+              errCode: 400,
+            },
+            message: errCode[400],
+          })
+          .end();
+        return;
+      }
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 401,
+          },
+          message: errCode[401],
+        })
+        .end();
+      return;
+    }
+    const getIdResult = await service.getIdByNameAndPhone(name, phone);
+
+    if (getIdResult.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+    if (getIdResult.data.length === 0) {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 102,
+          },
+          message: errCode[102],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: getIdResult.data,
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+          err,
+        },
+        message: errCode[0],
+      })
+      .end();
+  }
+};
+
+const findPw = async (req: Request, res: Response):Promise<any> => {
+  try {
+    const email = String(req.query.email);
+    const name = String(req.query.name);
+    const { verification: verToken } = req.headers;
+    const verifiedPhoneNumber = jwtVerify(verToken as string).data;
+
+    if (verifiedPhoneNumber === undefined) {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 404,
+          },
+          message: errCode[404],
+        })
+        .end();
+      return;
+    }
+    const result = await service.getUserByEmailNamePhone(email, name, verifiedPhoneNumber);
+    if (result.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+    if (result.data.length === 0) {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 102,
+          },
+          message: errCode[102],
+        })
+        .end();
+      return;
+    }
+    const token = jwtSignUpdatePw(verifiedPhoneNumber, email, name, 'customer');
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: {
+          token,
+        },
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+          err,
+        },
+        message: errCode[0],
+      })
+      .end();
+  }
+};
+
+const updatePw = async (req: Request, res: Response):Promise<any> => {
+  try {
+    const { newPw } = req.body;
+    const { verification: verToken } = req.headers;
+    const { phone, type } = jwtVerify(verToken as string);
+    const saltRounds = 10;
+
+    if (type !== 'customer') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+    if (phone === undefined) {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 404,
+          },
+          message: errCode[404],
+        })
+        .end();
+      return;
+    }
+    if (!isPassword(newPw)) {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 103,
+          },
+          message: errCode[103],
+        })
+        .end();
+      return;
+    }
+    const hashedPw = await bcrypt.hash(newPw, saltRounds);
+    const result = await service.updateNewPw(hashedPw, phone);
+    if (result.status !== 'success') {
+      if (result.errCode === 102) {
+        res
+          .status(400)
+          .json({
+            status: 'error',
+            data: {
+              errCode: 102,
+            },
+            message: errCode[102],
+          })
+          .end();
+        return;
+      }
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 304,
+          },
+          message: errCode[304],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: {},
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+          err,
+        },
+        message: errCode[0],
+      })
+      .end();
+  }
+};
+
+const getInfo = async (req:Request, res: Response):Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+    if (type !== 'customer') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+    const result = await service.getInfo(id);
+    if (result.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: result.data,
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+          err,
+        },
+        message: errCode[0],
+      })
+      .end();
+  }
+};
+
+const checkPw = async (req:Request, res: Response):Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+    const { password } = req.body;
+    if (type !== 'customer') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+    const customerPw = await service.getCustomerPwById(id);
+    if (customerPw.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+    if (!await bcrypt.compare(password, customerPw.data.password)) {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 405,
+          },
+          message: errCode[405],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: {},
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+          err,
+        },
+        message: errCode[0],
+      })
+      .end();
+  }
+};
+
+const updateInfo = async (req:Request, res:Response):Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+    const { newPw } = req.body;
+    const saltRounds = 10;
+    if (type !== 'customer') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+    if (!isPassword(newPw)) {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 103,
+          },
+          message: errCode[103],
+        })
+        .end();
+      return;
+    }
+    const hashedPw = await bcrypt.hash(newPw, saltRounds);
+    const result = await service.updateInfo(hashedPw, id);
+    if (result.status !== 'success') {
+      if (result.errCode === 102) {
+        res
+          .status(400)
+          .json({
+            status: 'error',
+            data: {
+              errCode: 102,
+            },
+            message: errCode[102],
+          })
+          .end();
+        return;
+      }
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 304,
+          },
+          message: errCode[304],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: {},
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+          err,
+        },
+        message: errCode[0],
+      })
+      .end();
+  }
+};
 
 const getCart = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -1409,6 +1860,12 @@ export {
   getDefaultAddress,
   getProductBoard,
   postProductBoard,
+  findId,
+  findPw,
+  updatePw,
+  getInfo,
+  checkPw,
+  updateInfo,
   getCart,
   postCart,
   deleteCart,

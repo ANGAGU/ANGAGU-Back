@@ -50,9 +50,11 @@ function jwtSignPhone(phoneNumber:string):string {
   });
 }
 
-function jwtSignUpdatePw(phone:string, email:string, name:string):string {
+function jwtSignUpdatePw(phone:string, email:string, name:string, type:string):string {
   const timeout = 300;
-  return jwt.sign({ phone, email, name }, jwtSecret, {
+  return jwt.sign({
+    phone, email, name, type,
+  }, jwtSecret, {
     expiresIn: timeout,
   });
 }
