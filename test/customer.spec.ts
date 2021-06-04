@@ -49,6 +49,16 @@ describe('customer test', () => {
     expect(res.status).to.equal(403);
   });
 
+  it('delete cart db test', async () => {
+    const result = await service.deleteCart(0);
+    expect(result.status).to.equal('success');
+  });
+
+  it('delete cart api test', async () => {
+    const res = await chai.request(server).delete('/customer/cart/0').send();
+    expect(res.status).to.equal(403);
+  });
+
   it('get address db test', async () => {
     const result = await service.getAddress(0);
     expect(result.status).to.equal('success');
