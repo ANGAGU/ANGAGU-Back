@@ -363,6 +363,70 @@ const postProductBoard = async (id:number, productId: number, boardData:any): Pr
   }
 };
 
+const getCart = async (customerId: number): Promise<any> => {
+  try {
+    const [result] = await pool.query('SELECT * FROM cart WHERE customer_id = (?)', customerId);
+    const data:any = result;
+    return {
+      data,
+      status: 'success',
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+    };
+  }
+};
+
+const postCart = async (customerId: number, productId:number): Promise<any> => {
+  try {
+    const sql = 'INSERT INTO cart(customer_id, product_id) VALUES(?,?)';
+    const [result] = await pool.query(sql, [customerId, productId]);
+    const data:any = result;
+    return {
+      status: 'success',
+      data: data.insertId,
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
+
+const deleteCart = async (cartId: number): Promise<any> => {
+  try {
+    const [result] = await pool.query('DELETE FROM cart WHERE id = (?)', cartId);
+    const data:any = result;
+    return {
+      data,
+      status: 'success',
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+    };
+  }
+};
+
+const getCustomerByCart = async (id :number):Promise<DBresult> => {
+  const result:DBresult = {
+    status: 'error',
+    data: [],
+  };
+  try {
+    const [rows] = await pool.query('SELECT customer_id FROM cart WHERE id = ?', id);
+    result.status = 'success';
+    result.data = JSON.parse(JSON.stringify(rows));
+    return result;
+  } catch (err) {
+    result.status = 'error';
+    result.data = err;
+    return result;
+  }
+};
+
 export {
   getCustomerByEmail,
   getProducts,
@@ -382,4 +446,8 @@ export {
   getDefaultAddress,
   getProductBoard,
   postProductBoard,
+  getCart,
+  postCart,
+  deleteCart,
+  getCustomerByCart,
 };

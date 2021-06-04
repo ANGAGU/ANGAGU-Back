@@ -26,4 +26,6 @@ export default {
   501: 'wrong request parameter',
   502: 'permission deny address',
   503: 'cannot find address',
+  504: 'permission deny cart',
+  505: 'cannot find cart',
 };
