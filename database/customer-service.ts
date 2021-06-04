@@ -378,6 +378,23 @@ const getCart = async (customerId: number): Promise<any> => {
   }
 };
 
+const postCart = async (customerId: number, productId:number): Promise<any> => {
+  try {
+    const sql = 'INSERT INTO cart(customer_id, product_id) VALUES(?,?)';
+    const [result] = await pool.query(sql, [customerId, productId]);
+    const data:any = result;
+    return {
+      status: 'success',
+      data: data.insertId,
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
+
 export {
   getCustomerByEmail,
   getProducts,
@@ -398,4 +415,5 @@ export {
   getProductBoard,
   postProductBoard,
   getCart,
+  postCart,
 };

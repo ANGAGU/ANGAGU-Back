@@ -25,5 +25,6 @@ router.post('/address/default/:addressId', auth.authorization, controller.setDef
 router.get('/address/default', auth.authorization, controller.getDefaultAddress);
 
 router.get('/cart', auth.authorization, controller.getCart);
+router.post('/cart', auth.authorization, controller.postCart);
 
 export default router;
