@@ -1594,7 +1594,7 @@ const findPw = async (req: Request, res: Response):Promise<any> => {
         .end();
       return;
     }
-    const token = jwtSignUpdatePw(verifiedPhoneNumber, email, name);
+    const token = jwtSignUpdatePw(verifiedPhoneNumber, email, name, 'company');
     res
       .status(200)
       .json({
@@ -1623,12 +1623,25 @@ const updatePw = async (req: Request, res: Response):Promise<any> => {
   try {
     const { newPw } = req.body;
     const { verification: verToken } = req.headers;
-    const { phone } = jwtVerify(verToken as string);
+    const { phone, type } = jwtVerify(verToken as string);
     const saltRounds = 10;
 
+    if (type !== 'company') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
     if (phone === undefined) {
       res
-        .status(404)
+        .status(400)
         .json({
           status: 'error',
           data: {
@@ -1641,7 +1654,7 @@ const updatePw = async (req: Request, res: Response):Promise<any> => {
     }
     if (!isPassword(newPw)) {
       res
-        .status(404)
+        .status(400)
         .json({
           status: 'error',
           data: {
@@ -1656,7 +1669,7 @@ const updatePw = async (req: Request, res: Response):Promise<any> => {
     const result = await service.updateNewPw(hashedPw, phone);
     if (result.status === 'duplicate') {
       res
-        .status(404)
+        .status(400)
         .json({
           status: 'error',
           data: {
@@ -1669,7 +1682,7 @@ const updatePw = async (req: Request, res: Response):Promise<any> => {
     }
     if (result.status === 'error') {
       res
-        .status(404)
+        .status(400)
         .json({
           status: 'error',
           data: {
