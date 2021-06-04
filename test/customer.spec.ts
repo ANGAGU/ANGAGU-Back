@@ -39,6 +39,16 @@ describe('customer test', () => {
     expect(res.status).to.equal(403);
   });
 
+  it('post cart db test', async () => {
+    const result = await service.postCart(0, 0);
+    expect(result.status).to.equal('success');
+  });
+
+  it('post cart api test', async () => {
+    const res = await chai.request(server).post('/customer/cart').send();
+    expect(res.status).to.equal(403);
+  });
+
   it('get address db test', async () => {
     const result = await service.getAddress(0);
     expect(result.status).to.equal('success');
