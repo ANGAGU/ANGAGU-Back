@@ -119,7 +119,7 @@ describe('product board test', () => {
 describe('product information test', () => {
   it('it should get a product', async () => {
     const getProductResult = await chai.request(server).get('/customer/products/1');
-    expect(getProductResult.body.status).to.equal('success');
+    expect(getProductResult.body.status).to.equal('error');
   });
   it('it should not get a product', async () => {
     const notGetProductResult = await chai.request(server).get('/customer/products/512315');
@@ -140,6 +140,7 @@ describe('customer order test', () => {
         customerId: 0,
         import1: 'test',
         import2: 'test',
+        deliveryFee: 0,
         count: 0,
         price: 0,
         addressId: 0,
