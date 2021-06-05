@@ -1190,7 +1190,7 @@ const postReview = async (req: Request, res: Response):Promise<any> => {
     const { id, type } = res.locals;
     const orderId = Number(req.params.orderId);
     const {
-      star, content, imageUrl,
+      star, content,
     } = req.body;
     if (type !== 'customer') {
       res
@@ -1246,7 +1246,7 @@ const postReview = async (req: Request, res: Response):Promise<any> => {
       return;
     }
     const { productId } = result.data;
-    const postResult = await service.postReview(orderId, id, productId, star, content, imageUrl);
+    const postResult = await service.postReview(orderId, id, productId, star, content);
     if (postResult.status !== 'success') {
       res
         .status(400)

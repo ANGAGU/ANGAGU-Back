@@ -385,12 +385,11 @@ const postReview = async (
   productId:number,
   star:number,
   content:string,
-  imageUrl:string,
 ):Promise<any> => {
   const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
-    const [result] = await conn.query('INSERT INTO review(product_id, customer_id, star, content, image_url) VALUES(?,?,?,?,?)', [productId, id, star, content, imageUrl]);
+    const [result] = await conn.query('INSERT INTO review(product_id, customer_id, star, content) VALUES(?,?,?,?)', [productId, id, star, content]);
     const data:any = result;
     const reviewId = data.insertId;
     const [result2] = await conn.query('UPDATE `order` SET review_id = ? WHERE id = ?', [reviewId, orderId]);
