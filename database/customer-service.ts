@@ -58,12 +58,14 @@ const getProductDetailById = async (productId: number): Promise<any> => {
     await conn.query('UPDATE product SET view_count = view_count+1 WHERE id = (?)', productId);
     const [result] = await conn.query('SELECT * FROM product WHERE id = (?)', productId);
     const [images] = await conn.query('SELECT image_url, image_order FROM product_image WHERE product_id = (?)', productId);
+    const [reviews] = await conn.query('SELECT r.*, c.`name` FROM review as r JOIN customer as c ON r.customer_id = c.id WHERE r.product_id = ?', productId);
     const data:any = result;
     await conn.commit();
     return {
       status: 'success',
       data: data[0],
       images,
+      reviews,
     };
   } catch (err) {
     await conn.rollback();

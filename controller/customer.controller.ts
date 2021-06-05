@@ -128,6 +128,7 @@ const productDetail = async (req: Request, res: Response):Promise<void> => {
     }
     const product:Product = result.data;
     const productImages:Array<ProductImage> = result.images;
+    const { reviews } = result;
     if (!product) {
       res
         .status(404)
@@ -142,6 +143,7 @@ const productDetail = async (req: Request, res: Response):Promise<void> => {
       return;
     }
     product.images = productImages;
+    product.reviews = reviews;
     res
       .status(200)
       .json({
