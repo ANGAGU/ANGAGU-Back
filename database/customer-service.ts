@@ -131,10 +131,41 @@ const postOrder = async (info:any): Promise<any> => {
       status: 'success',
     };
   } catch (err) {
-    console.log(err);
     return {
       status: 'error',
       err,
+    };
+  }
+};
+
+const getRefundInfoByOrder = async (orderId :number):Promise<DBresult> => {
+  const result:DBresult = {
+    status: 'error',
+    data: [],
+  };
+  try {
+    const [rows] = await pool.query('SELECT customer_id, refund_state FROM `order` WHERE id = ?', orderId);
+    result.status = 'success';
+    result.data = JSON.parse(JSON.stringify(rows));
+    return result;
+  } catch (err) {
+    result.status = 'error';
+    result.data = err;
+    return result;
+  }
+};
+
+const refund = async (orderId: number, text:any): Promise<any> => {
+  try {
+    const sql = 'UPDATE `order` SET refund_state = 1, refund_text = ? WHERE id = ?';
+    const [result]:any = await pool.query(sql, [text, orderId]);
+    return {
+      data: result,
+      status: 'success',
+    };
+  } catch (err) {
+    return {
+      status: 'error',
     };
   }
 };
@@ -665,6 +696,8 @@ export {
   getProductDetailById,
   getOrderList,
   postOrder,
+  getRefundInfoByOrder,
+  refund,
   getModelUrl,
   customerSignup,
   checkEmailDuplicate,
