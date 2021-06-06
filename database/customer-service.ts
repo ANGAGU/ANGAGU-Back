@@ -91,7 +91,9 @@ const getOrderList = async (customerId: number): Promise<any> => {
     addr.recipient,
     addr.road,
     addr.detail,
-    ord.review_id
+    ord.review_id,
+    ord.refund_state,
+    ord.refund_text
     FROM \`order\` as ord 
     JOIN product as prd on prd.id = ord.product_id 
     JOIN address as addr on addr.id = ord.address_id
