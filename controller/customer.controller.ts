@@ -1745,7 +1745,7 @@ const checkPw = async (req:Request, res: Response):Promise<void> => {
 const updateInfo = async (req:Request, res:Response):Promise<void> => {
   try {
     const { id, type } = res.locals;
-    const { newPw } = req.body;
+    const { oldPw, newPw } = req.body;
     const saltRounds = 10;
     if (type !== 'customer') {
       res
@@ -1756,6 +1756,33 @@ const updateInfo = async (req:Request, res:Response):Promise<void> => {
             errCode: 200,
           },
           message: errCode[200],
+        })
+        .end();
+      return;
+    }
+    const customerPw = await service.getCustomerPwById(id);
+    if (customerPw.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+    if (!await bcrypt.compare(oldPw, customerPw.data.password)) {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 405,
+          },
+          message: errCode[405],
         })
         .end();
       return;
