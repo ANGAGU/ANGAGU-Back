@@ -43,6 +43,16 @@ describe('company test', () => {
     const res = await chai.request(server).post('/company/info/business').send();
     expect(res.status).to.equal(403);
   });
+
+  it('refund db test', async () => {
+    const result = await service.refund(1, {});
+    expect(result.status).to.equal('success');
+  });
+
+  it('refund api test', async () => {
+    const res = await chai.request(server).get('/company/refund/1').send();
+    expect(res.status).to.equal(403);
+  });
 });
 
 describe('company products test', () => {
@@ -108,6 +118,17 @@ describe('company order test', () => {
 
   it('put delivery number test', async () => {
     const result = await service.addDeliveryNumber(1, 1, '1111');
+    expect(result.status).to.equal('success');
+  });
+});
+
+describe('product board test', () => {
+  it('get product board', async () => {
+    const result = await service.getBoard(1);
+    expect(result.status).to.equal('success');
+  });
+  it('post product board', async () => {
+    const result = await service.postBoard(1, 'test');
     expect(result.status).to.equal('success');
   });
 });

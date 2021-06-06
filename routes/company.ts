@@ -31,10 +31,14 @@ router.post('/info', auth.authorization, controller.updateInfo);
 
 router.get('/order', auth.authorization, controller.getOrder);
 router.put('/order', auth.authorization, controller.addDeliveryNumber);
+router.get('/refund/:orderId', auth.authorization, controller.refund);
 
 router.post('/find/code', controller.reqVerifyCode);
 router.get('/find/id', controller.findId);
 router.get('/find/pw', controller.findPw);
 router.post('/find/verification', controller.conVerifyCode);
 router.put('/find/pw', controller.updatePw);
+
+router.get('/board', auth.authorization, controller.getBoard);
+router.post('/board/:boardId', auth.authorization, controller.postBoard);
 export default router;
