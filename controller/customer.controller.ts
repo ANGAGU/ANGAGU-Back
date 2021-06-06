@@ -306,6 +306,100 @@ const postOrder = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+const refund = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+
+    if (type !== 'customer') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+
+    const { orderId } = req.params;
+    const result = await service.getRefundInfoByOrder(Number(orderId));
+    if (result.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+
+    if (result.data.length === 1) {
+      const data:any = result.data[0];
+      if (data.customer_id !== id) {
+        res.status(403).json({
+          status: 'error',
+          data: {
+            errCode: 508,
+          },
+          message: errCode[508],
+        }).end();
+        return;
+      }
+      if (data.refund_state !== 0) {
+        res.status(403).json({
+          status: 'error',
+          data: {
+            errCode: 510,
+          },
+          message: errCode[510],
+        }).end();
+        return;
+      }
+    } else {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 509,
+          },
+          message: errCode[509],
+        })
+        .end();
+      return;
+    }
+
+    const { text } = req.body;
+    const refundResult = await service.refund(Number(orderId), text);
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: refundResult.data,
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+          err,
+        },
+        message: errCode[0],
+      })
+      .end();
+  }
+};
+
 const modelUrl = async (req: Request, res: Response): Promise<void> => {
   try {
     const productId = Number(req.params.productId);
@@ -2303,6 +2397,7 @@ export {
   productDetail,
   orderList,
   postOrder,
+  refund,
   modelUrl,
   signup,
   reqVerifyCode,
