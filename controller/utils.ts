@@ -17,6 +17,17 @@ export interface ProductImage {
   imageOrder: number,
 }
 
+export interface Review {
+  id: number,
+  productId: number,
+  customerId: number,
+  star: number,
+  content: string,
+  createTime: Date,
+  updateTime: Date,
+  customerName: string,
+}
+
 export interface Product {
   id: number,
   companyId: number,
@@ -35,6 +46,7 @@ export interface Product {
   createTime: Date,
   updateTime: Date,
   images: Array<ProductImage>,
+  reviews: Array<Review>,
 }
 
 function jwtSignUser(user:User):string {

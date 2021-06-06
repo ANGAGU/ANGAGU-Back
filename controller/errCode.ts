@@ -28,4 +28,10 @@ export default {
   503: 'cannot find address',
   504: 'permission deny cart',
   505: 'cannot find cart',
+  506: 'permission deny board',
+  507: 'cannot find board',
+  604: 'no purchase history',
+  605: 'already reviewed product',
+  606: 'not matched review',
+  607: 'review not exist',
 };

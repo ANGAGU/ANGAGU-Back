@@ -128,6 +128,7 @@ const productDetail = async (req: Request, res: Response):Promise<void> => {
     }
     const product:Product = result.data;
     const productImages:Array<ProductImage> = result.images;
+    const { reviews } = result;
     if (!product) {
       res
         .status(404)
@@ -142,6 +143,7 @@ const productDetail = async (req: Request, res: Response):Promise<void> => {
       return;
     }
     product.images = productImages;
+    product.reviews = reviews;
     res
       .status(200)
       .json({
@@ -1185,6 +1187,97 @@ const postProductBoard = async (req: Request, res: Response):Promise<void> => {
       .end();
   }
 };
+
+const deleteBoard = async (req: Request, res: Response):Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+    if (type !== 'customer') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+    const boardId = Number(req.params.boardId);
+
+    const result = await service.getCustomerByBoard(boardId);
+    if (result.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    } if (result.data.length === 1) {
+      const customer:any = result.data[0];
+      if (customer.customer_id !== id) {
+        res.status(403).json({
+          status: 'error',
+          data: {
+            errCode: 506,
+          },
+          message: errCode[506],
+        }).end();
+        return;
+      }
+    } else {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 507,
+          },
+          message: errCode[507],
+        })
+        .end();
+      return;
+    }
+
+    const delResult = await service.deleteBoard(boardId);
+    if (delResult.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 303,
+          },
+          message: errCode[303],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: delResult.data,
+      })
+      .end();
+  } catch (err) {
+    res.status(500).json({
+      status: 'error',
+      data: {
+        errCode: 0,
+        data: err,
+      },
+      message: errCode[0],
+    });
+  }
+};
+
 const findId = async (req: Request, res: Response):Promise<any> => {
   try {
     const name = String(req.query.name);
@@ -1841,6 +1934,369 @@ const deleteCart = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+const postReview = async (req: Request, res: Response):Promise<any> => {
+  try {
+    const { id, type } = res.locals;
+    const orderId = Number(req.params.orderId);
+    const {
+      star, content,
+    } = req.body;
+    if (type !== 'customer') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+    const result = await service.getInfoByOrderId(orderId);
+    if (result.status !== 'success' || result.data.length === 0) {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+    if (result.data.customerId !== id) {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 604,
+          },
+          message: errCode[604],
+        })
+        .end();
+      return;
+    }
+    if (result.data.reviewId !== null) {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 605,
+          },
+          message: errCode[605],
+        })
+        .end();
+      return;
+    }
+    const { productId } = result.data;
+    const postResult = await service.postReview(orderId, id, productId, star, content);
+    if (postResult.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 301,
+          },
+          message: errCode[301],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: {
+          reviewId: postResult.data,
+        },
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+          err,
+        },
+        message: errCode[0],
+      })
+      .end();
+  }
+};
+
+const getReview = async (req: Request, res: Response):Promise<any> => {
+  try {
+    const { id, type } = res.locals;
+    const reviewId = Number(req.params.reviewId);
+    if (type !== 'customer') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+    const getResult = await service.getReview(reviewId, id);
+    if (getResult.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: {
+          id: getResult.data[0].id,
+          productId: getResult.data[0].product_id,
+          customerId: getResult.data[0].customer_id,
+          star: getResult.data[0].star,
+          content: getResult.data[0].content,
+          imageUrl: getResult.data[0].image_url,
+          createTime: getResult.data[0].create_time,
+          updateTime: getResult.data[0].update_time,
+        },
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+          err,
+        },
+        message: errCode[0],
+      })
+      .end();
+  }
+};
+
+const deleteReview = async (req:Request, res:Response):Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+    const orderId = Number(req.params.orderId);
+    const reviewId = Number(req.params.reviewId);
+    if (type !== 'customer') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+    const orderInfo = await service.getInfoByOrderId(orderId);
+    if (orderInfo.status !== 'success' || orderInfo.data.length === 0) {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+    if (orderInfo.data.customerId !== id) {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 604,
+          },
+          message: errCode[604],
+        })
+        .end();
+      return;
+    }
+    if (orderInfo.data.reviewId === null) {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 607,
+          },
+          message: errCode[607],
+        })
+        .end();
+      return;
+    }
+    if (orderInfo.data.reviewId !== reviewId) {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 606,
+          },
+          message: errCode[606],
+        })
+        .end();
+      return;
+    }
+    const result = await service.deleteReview(orderId, reviewId, id);
+    if (result.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 303,
+          },
+          message: errCode[303],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: {},
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+          err,
+        },
+        message: errCode[0],
+      })
+      .end();
+  }
+};
+
+const updateReview = async (req:Request, res:Response):Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+    const { star, content } = req.body;
+    const orderId = Number(req.params.orderId);
+    const reviewId = Number(req.params.reviewId);
+    if (type !== 'customer') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+    const orderInfo = await service.getInfoByOrderId(orderId);
+    if (orderInfo.status !== 'success' || orderInfo.data.length === 0) {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+    if (orderInfo.data.customerId !== id) {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 604,
+          },
+          message: errCode[604],
+        })
+        .end();
+      return;
+    }
+    if (orderInfo.data.reviewId !== reviewId) {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 606,
+          },
+          message: errCode[606],
+        })
+        .end();
+      return;
+    }
+    const result = await service.updateReview(Number(star), content, reviewId, id);
+    if (result.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 303,
+          },
+          message: errCode[303],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: {},
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+          err,
+        },
+        message: errCode[0],
+      })
+      .end();
+  }
+};
+
 export {
   login,
   products,
@@ -1860,6 +2316,7 @@ export {
   getDefaultAddress,
   getProductBoard,
   postProductBoard,
+  deleteBoard,
   findId,
   findPw,
   updatePw,
@@ -1869,4 +2326,8 @@ export {
   getCart,
   postCart,
   deleteCart,
+  postReview,
+  getReview,
+  deleteReview,
+  updateReview,
 };
