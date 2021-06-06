@@ -43,6 +43,16 @@ describe('company test', () => {
     const res = await chai.request(server).post('/company/info/business').send();
     expect(res.status).to.equal(403);
   });
+
+  it('refund db test', async () => {
+    const result = await service.refund(1, {});
+    expect(result.status).to.equal('success');
+  });
+
+  it('refund api test', async () => {
+    const res = await chai.request(server).get('/company/refund/1').send();
+    expect(res.status).to.equal(403);
+  });
 });
 
 describe('company products test', () => {
