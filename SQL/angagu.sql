@@ -270,6 +270,8 @@ CREATE TABLE `order` (
   `address_id` int NOT NULL,
   `delivery_number` varchar(45) DEFAULT NULL,
   `review_id` int DEFAULT NULL,
+  `refund_state` tinyint NOT NULL DEFAULT '0',
+  `refund_text` varchar(45) DEFAULT NULL,
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
@@ -351,38 +353,6 @@ LOCK TABLES `product_image` WRITE;
 /*!40000 ALTER TABLE `product_image` DISABLE KEYS */;
 INSERT INTO `product_image` VALUES (3,1,'product/productImages/04Nw4kwNZ',1,'2021-04-18 04:16:11','2021-04-18 04:16:11'),(4,1,'product/productImages/6sewGxPDeX',2,'2021-04-18 04:16:11','2021-04-18 04:16:11'),(5,1,'product/productImages/lawMdpfjl-',3,'2021-04-18 04:16:11','2021-04-18 04:16:11'),(8,4,'product/productImages/-pBiEHvO9P',2,'2021-04-18 13:03:49','2021-04-18 13:03:49'),(9,4,'product/productImages/oCwEsVhmFE',1,'2021-04-18 13:03:49','2021-04-18 13:03:49'),(10,5,'product/productImages/qJq6rntN-5',2,'2021-04-18 13:06:08','2021-04-18 13:06:08'),(11,5,'product/productImages/E0U-XtoiLz',1,'2021-04-18 13:06:08','2021-04-18 13:06:08'),(12,6,'product/productImages/8GXXPa0oKz',2,'2021-04-18 13:06:40','2021-04-18 13:06:40'),(13,6,'product/productImages/_Qinh4mloL',1,'2021-04-18 13:06:40','2021-04-18 13:06:40'),(14,1,'product/productImages/XH_u9UmNC',1,'2021-04-18 13:19:21','2021-04-18 13:19:21'),(15,1,'product/productImages/JmkKxfvsKp',3,'2021-04-18 13:19:21','2021-04-18 13:19:21'),(16,1,'product/productImages/I-948vpZw-',2,'2021-04-18 13:19:21','2021-04-18 13:19:21'),(23,51,'product/productImages/SVtdNCoS52',1,'2021-04-18 14:32:40','2021-04-18 14:32:40'),(24,52,'product/productImages/ep4Fh7aUmn',1,'2021-04-18 14:34:12','2021-04-18 14:34:12'),(25,52,'product/productImages/D7W9HVsXsS',2,'2021-04-18 14:34:12','2021-04-18 14:34:12'),(26,1,'product/productImages/sY620i0DK',1,'2021-04-18 14:42:19','2021-04-18 14:42:19'),(27,1,'product/productImages/WUKLfuMBMw',2,'2021-04-18 14:42:19','2021-04-18 14:42:19'),(28,1,'product/productImages/OT4TNDLJia',3,'2021-04-18 14:42:19','2021-04-18 14:42:19'),(29,54,'product/productImages/Kdj4A5AIuC',1,'2021-04-27 13:18:18','2021-04-27 13:18:18'),(30,54,'product/productImages/J_4OcoaARs',2,'2021-04-27 13:18:18','2021-04-27 13:18:18'),(31,55,'product/productImages/w1cRfZCjUK',1,'2021-04-27 13:20:54','2021-04-27 13:20:54'),(32,55,'product/productImages/QHPVvTGmkn',2,'2021-04-27 13:20:54','2021-04-27 13:20:54'),(33,56,'product/productImages/rjfWf1H7wc',1,'2021-04-27 13:40:03','2021-04-27 13:40:03'),(34,56,'product/productImages/rNFnZYk6Dd',2,'2021-04-27 13:40:03','2021-04-27 13:40:03'),(35,57,'product/productImages/1gebV9WeGr',1,'2021-04-27 13:48:34','2021-04-27 13:48:34'),(36,57,'product/productImages/-W_tPEdPjs',2,'2021-04-27 13:48:34','2021-04-27 13:48:34'),(37,58,'product/productImages/cg2idYtPy6',1,'2021-04-27 13:52:22','2021-04-27 13:52:22'),(38,58,'product/productImages/xAFOwPUcQc',2,'2021-04-27 13:52:22','2021-04-27 13:52:22'),(39,59,'product/productImages/tnLBWFhE_u',1,'2021-04-27 13:52:53','2021-04-27 13:52:53'),(40,59,'product/productImages/QjHfz_Ha8i',2,'2021-04-27 13:52:53','2021-04-27 13:52:53'),(43,61,'product/productImages/qj6Oye4qQ-',1,'2021-04-28 09:18:09','2021-04-28 09:18:09'),(44,61,'product/productImages/qxfBjdmGXk',2,'2021-04-28 09:18:09','2021-04-28 09:18:09'),(47,1,'product/productImages/wbZ7kmzIZ',1,'2021-04-28 10:01:03','2021-04-28 10:01:03'),(48,1,'product/productImages/8MHZ8x8viZ',2,'2021-04-28 10:01:03','2021-04-28 10:01:03'),(49,1,'product/productImages/35OmQM01PN',3,'2021-04-28 10:01:03','2021-04-28 10:01:03'),(50,60,'product/productImages/K0k17oh-i',1,'2021-04-28 10:01:25','2021-04-28 10:01:25'),(51,60,'product/productImages/uZztiHjVlr',2,'2021-04-28 10:01:25','2021-04-28 10:01:25'),(52,60,'product/productImages/cYEHwP0c62',3,'2021-04-28 10:01:25','2021-04-28 10:01:25'),(53,12345,'product/productImages/em0vE527i',1,'2021-04-28 10:01:30','2021-04-28 10:01:30'),(54,12345,'product/productImages/dHnNNcL-zf',2,'2021-04-28 10:01:30','2021-04-28 10:01:30'),(55,12345,'product/productImages/pmlYIsdmvD',3,'2021-04-28 10:01:30','2021-04-28 10:01:30');
 /*!40000 ALTER TABLE `product_image` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `refund`
---
-
-DROP TABLE IF EXISTS `refund`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `refund` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `customer_id` int NOT NULL,
-  `product_id` int NOT NULL,
-  `status` varchar(45) NOT NULL DEFAULT '진행전',
-  `refund_type` varchar(45) NOT NULL,
-  `reason` varchar(45) NOT NULL,
-  `content` varchar(500) NOT NULL,
-  `price` int NOT NULL,
-  `image_url` varchar(45) DEFAULT NULL,
-  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `refund`
---
-
-LOCK TABLES `refund` WRITE;
-/*!40000 ALTER TABLE `refund` DISABLE KEYS */;
-/*!40000 ALTER TABLE `refund` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
