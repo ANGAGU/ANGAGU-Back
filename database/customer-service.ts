@@ -384,7 +384,7 @@ const getProductBoard = async (productId: number): Promise<DBresult> => {
 const postProductBoard = async (id:number, productId: number, boardData:any): Promise<DBresult> => {
   try {
     const sql = 'INSERT INTO board(product_id, customer_id, title, content) VALUES(?,?,?,?)';
-    const [result] = await pool.query(sql, [id, productId, boardData.title, boardData.content]);
+    const [result] = await pool.query(sql, [productId, id, boardData.title, boardData.content]);
     const data:any = result;
     return {
       status: 'success',
