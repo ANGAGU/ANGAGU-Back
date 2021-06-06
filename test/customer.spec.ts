@@ -149,6 +149,13 @@ describe('customer order test', () => {
   });
 });
 
+describe('customer refund test', () => {
+  it('it should refund', async () => {
+    const refund = await service.refund(1, 'test');
+    expect(refund.status).to.equal('success');
+  });
+});
+
 describe('customer ar detail test', () => {
   it('it should get a 3d model s3 url', async () => {
     const modelUrl = await chai.request(server).get('/customer/products/1/ar');
