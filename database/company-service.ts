@@ -262,6 +262,50 @@ const getSaleProduct = async (id :number, month:string):Promise<DBresult> => {
   }
 };
 
+const getCompanyByOrder = async (orderId :number):Promise<DBresult> => {
+  const result:DBresult = {
+    status: 'error',
+    data: [],
+  };
+  try {
+    const [rows] = await pool.query('SELECT company_id, refund_state, price, create_time FROM `order` WHERE id = ?', orderId);
+    result.status = 'success';
+    result.data = JSON.parse(JSON.stringify(rows));
+    return result;
+  } catch (err) {
+    result.status = 'error';
+    result.data = err;
+    return result;
+  }
+};
+
+const refund = async (orderId :number, data:any):Promise<DBresult> => {
+  const result:DBresult = {
+    status: 'error',
+    data: [],
+  };
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+    const sql = 'UPDATE `order` SET refund_state = 2 WHERE id = ?';
+    const [rows] = await conn.query(sql, orderId);
+
+    const sql2 = 'UPDATE sale SET price = price - ? WHERE company_id = ? AND date = DATE_FORMAT(?, \'%y-%m-01\')';
+    const [rows2] = await conn.query(sql2, [data.price, data.company_id, data.create_time]);
+
+    await conn.commit();
+    result.status = 'success';
+    return result;
+  } catch (err) {
+    await conn.rollback();
+    result.status = 'error';
+    result.data = err;
+    return result;
+  } finally {
+    conn.release();
+  }
+};
+
 const addBusinessInfo = async (id :number, businessNumber:string):Promise<DBresult> => {
   const result:DBresult = {
     status: 'error',
@@ -549,6 +593,8 @@ export {
   addProductAr,
   getSale,
   getSaleProduct,
+  getCompanyByOrder,
+  refund,
   addBusinessInfo,
   checkEmailDuplicate,
   getInfo,
