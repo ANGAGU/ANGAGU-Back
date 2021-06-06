@@ -544,7 +544,8 @@ const updateInfo = async (newPw:string, id:number):Promise<any> => {
 
 const getCart = async (customerId: number): Promise<any> => {
   try {
-    const [result] = await pool.query('SELECT * FROM cart WHERE customer_id = (?)', customerId);
+    const sql = 'SELECT cart.*, product.name, product.price, product.thumb_url FROM angagu.cart join product on product.id = cart.product_id WHERE customer_id = (?)';
+    const [result] = await pool.query(sql, customerId);
     const data:any = result;
     return {
       data,
