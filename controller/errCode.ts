@@ -37,4 +37,5 @@ export default {
   605: 'already reviewed product',
   606: 'not matched review',
   607: 'review not exist',
+  608: 'not your review',
 };

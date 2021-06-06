@@ -658,10 +658,31 @@ const postReview = async (
     conn.release();
   }
 };
+const getReviewIdbyOrderId = async (orderId:number, customerId:number):Promise<any> => {
+  try {
+    const [result] = await pool.query('SELECT * FROM `order` WHERE id = ? AND customer_id = ?', [orderId, customerId]);
+    const data:any = result;
+    if (!data[0]) {
+      return {
+        status: 'error',
+        errCode: 608,
+      };
+    }
+    return {
+      status: 'success',
+      data: data[0].review_id,
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
 
 const getReview = async (reviewId:number, customerId:number):Promise<any> => {
   try {
-    const [result] = await pool.query('SELECT * FROM review WHERE id = ? AND customer_id', [reviewId, customerId]);
+    const [result] = await pool.query('SELECT * FROM review WHERE id = ? AND customer_id = ?', [reviewId, customerId]);
     const data:any = result;
     return {
       status: 'success',
@@ -760,4 +781,5 @@ export {
   getReview,
   deleteReview,
   updateReview,
+  getReviewIdbyOrderId,
 };

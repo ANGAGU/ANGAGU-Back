@@ -2157,7 +2157,7 @@ const postReview = async (req: Request, res: Response):Promise<any> => {
 const getReview = async (req: Request, res: Response):Promise<any> => {
   try {
     const { id, type } = res.locals;
-    const reviewId = Number(req.params.reviewId);
+    const orderId = Number(req.params.orderId);
     if (type !== 'customer') {
       res
         .status(403)
@@ -2167,6 +2167,47 @@ const getReview = async (req: Request, res: Response):Promise<any> => {
             errCode: 200,
           },
           message: errCode[200],
+        })
+        .end();
+      return;
+    }
+    const getReviewIdResult = await service.getReviewIdbyOrderId(orderId, id);
+    if (getReviewIdResult.status !== 'success') {
+      if (getReviewIdResult.errCode === 608) {
+        res
+          .status(400)
+          .json({
+            status: 'error',
+            data: {
+              errCode: 608,
+            },
+            message: errCode[608],
+          })
+          .end();
+        return;
+      }
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+    const reviewId = getReviewIdResult.data;
+    if (!reviewId) {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 607,
+          },
+          message: errCode[607],
         })
         .end();
       return;
@@ -2195,7 +2236,6 @@ const getReview = async (req: Request, res: Response):Promise<any> => {
           customerId: getResult.data[0].customer_id,
           star: getResult.data[0].star,
           content: getResult.data[0].content,
-          imageUrl: getResult.data[0].image_url,
           createTime: getResult.data[0].create_time,
           updateTime: getResult.data[0].update_time,
         },
