@@ -365,6 +365,38 @@ const postProductBoard = async (id:number, productId: number, boardData:any): Pr
   }
 };
 
+const getCustomerByBoard = async (id :number):Promise<DBresult> => {
+  const result:DBresult = {
+    status: 'error',
+    data: [],
+  };
+  try {
+    const [rows] = await pool.query('SELECT customer_id FROM board WHERE id = ?', id);
+    result.status = 'success';
+    result.data = JSON.parse(JSON.stringify(rows));
+    return result;
+  } catch (err) {
+    result.status = 'error';
+    result.data = err;
+    return result;
+  }
+};
+
+const deleteBoard = async (boardId: number): Promise<any> => {
+  try {
+    const [result] = await pool.query('DELETE FROM board WHERE id = (?)', boardId);
+    const data:any = result;
+    return {
+      data,
+      status: 'success',
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+    };
+  }
+};
+
 const getIdByNameAndPhone = async (name:string, phone: string):Promise<any> => {
   try {
     const [result] = await pool.query('SELECT email FROM customer WHERE name = ? AND phone_number = ?', [name, phone]);
@@ -675,6 +707,8 @@ export {
   getDefaultAddress,
   getProductBoard,
   postProductBoard,
+  getCustomerByBoard,
+  deleteBoard,
   getIdByNameAndPhone,
   updateNewPw,
   getUserByEmailNamePhone,

@@ -482,6 +482,58 @@ const getUserByEmailNamePhone = async (
     };
   }
 };
+
+const getBoard = async (id:number): Promise<any> => {
+  try {
+    const sql = 'select board.* from board join product on product.id = board.product_id where company_id = ?';
+    const [result] = await pool.query(sql, id);
+    const data:any = result;
+    return {
+      status: 'success',
+      data,
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
+
+const getCompanyByBoard = async (id :number):Promise<DBresult> => {
+  const result:DBresult = {
+    status: 'error',
+    data: [],
+  };
+  try {
+    const sql = 'select product.company_id from board join product on product.id = board.product_id where board.id = ?';
+    const [rows] = await pool.query(sql, id);
+    result.status = 'success';
+    result.data = JSON.parse(JSON.stringify(rows));
+    return result;
+  } catch (err) {
+    result.status = 'error';
+    result.data = err;
+    return result;
+  }
+};
+const postBoard = async (id:number, answer:string): Promise<any> => {
+  try {
+    const sql = 'UPDATE board SET answer = ?, answer_time = now() WHERE id = ?';
+    const [result] = await pool.query(sql, [answer, id]);
+    const data:any = result;
+    return {
+      status: 'success',
+      data,
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
+
 export {
   getCompanyByEmail,
   getProducts,
@@ -506,4 +558,7 @@ export {
   getIdByNameAndPhone,
   updateNewPw,
   getUserByEmailNamePhone,
+  getBoard,
+  postBoard,
+  getCompanyByBoard,
 };
