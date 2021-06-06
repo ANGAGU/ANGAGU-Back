@@ -10,7 +10,7 @@ router.get('/products/:productId', controller.productDetail);
 router.get('/order', auth.authorization, controller.orderList);
 router.post('/order', auth.authorization, controller.postOrder);
 router.post('/order/:orderId/review', auth.authorization, controller.postReview);
-router.get('/order/:orderId/review/:reviewId', auth.authorization, controller.getReview);
+router.get('/order/:orderId/review', auth.authorization, controller.getReview);
 router.delete('/order/:orderId/review/:reviewId', auth.authorization, controller.deleteReview);
 router.put('/order/:orderId/review/:reviewId', auth.authorization, controller.updateReview);
 router.get('/products/:productId/ar', controller.modelUrl);
