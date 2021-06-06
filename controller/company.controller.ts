@@ -1820,6 +1820,151 @@ const updatePw = async (req: Request, res: Response):Promise<any> => {
   }
 };
 
+const getBoard = async (req: Request, res: Response):Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+    if (type !== 'company') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+    const result = await service.getBoard(id);
+    if (result.status !== 'success') {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: result.data,
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+        },
+        message: errCode[0],
+      })
+      .end();
+  }
+};
+
+const postBoard = async (req: Request, res: Response):Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+    if (type !== 'company') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+
+    const { boardId } = req.params;
+    const result = await service.getCompanyByBoard(Number(boardId));
+    if (result.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+
+    if (result.data.length === 1) {
+      const company:any = result.data[0];
+      if (company.company_id !== id) {
+        res.status(403).json({
+          status: 'error',
+          data: {
+            errCode: 506,
+          },
+          message: errCode[506],
+        }).end();
+        return;
+      }
+    } else {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 507,
+          },
+          message: errCode[507],
+        })
+        .end();
+      return;
+    }
+
+    const { answer } = req.body;
+    const postResult = await service.postBoard(Number(boardId), answer);
+    if (postResult.status !== 'success') {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 304,
+          },
+          message: errCode[304],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: postResult.data[0],
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+        },
+        message: errCode[0],
+      })
+      .end();
+  }
+};
 export {
   login,
   products,
@@ -1844,4 +1989,6 @@ export {
   findId,
   findPw,
   updatePw,
+  getBoard,
+  postBoard,
 };

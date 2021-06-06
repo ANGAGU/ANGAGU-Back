@@ -38,4 +38,7 @@ router.get('/find/id', controller.findId);
 router.get('/find/pw', controller.findPw);
 router.post('/find/verification', controller.conVerifyCode);
 router.put('/find/pw', controller.updatePw);
+
+router.get('/board', auth.authorization, controller.getBoard);
+router.post('/board/:boardId', auth.authorization, controller.postBoard);
 export default router;

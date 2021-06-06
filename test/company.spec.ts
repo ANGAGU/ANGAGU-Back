@@ -121,3 +121,14 @@ describe('company order test', () => {
     expect(result.status).to.equal('success');
   });
 });
+
+describe('product board test', () => {
+  it('get product board', async () => {
+    const result = await service.getBoard(1);
+    expect(result.status).to.equal('success');
+  });
+  it('post product board', async () => {
+    const result = await service.postBoard(1, 'test');
+    expect(result.status).to.equal('success');
+  });
+});

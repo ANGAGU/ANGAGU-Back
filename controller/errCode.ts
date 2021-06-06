@@ -28,6 +28,8 @@ export default {
   503: 'cannot find address',
   504: 'permission deny cart',
   505: 'cannot find cart',
+  506: 'permission deny board',
+  507: 'cannot find board',
   508: 'permission deny order',
   509: 'cannot find order',
   510: 'cannot refund state',

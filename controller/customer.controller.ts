@@ -1281,6 +1281,97 @@ const postProductBoard = async (req: Request, res: Response):Promise<void> => {
       .end();
   }
 };
+
+const deleteBoard = async (req: Request, res: Response):Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+    if (type !== 'customer') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+    const boardId = Number(req.params.boardId);
+
+    const result = await service.getCustomerByBoard(boardId);
+    if (result.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    } if (result.data.length === 1) {
+      const customer:any = result.data[0];
+      if (customer.customer_id !== id) {
+        res.status(403).json({
+          status: 'error',
+          data: {
+            errCode: 506,
+          },
+          message: errCode[506],
+        }).end();
+        return;
+      }
+    } else {
+      res
+        .status(404)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 507,
+          },
+          message: errCode[507],
+        })
+        .end();
+      return;
+    }
+
+    const delResult = await service.deleteBoard(boardId);
+    if (delResult.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 303,
+          },
+          message: errCode[303],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: delResult.data,
+      })
+      .end();
+  } catch (err) {
+    res.status(500).json({
+      status: 'error',
+      data: {
+        errCode: 0,
+        data: err,
+      },
+      message: errCode[0],
+    });
+  }
+};
+
 const findId = async (req: Request, res: Response):Promise<any> => {
   try {
     const name = String(req.query.name);
@@ -2320,6 +2411,7 @@ export {
   getDefaultAddress,
   getProductBoard,
   postProductBoard,
+  deleteBoard,
   findId,
   findPw,
   updatePw,

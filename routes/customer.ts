@@ -25,6 +25,8 @@ router.post('/signup/email', controller.checkEmail);
 router.get('/products/:productId/board', controller.getProductBoard);
 router.post('/products/:productId/board', auth.authorization, controller.postProductBoard);
 
+router.delete('/board/:boardId', auth.authorization, controller.deleteBoard);
+
 router.get('/address', auth.authorization, controller.getAddress);
 router.post('/address', auth.authorization, controller.postAddress);
 router.delete('/address/:addressId', auth.authorization, controller.deleteAddress);

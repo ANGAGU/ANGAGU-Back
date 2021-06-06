@@ -71,32 +71,6 @@ INSERT INTO `admin` VALUES ('minjae','1234','2021-04-30 12:10:53','2021-04-30 12
 UNLOCK TABLES;
 
 --
--- Table structure for table `answer`
---
-
-DROP TABLE IF EXISTS `answer`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `answer` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `board_id` int NOT NULL,
-  `content` varchar(500) NOT NULL,
-  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `answer`
---
-
-LOCK TABLES `answer` WRITE;
-/*!40000 ALTER TABLE `answer` DISABLE KEYS */;
-/*!40000 ALTER TABLE `answer` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `board`
 --
 
@@ -107,6 +81,8 @@ CREATE TABLE `board` (
   `id` int NOT NULL AUTO_INCREMENT,
   `product_id` int NOT NULL,
   `customer_id` int NOT NULL,
+  `answer` varchar(500) DEFAULT NULL,
+  `answer_time` datetime DEFAULT NULL,
   `title` varchar(45) NOT NULL,
   `content` varchar(500) NOT NULL,
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
