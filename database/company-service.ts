@@ -529,7 +529,7 @@ const getUserByEmailNamePhone = async (
 
 const getBoard = async (id:number): Promise<any> => {
   try {
-    const sql = 'select board.*, customer.name as customer_name from board join product on product.id = board.product_id join customer on board.customer_id = customer.id where company_id = ?';
+    const sql = 'select board.*, customer.name as customer_name, product.name as product_name from board join product on product.id = board.product_id join customer on board.customer_id = customer.id where company_id = ?';
     const [result] = await pool.query(sql, id);
     const data:any = result;
     return {
