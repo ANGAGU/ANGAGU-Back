@@ -117,6 +117,69 @@ const products = async (req:Request, res:Response): Promise<void> => {
     });
   }
 };
+
+const getProductDetail = async (req: Request, res:Response): Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+    const productId = Number(req.params.productId);
+    if (type !== 'company') {
+      res.status(403).json({
+        status: 'error',
+        data: {
+          errCode: 200,
+        },
+        message: errCode[200],
+      });
+    }
+    const result = await service.getProductDetail(id, productId);
+    if (result.status !== 'success') {
+      if (result.errCode === 300) {
+        res
+          .status(400)
+          .json({
+            status: 'error',
+            data: {
+              errCode: 300,
+            },
+            message: errCode[300],
+          })
+          .end();
+        return;
+      }
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: result.data,
+      })
+      .end();
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        status: 'error',
+        data: {
+          errCode: 0,
+          data: err,
+        },
+        message: errCode[0],
+      })
+      .end();
+  }
+};
+
 const signup = async (req:Request, res:Response): Promise<void> => {
   try {
     const info = req.body;
@@ -264,6 +327,9 @@ const addProduct = async (req:Request, res:Response): Promise<void> => {
       inform.price,
       inform.stock,
       inform.delivery_charge,
+      inform.width,
+      inform.depth,
+      inform.height,
     );
     if (result.status !== 'success') {
       res
@@ -1970,6 +2036,7 @@ export {
   products,
   signup,
   addProduct,
+  getProductDetail,
   deleteProduct,
   updateProductDetail,
   addProductImage,
