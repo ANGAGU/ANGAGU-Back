@@ -34,6 +34,28 @@ const getProducts = async (id :number):Promise<DBresult> => {
   }
 };
 
+const getProductDetail = async (companyId:number, productId:number):Promise<any> => {
+  try {
+    const [result] = await pool.query('SELECT * FROM product WHERE company_id = ? AND id = ?', [companyId, productId]);
+    const resultData:any = result;
+    if (!resultData) {
+      return {
+        status: 'error',
+        errCode: 300,
+      };
+    }
+    return {
+      status: 'success',
+      data: resultData[0],
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
+
 const getCompanyByProduct = async (id :number):Promise<DBresult> => {
   const result:DBresult = {
     status: 'error',
@@ -63,15 +85,29 @@ const addProduct = async (
   price: number,
   stock: number,
   deliveryCharge: number,
+  width: number,
+  depth: number,
+  height: number,
 ): Promise<any> => {
   const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
 
-    const productInsertQeury = 'INSERT INTO product(company_id, description_url, thumb_url, description, name, price, stock, delivery_charge) VALUES(?,?,?,?,?,?,?,?)';
+    const productInsertQeury = 'INSERT INTO product(company_id, description_url, thumb_url, description, name, price, stock, delivery_charge, width, depth, height) VALUES(?,?,?,?,?,?,?,?,?,?,?)';
     const [result] = await conn.query(
       productInsertQeury,
-      [companyId, descriptionUrl, thumbUrl, description, name, price, stock, deliveryCharge],
+      [
+        companyId,
+        descriptionUrl,
+        thumbUrl,
+        description,
+        name, price,
+        stock,
+        deliveryCharge,
+        width,
+        depth,
+        height,
+      ],
     );
     const data:any = result;
 
@@ -581,6 +617,7 @@ const postBoard = async (id:number, answer:string): Promise<any> => {
 export {
   getCompanyByEmail,
   getProducts,
+  getProductDetail,
   getCompanyByProduct,
   companySignup,
   addProduct,

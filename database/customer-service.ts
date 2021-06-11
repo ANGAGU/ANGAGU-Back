@@ -6,7 +6,7 @@ const getCustomerByEmail = async (email:string):Promise<DBresult> => {
     data: [],
   };
   try {
-    const [rows] = await pool.query('SELECT id,email,password,birth,phone_number FROM customer WHERE email = ?', [email]);
+    const [rows] = await pool.query('SELECT id,name,email,password,birth,phone_number FROM customer WHERE email = ?', [email]);
     result.status = 'success';
     result.data = JSON.parse(JSON.stringify(rows));
     return result;
