@@ -497,6 +497,12 @@ const getProductOriginalAr = async (id:number):Promise<any> => {
   try {
     const [getResult] = await pool.query('SELECT main_path as mainUrl, texture_path as textureUrl FROM original_ar WHERE product_id = ?', id);
     const result:any = getResult;
+    if (result.length === 0) {
+      return {
+        status: 'error',
+        errCode: 900,
+      };
+    }
     const main = result[0].mainUrl;
     const textures = result.map((x:any) => x.textureUrl);
     const data = {
