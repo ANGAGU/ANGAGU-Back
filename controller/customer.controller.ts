@@ -254,7 +254,7 @@ const postOrder = async (req: Request, res: Response): Promise<void> => {
     }
 
     const data:any = productResult.data[0];
-    if (data.price * info.count !== info.price) {
+    if (data.price * info.count !== info.price || data.stock < info.count) {
       res
         .status(400)
         .json({

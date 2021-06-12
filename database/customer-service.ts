@@ -135,8 +135,8 @@ const postOrder = async (info:any): Promise<any> => {
       info.addressId,
       info.deliveryFee,
     ]);
-    const sql2 = 'UPDATE product SET stock=stock-1, sell_count=sell_count+1 where id=?;';
-    const [result2] = await conn.query(sql2, info.productId);
+    const sql2 = 'UPDATE product SET stock=stock-?, sell_count=sell_count+? where id=?;';
+    const [result2] = await conn.query(sql2, [info.count, info.count, info.productId]);
     await conn.commit();
     const data:any = result;
     return {
