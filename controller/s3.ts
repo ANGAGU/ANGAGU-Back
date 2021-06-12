@@ -18,9 +18,9 @@ export const imageStorage = multerS3({
     const id = Number(req.params.productId);
     const name = shortId.generate();
     if (file.fieldname === 'mainFile') {
-      cb(null, `product/${id}/ar/original/main/${name.toString()}`);
+      cb(null, `product/${id}/ar/original/main/${file.originalname}`);
     } else if (file.fieldname === 'textureFile') {
-      cb(null, `product/${id}/ar/original/texture/${name.toString()}`);
+      cb(null, `product/${id}/ar/original/texture/${file.originalname}`);
     } else if (file.fieldname === 'product_image') {
       cb(null, `product/productImages/${name.toString()}`);
     } else if (file.fieldname === 'desc_image') {
