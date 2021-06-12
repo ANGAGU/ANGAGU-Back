@@ -1090,7 +1090,7 @@ const getProductAr = async (req:Request, res:Response): Promise<void> => {
     if (getResult.status !== 'success') {
       if (getResult.errCode === 900) {
         res
-          .status(400)
+          .status(200)
           .json({
             status: 'error',
             data: {
