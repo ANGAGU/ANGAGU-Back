@@ -117,7 +117,7 @@ const postOrder = async (info:any): Promise<any> => {
   try {
     await conn.beginTransaction();
     const sql = 'INSERT INTO `order`(product_id, company_id,customer_id, import_1, import_2, count, price, address_id, delivery_fee) VALUES(?,?,?,?,?,?,?,?,?)';
-    const [result] = await pool.query(sql, [
+    const [result] = await conn.query(sql, [
       info.productId,
       info.companyId,
       info.customerId,
@@ -128,8 +128,8 @@ const postOrder = async (info:any): Promise<any> => {
       info.addressId,
       info.deliveryFee,
     ]);
-    const sql2 = 'UPDATE product SET stock=stock-1 where id=?;';
-    const [result2] = await pool.query(sql, info.productId);
+    const sql2 = 'UPDATE product SET stock=stock-1, sell_count=sell_count+1 where id=?;';
+    const [result2] = await conn.query(sql2, info.productId);
     await conn.commit();
     const data:any = result;
     return {
