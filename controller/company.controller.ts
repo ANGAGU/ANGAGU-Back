@@ -903,7 +903,19 @@ const addProductAr = async (req:Request, res:Response): Promise<void> => {
     const { id, type } = res.locals;
     const productId = Number(req.params.productId);
     const fileList:any = req.files;
-
+    if (type !== 'company') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
     if (!fileList) {
       res
         .status(400)
@@ -937,19 +949,6 @@ const addProductAr = async (req:Request, res:Response): Promise<void> => {
     let textureUrl:any = [];
     if (textureFile) {
       textureUrl = textureFile.map((file:any) => file.key);
-    }
-    if (type !== 'company') {
-      res
-        .status(403)
-        .json({
-          status: 'error',
-          data: {
-            errCode: 200,
-          },
-          message: errCode[200],
-        })
-        .end();
-      return;
     }
 
     const result = await service.getCompanyByProduct(productId);
@@ -1016,6 +1015,96 @@ const addProductAr = async (req:Request, res:Response): Promise<void> => {
           mainUrl: mainFile[0].key,
           textureUrl,
         },
+      })
+      .end();
+  } catch (err) {
+    res.status(500).json({
+      status: 'error',
+      data: {
+        errCode: 0,
+        data: err,
+      },
+      message: errCode[0],
+    });
+  }
+};
+
+const getProductAr = async (req:Request, res:Response): Promise<void> => {
+  try {
+    const { id, type } = res.locals;
+    const productId = Number(req.params.productId);
+    if (type !== 'company') {
+      res
+        .status(403)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 200,
+          },
+          message: errCode[200],
+        })
+        .end();
+      return;
+    }
+    const result = await service.getCompanyByProduct(productId);
+    if (result.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+
+    if (result.data.length === 1) {
+      const company:any = result.data[0];
+      if (company.company_id !== id) {
+        res.status(403).json({
+          status: 'error',
+          data: {
+            errCode: 500,
+          },
+          message: errCode[500],
+        }).end();
+        return;
+      }
+    } else {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 300,
+          },
+          message: errCode[300],
+        })
+        .end();
+      return;
+    }
+    const getResult = await service.getProductOriginalAr(productId);
+    if (getResult.status !== 'success') {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 100,
+          },
+          message: errCode[100],
+        })
+        .end();
+      return;
+    }
+    res
+      .status(200)
+      .json({
+        status: 'success',
+        data: getResult.data,
       })
       .end();
   } catch (err) {
@@ -2064,6 +2153,7 @@ export {
   addProductImage,
   deleteProductImage,
   addProductAr,
+  getProductAr,
   sale,
   saleProduct,
   addBusinessInfo,

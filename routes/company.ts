@@ -17,6 +17,7 @@ router.put('/products/:productId', auth.authorization, upload.fileUpload, contro
 router.post('/products/:productId/image', auth.authorization, upload.fileUpload, controller.addProductImage);
 router.delete('/products/:productId/image', auth.authorization, controller.deleteProductImage);
 
+router.get('/products/:productId/ar', auth.authorization, controller.getProductAr);
 router.post('/products/:productId/ar', auth.authorization, upload.fileUpload, controller.addProductAr);
 
 router.get('/sale', auth.authorization, controller.sale);
