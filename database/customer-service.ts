@@ -23,7 +23,8 @@ const getProducts = async ():Promise<DBresult> => {
     data: [],
   };
   try {
-    const [rows] = await pool.query('SELECT * FROM product');
+    const sql = 'select product.* from product join company on product.company_id = company.id where company.is_approve = 1';
+    const [rows] = await pool.query(sql);
     result.status = 'success';
     result.data = JSON.parse(JSON.stringify(rows));
     return result;
