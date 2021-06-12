@@ -467,7 +467,7 @@ const addProductAr = async (
   const conn = await pool.getConnection();
   try {
     conn.beginTransaction();
-    await conn.query('TRUNCATE TABLE original_ar');
+    await conn.query('DELETE FROM original_ar WHERE product_id = ?', id);
     const addArQuery = 'INSERT INTO original_ar(product_id, main_path, texture_path) VALUES ?';
     const values:any = [];
     if (textureUrl.length > 0) {
