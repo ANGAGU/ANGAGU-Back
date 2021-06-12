@@ -242,7 +242,7 @@ const updateProductDetail = async (
   const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
-    const sql1 = 'UPDATE PRODUCT SET ';
+    const sql1 = 'UPDATE product SET ';
     const sql2 = conn.escape(Object.keys(detail).map((key) => `${key} = ?`).join(', '));
     const sql3 = ' WHERE id = ?';
     const sql = sql1 + sql2.replace(/['']+/g, '') + sql3;
