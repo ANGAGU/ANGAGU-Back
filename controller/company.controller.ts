@@ -992,22 +992,6 @@ const addProductAr = async (req:Request, res:Response): Promise<void> => {
       return;
     }
 
-    const addResult = await service.addProductAr(productId, mainFile[0].key, textureUrl);
-
-    if (addResult.status !== 'success') {
-      res
-        .status(400)
-        .json({
-          status: 'error',
-          data: {
-            errCode: 301,
-          },
-          message: errCode[301],
-        })
-        .end();
-      return;
-    }
-
     res.status(200)
       .json({
         status: 'success',
