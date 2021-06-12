@@ -470,11 +470,17 @@ const addProductAr = async (
     await conn.query('TRUNCATE TABLE original_ar');
     const addArQuery = 'INSERT INTO original_ar(product_id, main_path, texture_path) VALUES ?';
     const values:any = [];
-    textureUrl.forEach((texturePath:any) => {
+    if (textureUrl.length > 0) {
+      textureUrl.forEach((texturePath:any) => {
+        const value:any = [];
+        value.push(id, originalUrl, texturePath);
+        values.push(value);
+      });
+    } else {
       const value:any = [];
-      value.push(id, originalUrl, texturePath);
+      value.push(id, originalUrl, null);
       values.push(value);
-    });
+    }
     await conn.query(addArQuery, [values]);
     await conn.commit();
     result.status = 'success';

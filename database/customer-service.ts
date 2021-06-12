@@ -23,7 +23,15 @@ const getProducts = async ():Promise<DBresult> => {
     data: [],
   };
   try {
-    const [rows] = await pool.query('SELECT * FROM product');
+    const sql = `select pr.*, count(rv.star) as review_count, avg(CAST(rv.star as Float)) as average_star 
+                from angagu.product as pr 
+                join angagu.company as cp
+                on pr.company_id = cp.id
+                join angagu.review as rv
+                on pr.id = rv.product_id
+                where cp.is_approve = 1
+                group by pr.id;`;
+    const [rows] = await pool.query(sql);
     result.status = 'success';
     result.data = JSON.parse(JSON.stringify(rows));
     return result;
@@ -112,9 +120,11 @@ const getOrderList = async (customerId: number): Promise<any> => {
 };
 
 const postOrder = async (info:any): Promise<any> => {
+  const conn = await pool.getConnection();
   try {
+    await conn.beginTransaction();
     const sql = 'INSERT INTO `order`(product_id, company_id,customer_id, import_1, import_2, count, price, address_id, delivery_fee) VALUES(?,?,?,?,?,?,?,?,?)';
-    const [result] = await pool.query(sql, [
+    const [result] = await conn.query(sql, [
       info.productId,
       info.companyId,
       info.customerId,
@@ -125,16 +135,22 @@ const postOrder = async (info:any): Promise<any> => {
       info.addressId,
       info.deliveryFee,
     ]);
+    const sql2 = 'UPDATE product SET stock=stock-?, sell_count=sell_count+? where id=?;';
+    const [result2] = await conn.query(sql2, [info.count, info.count, info.productId]);
+    await conn.commit();
     const data:any = result;
     return {
       data,
       status: 'success',
     };
   } catch (err) {
+    await conn.rollback();
     return {
       status: 'error',
-      err,
+      data: err,
     };
+  } finally {
+    conn.release();
   }
 };
 
