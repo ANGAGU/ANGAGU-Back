@@ -493,6 +493,28 @@ const addProductAr = async (
   }
 };
 
+const getProductOriginalAr = async (id:number):Promise<any> => {
+  try {
+    const [getResult] = await pool.query('SELECT main_path as mainUrl, texture_path as textureUrl FROM original_ar WHERE product_id = ?', id);
+    const result:any = getResult;
+    const main = result[0].mainUrl;
+    const textures = result.map((x:any) => x.textureUrl);
+    const data = {
+      mainUrl: main,
+      textureUrl: textures,
+    };
+    return {
+      status: 'success',
+      data,
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
+
 const getOrder = async (id:number): Promise<any> => {
   try {
     const [result] = await pool.query('SELECT ord.*, ct.name as customer_name, pd.name as product_name FROM angagu.`order` as ord JOIN angagu.customer as ct ON ord.customer_id = ct.id JOIN angagu.product as pd ON ord.product_id = pd.id WHERE ord.company_id = ?', id);
@@ -651,6 +673,7 @@ export {
   getOtherImageKeys,
   addProductImage,
   addProductAr,
+  getProductOriginalAr,
   getSale,
   getSaleProduct,
   getCompanyByOrder,
