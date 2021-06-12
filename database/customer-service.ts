@@ -113,7 +113,9 @@ const getOrderList = async (customerId: number): Promise<any> => {
 };
 
 const postOrder = async (info:any): Promise<any> => {
+  const conn = await pool.getConnection();
   try {
+    await conn.beginTransaction();
     const sql = 'INSERT INTO `order`(product_id, company_id,customer_id, import_1, import_2, count, price, address_id, delivery_fee) VALUES(?,?,?,?,?,?,?,?,?)';
     const [result] = await pool.query(sql, [
       info.productId,
@@ -126,16 +128,22 @@ const postOrder = async (info:any): Promise<any> => {
       info.addressId,
       info.deliveryFee,
     ]);
+    const sql2 = 'UPDATE product SET stock=stock-1 where id=?;';
+    const [result2] = await pool.query(sql, info.productId);
+    await conn.commit();
     const data:any = result;
     return {
       data,
       status: 'success',
     };
   } catch (err) {
+    await conn.rollback();
     return {
       status: 'error',
-      err,
+      data: err,
     };
+  } finally {
+    conn.release();
   }
 };
 
