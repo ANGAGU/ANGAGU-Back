@@ -1088,6 +1088,19 @@ const getProductAr = async (req:Request, res:Response): Promise<void> => {
     }
     const getResult = await service.getProductOriginalAr(productId);
     if (getResult.status !== 'success') {
+      if (getResult.errCode === 900) {
+        res
+          .status(400)
+          .json({
+            status: 'error',
+            data: {
+              errCode: 900,
+            },
+            message: errCode[900],
+          })
+          .end();
+        return;
+      }
       res
         .status(400)
         .json({

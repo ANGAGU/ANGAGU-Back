@@ -38,4 +38,5 @@ export default {
   606: 'not matched review',
   607: 'review not exist',
   608: 'not your review',
+  900: 'cannot find model',
 };
