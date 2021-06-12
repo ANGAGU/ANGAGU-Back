@@ -455,44 +455,6 @@ const updateInfo = async (id:number, detail:any): Promise<any> => {
   }
 };
 
-const addProductAr = async (
-  id:number,
-  originalUrl:string,
-  textureUrl:Array<string>,
-): Promise<any> => {
-  const result:DBresult = {
-    status: 'error',
-    data: [],
-  };
-  const conn = await pool.getConnection();
-  try {
-    conn.beginTransaction();
-    await conn.query('TRUNCATE TABLE original_ar');
-    const addArQuery = 'INSERT INTO original_ar(product_id, main_path, texture_path) VALUES ?';
-    const values:any = [];
-    if (textureUrl.length > 0) {
-      textureUrl.forEach((texturePath:any) => {
-        const value:any = [];
-        value.push(id, originalUrl, texturePath);
-        values.push(value);
-      });
-    } else {
-      const value:any = [];
-      value.push(id, originalUrl, null);
-      values.push(value);
-    }
-    await conn.query(addArQuery, [values]);
-    await conn.commit();
-    result.status = 'success';
-    return result;
-  } catch (err) {
-    await conn.rollback();
-    return result;
-  } finally {
-    conn.release();
-  }
-};
-
 const getProductOriginalAr = async (id:number):Promise<any> => {
   try {
     const [getResult] = await pool.query('SELECT main_path as mainUrl, texture_path as textureUrl FROM original_ar WHERE product_id = ?', id);
@@ -678,7 +640,6 @@ export {
   getProductImageKeys,
   getOtherImageKeys,
   addProductImage,
-  addProductAr,
   getProductOriginalAr,
   getSale,
   getSaleProduct,
