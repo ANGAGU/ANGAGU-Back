@@ -902,8 +902,42 @@ const addProductAr = async (req:Request, res:Response): Promise<void> => {
   try {
     const { id, type } = res.locals;
     const productId = Number(req.params.productId);
-    const fileList: any = req.files;
+    const fileList:any = req.files;
 
+    if (!fileList) {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 302,
+          },
+          message: errCode[302],
+        })
+        .end();
+      return;
+    }
+
+    const { mainFile, textureFile } = fileList;
+
+    if (!mainFile) {
+      res
+        .status(400)
+        .json({
+          status: 'error',
+          data: {
+            errCode: 302,
+          },
+          message: errCode[302],
+        })
+        .end();
+      return;
+    }
+
+    let textureUrl:any = [];
+    if (textureFile) {
+      textureUrl = textureFile.map((file:any) => file.key);
+    }
     if (type !== 'company') {
       res
         .status(403)
@@ -959,21 +993,8 @@ const addProductAr = async (req:Request, res:Response): Promise<void> => {
       return;
     }
 
-    if (!fileList.product_ar) {
-      res
-        .status(400)
-        .json({
-          status: 'error',
-          data: {
-            errCode: 302,
-          },
-          message: errCode[302],
-        })
-        .end();
-      return;
-    }
+    const addResult = await service.addProductAr(productId, mainFile[0].key, textureUrl);
 
-    const addResult = await service.addProductAr(productId, fileList.product_ar[0].key);
     if (addResult.status !== 'success') {
       res
         .status(400)
@@ -992,7 +1013,8 @@ const addProductAr = async (req:Request, res:Response): Promise<void> => {
       .json({
         status: 'success',
         data: {
-          url: fileList.product_ar[0].key,
+          mainUrl: mainFile[0].key,
+          textureUrl,
         },
       })
       .end();
