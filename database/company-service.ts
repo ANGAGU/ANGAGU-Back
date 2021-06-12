@@ -455,18 +455,35 @@ const updateInfo = async (id:number, detail:any): Promise<any> => {
   }
 };
 
-const addProductAr = async (id:number, url:string): Promise<any> => {
+const addProductAr = async (
+  id:number,
+  originalUrl:string,
+  textureUrl:Array<string>,
+): Promise<any> => {
   const result:DBresult = {
     status: 'error',
     data: [],
   };
+  const conn = await pool.getConnection();
   try {
-    const addArQuery = 'UPDATE product SET 3d_model_url = ? where id = ?';
-    await pool.query(addArQuery, [url, id]);
+    conn.beginTransaction();
+    await conn.query('TRUNCATE TABLE original_ar');
+    const addArQuery = 'INSERT INTO original_ar(product_id, main_path, texture_path) VALUES ?';
+    const values:any = [];
+    textureUrl.forEach((texturePath:any) => {
+      const value:any = [];
+      value.push(id, originalUrl, texturePath);
+      values.push(value);
+    });
+    await conn.query(addArQuery, [values]);
+    await conn.commit();
     result.status = 'success';
     return result;
   } catch (err) {
+    await conn.rollback();
     return result;
+  } finally {
+    conn.release();
   }
 };
 
