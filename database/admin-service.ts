@@ -110,6 +110,37 @@ const getSaleCompany = async (month:string):Promise<any> => {
   }
 };
 
+const getApprove = async ():Promise<any> => {
+  try {
+    const sql = 'SELECT * FROM company WHERE business_number is not NULL AND is_approve = 0';
+    const [result] = await pool.query(sql);
+    return {
+      status: 'success',
+      data: result,
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
+
+const postApprove = async (companyId:number):Promise<any> => {
+  try {
+    const sql = 'UPDATE company SET is_approve = 1 WHERE id = ?';
+    const [getSaleResult] = await pool.query(sql, companyId);
+    return {
+      status: 'success',
+      data: getSaleResult,
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      data: err,
+    };
+  }
+};
 export {
   getApproveProductList,
   approveProduct,
@@ -118,4 +149,6 @@ export {
   getCompanyList,
   get6monthSale,
   getSaleCompany,
+  getApprove,
+  postApprove,
 };
