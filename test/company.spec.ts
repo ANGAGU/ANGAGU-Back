@@ -69,11 +69,6 @@ describe('company products test', () => {
     const result = await service.getCompanyByProduct(0);
     expect(result.status).to.equal('success');
   });
-
-  it('update 3d model product db test', async () => {
-    const result = await service.addProductAr(0, 'test');
-    expect(result.status).to.equal('success');
-  });
 });
 
 describe('company signup test', () => {
