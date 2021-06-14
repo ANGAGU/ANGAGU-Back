@@ -27,7 +27,7 @@ const getProducts = async ():Promise<DBresult> => {
                 from angagu.product as pr 
                 join angagu.company as cp
                 on pr.company_id = cp.id
-                join angagu.review as rv
+                left join angagu.review as rv
                 on pr.id = rv.product_id
                 where cp.is_approve = 1
                 group by pr.id;`;
